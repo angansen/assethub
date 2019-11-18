@@ -1,0 +1,43 @@
+var express = require('express');
+var router = express.Router();
+const getDb=require('../database/db').getDb;
+const oracledb =require('oracledb');
+
+/* GET home page. */
+router.post('/', function(req, res, next) {
+  const connection=getDb();
+  const name=req.body.name;
+  console.log(name)
+  const password=req.body.password;
+  connection.transaction([
+    function firstAction() {
+      return connection.insert('INSERT into test_user values(:NAME,:PASSWORD)',
+      [name,password],
+      {
+        autocommit:true,
+        outFormat:oracledb.Object
+      }).then(res=>{
+        console.log('1st insert')
+      }).catch(err=>{
+        console.log("Cant execute")
+      })//return a promise
+    },
+    function secondAction() {
+      return connection.insert('INSERT into test_user_details values(:NAME,:AGE,:HOBBY)',
+      [name,24,'Football'],
+      {
+        autocommit:true,
+        outFormat:oracledb.Object
+      }).then(res=>{
+        console.log('2st insert')
+      })//return a promise
+    }], {
+    sequence: true
+  }).then(function onTransactionResults(output) {
+    //continue flow...
+    console.log(output);
+  });
+  res.end();
+});
+
+module.exports = router;

@@ -1,0 +1,240 @@
+const getDb=require('../database/db').getDb;
+var uniqid = require('uniqid');
+const oracledb =require('oracledb');
+const path=require('path');
+
+const getAssetsById=(assetId)=>{
+    const connection=getDb();
+    return connection.query(`SELECT * from ASSET_DETAILS where ASSET_ID=:ASSET_ID`,[assetId],
+    {
+        outFormat:oracledb.OBJECT
+    })
+}   
+
+const getLinksById=(assetId)=>{
+    const connection=getDb();
+     return connection.query(`SELECT * from ASSET_LINKS where ASSET_ID=:ASSET_ID`,[assetId],
+    {
+        outFormat:oracledb.OBJECT
+    })
+}
+
+const getImagesById=(assetId)=>{
+    const connection=getDb();
+    return connection.query(`SELECT * from ASSET_IMAGES where ASSET_ID=:ASSET_ID`,[assetId],
+    {
+        outFormat:oracledb.OBJECT
+    })
+}   
+
+module.exports=class Asset{
+    constructor(assetId,title,description,usercase,customer,createdBy,
+        createdDate,scrmId,oppId,
+        thumbnail,modifiedDate,modifiedBy,links)
+        {
+        this.assetId=assetId;
+        this.title=title;
+        this.description=description;
+        this.usercase=usercase;
+        this.customer=customer;
+        this.createdBy=createdBy;
+        this.createdDate=createdDate;
+        this.scrmId=scrmId;
+        this.oppId=oppId;
+        this.thumbnail=thumbnail;
+        this.modifiedDate=modifiedDate;
+        this.modifiedBy=modifiedBy;
+        this.links=links;
+    }
+
+    save(){
+        const connection=getDb();
+        var self=this;
+        this.assetId=uniqid();
+        var assetid=this.assetId;
+        const oj= this.links;
+        if(!(oj===null)){
+            oj.forEach(link=>{
+                link.LINK_ID=uniqid();
+                link.ASSET_ID=assetid;
+            })
+        }
+        
+        console.log(oj)
+
+        connection.transaction([
+            function firstAction() {
+            return connection.insert(`INSERT into ASSET_DETAILS values(:ASSET_ID,:ASSET_TITLE,:ASSET_DESCRIPTION,
+                :ASSET_USERCASE,:ASSET_CUSTOMER,:ASSET_CREATEDBY,:CREATED_DATE,:ASSET_SCRM_ID,:ASSET_OPP_ID,
+                :ASSET_THUMBNAIL,:ASSET_MODIFIED_DATE,:ASSET_MODIFIED_BY)`,
+            [assetid,self.title,self.description,self.usercase,self.customer,self.createdBy,
+            self.createdDate,self.scrmId,self.oppId,self.thumbnail,self.modifiedDate,self.modifiedBy],
+            {
+                outFormat:oracledb.Object
+            }).then(res=>{
+                console.log('1st insert done(Asset details inserted)')
+            })
+            }
+            ,function secondAction(){
+                if(!(oj===null))
+                {
+            return connection.batchInsert (`INSERT into ASSET_LINKS values(
+                :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_ID,:ASSET_ID)`,
+                oj,{
+                    autocommit:true
+                }
+                )
+            }
+            else{
+                return connection.query(`SELECT * from asset_links`,{})
+            }
+            }], {
+            sequence: true
+            })
+            .then(function onTransactionResults(output) {
+                console.log('transaction successful');
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+
+        }
+        
+        
+        static uploadImages(assetId,images)
+        {
+            return new Promise((resolve,reject)=>{
+                const filesArray=[];
+            var imgObject={};
+            const connection=getDb();
+            console.log(assetId+"/n",images)
+            images.forEach(sampleFile=>{
+            const fname=sampleFile.name.split('.')[0]; 
+            const ftype=sampleFile.name.split('.')[1];
+            const uniqueId=uniqid();
+            const finalFname=fname+uniqueId.concat('.',ftype);
+            const uploadPath = path.join(__dirname,'../public/' , finalFname);
+            var content=`http://localhost:3002/${finalFname}`
+            imgObject.IMAGE_ID=uniqueId;
+            imgObject.ASSET_ID=assetId;
+            imgObject.IMAGE_NAME=finalFname;
+            imgObject.IMAGEURL=content;
+            filesArray.push(imgObject)
+            imgObject={}
+            sampleFile.mv(uploadPath, function(err) {
+          if (err) {
+            return res.status(500).send(err);
+          }
+            })
+        })
+        console.log(filesArray)
+        connection.batchInsert(`INSERT INTO ASSET_IMAGES values(:IMAGE_ID,:ASSET_ID,:IMAGE_NAME,:IMAGEURL)`,
+        filesArray,
+        {	
+            autoCommit:true,
+        }
+        ).then(res=>{
+            resolve('done')
+        }).catch(err=>{
+            console.log(err)
+            reject(err)
+        })
+    })
+}
+
+
+//Fetch asset model function
+
+static fetchAssets(offset,limit){
+    return new Promise((resolve,reject)=>{
+    let allAssetsObj={};
+    let allAssets=[];
+    let assetsArray=[];
+    let linksArray=[];
+    let imagesArray=[];
+    const connection=getDb();
+    connection.query(`SELECT * from ASSET_DETAILS OFFSET :OFFSET ROWS 
+    FETCH NEXT :LIMIT ROWS ONLY`,{
+        OFFSET:offset,
+        LIMIT:limit
+    },
+    	{
+    		outFormat:oracledb.OBJECT
+        })
+        .then(res=>{
+            //console.log("Asset Details : ",res)
+            assetsArray=res
+            connection.execute(`SELECT * from ASSET_LINKS`,{},
+            {
+                outFormat:oracledb.OBJECT
+            },
+    	    ).then(res=>{
+                //console.log("links Details : ",res)
+                linksArray=res.rows;
+                connection.execute(`SELECT * from ASSET_IMAGES`,{},
+                {
+                    outFormat:oracledb.OBJECT
+                })
+                .then(res=>{
+                    imagesArray=res.rows;
+                    assetsArray.forEach(asset=>{
+                        const id=asset.ASSET_ID;
+                        allAssetsObj=asset
+                        var links=linksArray.filter(link=>link.ASSET_ID===id)
+                        allAssetsObj.LINKS=links
+                        var images=imagesArray.filter(image=>image.ASSET_ID===id);
+                        allAssetsObj.IMAGES=images;
+                        allAssets.push(allAssetsObj)
+                                             
+                    })
+                   resolve(allAssets);
+                })
+                })
+            })        
+        })
+    }
+
+
+    static fetchAssetsById(assetId){
+        let assetObj={}
+        return new Promise((resolve,reject)=>{
+            getAssetsById(assetId)
+            .then(res=>{
+           // console.log(res)
+            assetObj=res[0];
+            //resolve(res[0])
+            getLinksById(assetId)
+            .then(res=>{
+               // console.log(res)
+                assetObj.LINKS=res;
+                getImagesById(assetId)
+                .then(res=>{
+                  //  console.log(res)
+                    assetObj.IMAGES=res
+                    resolve(assetObj)
+                })
+            })
+            })
+        })
+        
+    }
+
+    static fetchLinksById(assetId){
+        return new Promise((resolve,reject)=>{
+            getLinksById(assetId)
+            .then(res=>{
+            console.log(res)
+            resolve(res)
+            })
+        })
+    }
+    static fetchImagesById(assetId){
+        return new Promise((resolve,reject)=>{
+            getImagesById(assetId)
+            .then(res=>{
+            console.log(res)
+            resolve(res)
+            })
+        })
+    }
+}

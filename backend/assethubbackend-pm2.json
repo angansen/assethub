@@ -1,0 +1,18 @@
+{
+  "script": "bin/assethubbackend",
+  "name": "assethubbackend",
+  "merge_logs": true,
+  "node_args": "--max_old_space_size=4000",
+  "vizion": true,
+  "autorestart": true,
+  "watch": false,
+  "exec_mode": "fork_mode",
+  "instance_var": "NODE_APP_INSTANCE",
+  "pmx": true,
+  "automation": true,
+  "treekill": true,
+  "username": "root",
+  "windowsHide": true,
+  "kill_retry_time": 100,
+  "write": true
+}
