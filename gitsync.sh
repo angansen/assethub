@@ -1,2 +1,2 @@
-git fetch --all
-git reset --hard HEAD
+git fetch
+git reset --hard origin/master
