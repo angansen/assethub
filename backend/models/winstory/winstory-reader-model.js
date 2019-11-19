@@ -998,7 +998,6 @@ module.exports = class Asset {
         })
     }
 
-
     static filterAssetBySearchString(data, filterdata, searchString, filtersasset) {
         searchString = searchString.trim().toLowerCase();
         let assetFilters = [];
@@ -1108,7 +1107,6 @@ module.exports = class Asset {
             }
         });
     }
-
     static refineAssets(host, offset, limit, assetsArray, sortBy, order, action) {
 
         let allAssetsObj = {};
@@ -1186,30 +1184,30 @@ module.exports = class Asset {
                                                                     })
                                                                     .then(res => {
                                                                         industryArray = res.rows;
-                                                                        connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Win Status'`, {},
+                                                                        connection.execute(`SELECT count(*) like_count,WINSTORY_ID from ASSET_WINSTORY_LIKES group by WINSTORY_ID`, [],
                                                                             {
                                                                                 outFormat: oracledb.OBJECT
                                                                             })
                                                                             .then(res => {
-                                                                                let winStatusArray = res.rows;
-                                                                                connection.execute(`SELECT count(*) like_count,WINSTORY_ID from ASSET_WINSTORY_LIKES group by WINSTORY_ID`, [],
+                                                                                likesArray = res.rows;
+                                                                                connection.execute(`SELECT count(*) view_count,WINSTORY_ID from ASSET_WINSTORY_VIEWS group by WINSTORY_ID`, [],
                                                                                     {
                                                                                         outFormat: oracledb.OBJECT
                                                                                     })
                                                                                     .then(res => {
-                                                                                        likesArray = res.rows;
-                                                                                        connection.execute(`SELECT count(*) view_count,WINSTORY_ID from ASSET_WINSTORY_VIEWS group by WINSTORY_ID`, [],
+                                                                                        viewsArray = res.rows;
+                                                                                        connection.execute(`SELECT WINSTORY_ID from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1`, [],
                                                                                             {
                                                                                                 outFormat: oracledb.OBJECT
                                                                                             })
                                                                                             .then(res => {
-                                                                                                viewsArray = res.rows;
-                                                                                                connection.execute(`SELECT WINSTORY_ID from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1`, [],
+                                                                                                promotedArray = res.rows;
+                                                                                                connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Win Status'`, {},
                                                                                                     {
                                                                                                         outFormat: oracledb.OBJECT
                                                                                                     })
                                                                                                     .then(res => {
-                                                                                                        promotedArray = res.rows;
+                                                                                                        let winStatusArray = res.rows;
                                                                                                         //console.log(viewsArray);
                                                                                                         assetsArray.forEach(asset => {
                                                                                                             const id = asset.WINSTORY_ID;
@@ -1236,6 +1234,7 @@ module.exports = class Asset {
                                                                                                             salesPlays = salesPlaysArray.filter(s => s.WINSTORY_ID == id);
                                                                                                             industry = industryArray.filter(s => s.WINSTORY_ID == id);
                                                                                                             let winStatus = winStatusArray.filter(s => s.WINSTORY_ID == id);
+                                                                                                            //console.log(solutionAreas);
                                                                                                             allAssetsObj.WIN_STATUS = winStatus
                                                                                                             allAssetsObj.SOLUTION_AREAS = solutionAreas
                                                                                                             allAssetsObj.ASSET_TYPE = assetTypes;
@@ -1342,6 +1341,7 @@ module.exports = class Asset {
             resolve(queryString);
         })
     }
+
 
     //Fetch asset model function
     static fetchAssets(host, offset, limit, filters, searchString2, sortBy, order, action) {
