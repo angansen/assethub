@@ -203,32 +203,112 @@ exports.deleteFilterTypeByName = (filtername) => {
                 outFormat: oracledb.Object
             })
             .then(filters => {
-                let filterids=[]
-                filters.filter(f=>{
-                   filterids.push(f.FILTER_ID);
-                });
-                console.log(JSON.stringify(filterids));
-
-                // DELETE ASSET MAPPING FOR THE REQUIRED FILTERS
-
-                let deleteassetfiltermap=`delete from asset_filter_asset_map where filter_id in(:0)`;
-                let opt=[filterids.join()]
-
-                connection.query(fetchfiltersByfilterType, opt,
-                    {
-                        outFormat: oracledb.Object
-                    })
-                    .then(dbfeed => {
-
-
+                let filterids = []
+                if (filters.length > 0) {
+                    filters.filter(f => {
+                        filterids.push(f.FILTER_ID);
                     });
+                    // console.log(JSON.stringify(filterids));
 
-                resolve({ "msg": "filter deletion success "+filterids.join()});
+                    // DELETE ASSET MAPPING 
+                    let filterstring = filterids.join().replace(/,/g, "','");
+                    filterstring = "'" + filterstring + "'";
+                    let deleteassetfiltermap = `delete from asset_filter_asset_map where filter_id in(` + filterstring + `)`;
+                    // let opt = [filterids.join()]
+                    // console.log(deleteassetfiltermap);
+                    console.log("Removing Asset filter mapping . . .");
+                    connection.execute(deleteassetfiltermap, {},
+                        {
+                            outFormat: oracledb.Object,
+                            autoCommit: true
+                        })
+                        .then(dbfeed => {
+                            console.log("Asset mapping : " + JSON.stringify(dbfeed));
+                        })
+                        .finally(obj => {
+                            // DELETING WINS MAPPING
+                            console.log("Removing Wins filter mapping . . .");
+                            let deletewinsfiltermap = `delete from ASSET_WINSTORY_FILTER_WINSTORY_MAP where filter_id in(` + filterstring + `)`;
+                            // console.log(deletewinsfiltermap);
+                            connection.execute(deletewinsfiltermap, {},
+                                {
+                                    outFormat: oracledb.Object,
+                                    autoCommit: true
+                                })
+                                .then(dbfeed => {
+                                    console.log("Win mapping : " + JSON.stringify(dbfeed));
+                                })
+                                .finally(obj => {
 
+                                    console.log("fetching filters . . .");
+                                    let getfilters = `select filter_type_image,filter_image from asset_filter where filter_id in(` + filterstring + `)`;
+                                    // console.log(getfilters);
+                                    connection.query(getfilters, {},
+                                        {
+                                            outFormat: oracledb.Object
+                                            // autoCommit: true
+                                        })
+                                        .then(dbfeed => {
+                                            console.log("deleting filter icons : ");
+                                            dbfeed.filter(fileobj => {
+                                                console.log(fileobj.FILTER_TYPE_IMAGE + " --- " + fileobj.FILTER_IMAGE);
+                                                let filtertypeimage = path.join(__dirname, '../../../..', 'mnt/ahfs', '/' + fileobj.FILTER_IMAGE);
+                                                let filterimage = path.join(__dirname, '../../../..', 'mnt/ahfs', '/' + fileobj.FILTER_TYPE_IMAGE);
+                                                deletefilterimage(filtertypeimage);
+                                                deletefilterimage(filterimage);
+                                            })
+
+
+                                        })
+                                        .catch(err => {
+                                            console.log(JSON.stringify(err));
+                                        })
+                                        .finally(obj => {
+                                            // DELETING FILTERS FROM FILTER TABLE
+                                            console.log("Removing filters . . .");
+                                            let deletefilters = `delete from asset_filter where filter_id in(` + filterstring + `)`;
+
+                                            connection.execute(deletefilters, {},
+                                                {
+                                                    outFormat: oracledb.Object,
+                                                    autoCommit: true
+                                                })
+                                                
+                                                .then(dbfeed => {
+                                                    console.log("deleting filter : " + JSON.stringify(dbfeed));
+                                                })
+                                                .finally(obj => {
+                                                    resolve({ "msg": "filter deletion success " });
+                                                });
+                                        });
+
+
+                                });
+                        });
+                }else{
+                    reject({ "msg": "nothing to delete" });
+                }
             });
 
     })
 }
+
+deletefilterimage = (filepath) => {
+    console.log("deleting > " + filepath);
+    try {
+        if (fs.existsSync(filepath)) {
+            fs.unlinkSync(filepath);
+            console.log('File deleted!');
+        } else {
+            console.log("file not found");
+        }
+    } catch (error) {
+        console.log(error);
+    }
+
+
+}
+
 exports.mapFilters = (filter, host) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {

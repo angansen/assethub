@@ -39,7 +39,7 @@ exports.deleteparentbyname = (req, res) => {
         .then(respdata => {
             res.send(respdata);
         }).catch(err => {
-            res.json(err)
+            res.status(404).send(err)
         })
 }
 
