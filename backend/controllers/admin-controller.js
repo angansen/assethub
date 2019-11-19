@@ -33,6 +33,16 @@ exports.deletefilter = (req, res) => {
             res.json(err)
         })
 }
+
+exports.deleteparentbyname = (req, res) => {
+    admin.deleteFilterTypeByName(req.params.parentname)
+        .then(respdata => {
+            res.send(respdata);
+        }).catch(err => {
+            res.json(err)
+        })
+}
+
 exports.editFilter = (req, res) => {
     admin.editFilterbyId(req.body, req.headers.host)
         .then(result => {

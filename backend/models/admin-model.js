@@ -186,6 +186,31 @@ exports.deleteFilterbyId = (filterId, host) => {
             })
     })
 }
+
+exports.deleteFilterTypeByName = (filtername) => {
+
+    console.log("-----------------------");
+    console.log(filtername);
+    return new Promise((resolve, reject) => {
+
+        const connection = getDb();
+        let fetchfiltersByfilterType = `select filter_id from asset_filter where filter_type=:0`;
+        let opt = [filtername];
+
+        connection.query(fetchfiltersByfilterType, opt,
+            {
+                outFormat: oracledb.Object
+            })
+            .then(filters => {
+                console.log(JSON.stringify(filters));
+                let filterids=filters.filter(f=>f.FILTER_ID);
+                console.log(JSON.stringify(filterids));
+                resolve({ "msg": "filter deletion success "+filterids.join()});
+
+            });
+
+    })
+}
 exports.mapFilters = (filter, host) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
@@ -458,7 +483,7 @@ exports.reMapFilters = (data) => {
     })
 }
 exports.getAllFilters = (req, host) => {
-    host="http://"+host+"/"
+    host = "http://" + host + "/"
     console.log('Admin get All Filters')
     let typeArr = [];
     let filteredArr = [];
