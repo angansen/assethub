@@ -333,7 +333,7 @@ saveWinstoryLogoImage = (host, image, winstoryid, res) => {
     image = image.split(';base64,').pop();
 
     let filename = base64.encode(winstoryid) + "_logo." + imageext;
-    let filelocation = path.join(__dirname, '../../../..', 'mnt/ahfs', '/winstorylogo/');
+    let filelocation = path.join(__dirname, '../../../../..', 'mnt/ahfs', '/winstorylogo/');
 
     savefileto(image, filelocation + filename).then((data) => {
         const connection = getDb();
@@ -365,7 +365,7 @@ saveWinstoryThubnailImage = (host, image, winstoryid, res) => {
     image = image.split(';base64,').pop();
 
     let filename = base64.encode(winstoryid) + "." + imageext;
-    let filelocation = path.join(__dirname, '../../../..', 'mnt/ahfs', '/winstorythumbnail/');
+    let filelocation = path.join(__dirname, '../../../../..', 'mnt/ahfs', '/winstorythumbnail/');
 
     savefileto(image, filelocation + filename).then((data) => {
         const connection = getDb();
