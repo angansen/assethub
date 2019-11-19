@@ -203,8 +203,9 @@ exports.deleteFilterTypeByName = (filtername) => {
             })
             .then(filters => {
                 console.log(JSON.stringify(filters));
-                let filterids=filters.filter(f=>{
-                    return f.FILTER_ID;
+                let filterids=[]
+                filters.filter(f=>{
+                   filterids.push(f.FILTER_ID);
                 });
                 console.log(JSON.stringify(filterids));
                 resolve({ "msg": "filter deletion success "+filterids.join()});
