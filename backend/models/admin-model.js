@@ -194,20 +194,35 @@ exports.deleteFilterTypeByName = (filtername) => {
     return new Promise((resolve, reject) => {
 
         const connection = getDb();
+
+        // GET THE ASSOCIATED FILTER IDS FOR THE ASSET TYPE
         let fetchfiltersByfilterType = `select filter_id from asset_filter where filter_type=:0`;
         let opt = [filtername];
-
         connection.query(fetchfiltersByfilterType, opt,
             {
                 outFormat: oracledb.Object
             })
             .then(filters => {
-                console.log(JSON.stringify(filters));
                 let filterids=[]
                 filters.filter(f=>{
                    filterids.push(f.FILTER_ID);
                 });
                 console.log(JSON.stringify(filterids));
+
+                // DELETE ASSET MAPPING FOR THE REQUIRED FILTERS
+
+                let deleteassetfiltermap=`delete from asset_filter_asset_map where filter_id in(:0)`;
+                let opt=[filterids.join()]
+
+                connection.query(fetchfiltersByfilterType, opt,
+                    {
+                        outFormat: oracledb.Object
+                    })
+                    .then(dbfeed => {
+
+
+                    });
+
                 resolve({ "msg": "filter deletion success "+filterids.join()});
 
             });
