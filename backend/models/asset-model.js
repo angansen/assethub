@@ -999,7 +999,6 @@ module.exports = class Asset {
     }
 
 
-
     static filterAssetBySearchString(data, filterdata, searchString, filtersasset) {
         searchString = searchString.trim().toLowerCase();
         let assetFilters = [];
