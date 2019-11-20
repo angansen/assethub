@@ -1108,8 +1108,8 @@ module.exports = class Asset {
         let assetidtracker={};
         let uniqueassetarray=assetsArray.filter(asset=>{
             console.log(JSON.stringify(asset));
-            if(!assetidtracker.asset.ASSET_ID){
-                assetidtracker.asset.ASSET_ID=1;
+            if(!assetidtracker[asset.ASSET_ID]){
+                assetidtracker[asset.ASSET_ID]=1;
                 return asset;
             }
         })
