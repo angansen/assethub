@@ -489,7 +489,7 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         searchtext: searchString
     }
 
-    if (filters.indexof("14983ddhswcdol") != -1) {
+    if (filters.includes("14983ddhswcdol")) {
         try {
             worker.captureSearch(activity);
         } catch (err) {
@@ -518,6 +518,8 @@ exports.getAllAssetsByFilters2 = (req, res) => {
                 res.json(result);
             })
         }
+    }else{
+        res.send([]);
     }
 }
 
