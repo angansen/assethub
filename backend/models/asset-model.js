@@ -1131,7 +1131,11 @@ module.exports = class Asset {
         return new Promise((resolve, reject) => {
             assetsArray.forEach(asset => {
                 
+                console.log("---------------- THUMBNAIL -------------------------")
+                console.log(asset.ASSET_THUMBNAIL);
                 asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
+                console.log(asset.ASSET_THUMBNAIL);
+                console.log("---------------- THUMBNAIL -------------------------")
                 asset.createdDate = asset.ASSET_CREATED_DATE;
             })
             const connection = getDb();
