@@ -1005,7 +1005,7 @@ module.exports = class Asset {
         return new Promise((resolve) => {
             for (let i = 0; i < data.length; i++) {
 
-
+                console.log(data[i].ASSET_THUMBNAIL);
                 let combineContentToMatch = data[i].ASSET_TITLE +
                     data[i].ASSET_DESCRIPTION +
                     data[i].ASSET_USERCASE +
