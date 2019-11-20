@@ -1104,6 +1104,7 @@ module.exports = class Asset {
 
     static refineAssets(host, offset, limit, assetsArray, sortBy, order, action) {
 
+        console.log(JSON.stringify(assetsArray));
         let allAssetsObj = {};
         let tAssets = [];
         let allAssets = [];
