@@ -5,8 +5,8 @@ var router = express.Router();
 
 // GET
 router.get('/allwinstoryfilters', winstoryreaderController.getAllFilters);
-router.get('/getAllWinStoryByFilters', winstoryreaderController.getAllAssetsByFilters);
-router.get('/getAllWinStoryByFilters2', winstoryreaderController.getAllAssetsByFilters2);
+router.get('/getAllWinStoryByFilters', winstoryreaderController.getAllAssetsByFilters2);
+router.get('/getAllWinStoryByFilters2', winstoryreaderController.getAllAssetsByFilters);
 router.get('/mywinstory', winstoryreaderController.getUserWinstory);
 router.get('/winstorylobs', winstoryreaderController.getWinStoryLobsList);
 router.get('/winstoryimperative', winstoryreaderController.winstoryimperative);
