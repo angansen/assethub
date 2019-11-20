@@ -1104,7 +1104,7 @@ module.exports = class Asset {
 
     static refineAssets(host, offset, limit, assetsArray, sortBy, order, action) {
 
-        console.log(assetsArray.length);
+        console.log(" >>> "+assetsArray.length);
         let assetidtracker={};
         let uniqueassetarray=assetsArray.filter(asset=>{
             console.log(JSON.stringify(asset));
@@ -1114,7 +1114,7 @@ module.exports = class Asset {
             }
         })
         assetsArray=uniqueassetarray;
-        console.log(assetsArray.length);
+        console.log(" >>> >> "+assetsArray.length);
 
         let allAssetsObj = {};
         let tAssets = [];
