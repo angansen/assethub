@@ -1731,8 +1731,17 @@ module.exports = class Asset {
                         })
                         .then(res => {
                             bannerObj.hubs = res;
+                            connection.query(`select activity_platform, count(*) from asset_user_activity group by activity_platform`, {},
+                                {
+                                    outFormat: oracledb.OBJECT
+                                })
+                                .then(res => {
+                                    bannerObj.visit = res;
 
-                            resolve(bannerObj)
+
+                                    resolve(bannerObj)
+                                })
+
                         })
 
                 })
@@ -1841,7 +1850,7 @@ module.exports = class Asset {
                                                     });
                                                     typeArr.forEach(type => {
                                                         filteredArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && !f.FILTER_NAME.toLowerCase().includes('other'));
-                                                        
+
                                                         filterObj.Type = type;
                                                         filterObj.FILTER_TYPE_IMAGE = 'http://' + host + '/' + filteredArr[0].FILTER_TYPE_IMAGE;
                                                         filteredArr.sort((a, b) => (a.FILTER_NAME > b.FILTER_NAME) ? 1 : -1)
