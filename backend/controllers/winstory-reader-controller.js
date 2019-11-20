@@ -489,33 +489,35 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         searchtext: searchString
     }
 
-    try {
-        worker.captureSearch(activity);
-    } catch (err) {
-        console.log("search activity log error");
-    }
-    //console.log("limit  :" + limit)
-    searchString = searchString == undefined ? "" : searchString;
-    filters = filters == undefined ? [] : filters;
-    if (limit === '-1') {
-        //console.log("-1 limit if")
-        const connection = getDb();
-        connection.execute(`SELECT count(*) total from ASSET_WINSTORY_DETAILS where lower(WINSTORY_STATUS)='live'`, {},
-            {
-                outFormat: oracledb.OBJECT
-            },
-        ).then(result => {
-            limit = result.rows[0].TOTAL;
-            // console.log("new Limit" + limit)
-            winstoryreader.fetchAssets2(req.headers.host, offset, limit, filters, searchString, sortBy, order).then(result => {
+    if (filters.indexof("14983ddhswcdol") != -1) {
+        try {
+            worker.captureSearch(activity);
+        } catch (err) {
+            console.log("search activity log error");
+        }
+        //console.log("limit  :" + limit)
+        searchString = searchString == undefined ? "" : searchString;
+        filters = filters == undefined ? [] : filters;
+        if (limit === '-1') {
+            //console.log("-1 limit if")
+            const connection = getDb();
+            connection.execute(`SELECT count(*) total from ASSET_WINSTORY_DETAILS where lower(WINSTORY_STATUS)='live'`, {},
+                {
+                    outFormat: oracledb.OBJECT
+                },
+            ).then(result => {
+                limit = result.rows[0].TOTAL;
+                // console.log("new Limit" + limit)
+                winstoryreader.fetchAssets2(req.headers.host, offset, limit, filters, searchString, sortBy, order).then(result => {
+                    res.json(result);
+                })
+            })
+        }
+        else {
+            winstoryreader.fetchAssets(req.headers.host, offset, limit, filters, searchString, sortBy, order).then(result => {
                 res.json(result);
             })
-        })
-    }
-    else {
-        winstoryreader.fetchAssets(req.headers.host, offset, limit, filters, searchString, sortBy, order).then(result => {
-            res.json(result);
-        })
+        }
     }
 }
 

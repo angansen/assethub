@@ -482,38 +482,40 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         searchtext: searchString
     }
 
-    try {
-        worker.captureSearch(activity);
-    } catch (err) {
-        console.log("search activity log error");
-    }
+    if (filters.indexof("Gdjfdskyuetr472V") != -1) {
+        try {
+            worker.captureSearch(activity);
+        } catch (err) {
+            console.log("search activity log error");
+        }
 
-    console.log("Host:- " + req.headers.host);
+        console.log("Host:- " + req.headers.host);
 
-    searchString = searchString == undefined ? "" : searchString;
-    filters = filters == undefined ? [] : filters;
+        searchString = searchString == undefined ? "" : searchString;
+        filters = filters == undefined ? [] : filters;
 
-    let host = req.headers.host;
-    if (limit === '-1') {
-        console.log("-1 limit if")
-        const connection = getDb();
-        connection.execute(`SELECT count(*) total from ASSET_DETAILS where asset_status='Live'`, {},
-            {
-                outFormat: oracledb.OBJECT
-            },
-        ).then(result => {
-            limit = result.rows[0].TOTAL;
-            console.log("new Limit" + limit)
+        let host = req.headers.host;
+        if (limit === '-1') {
+            console.log("-1 limit if")
+            const connection = getDb();
+            connection.execute(`SELECT count(*) total from ASSET_DETAILS where asset_status='Live'`, {},
+                {
+                    outFormat: oracledb.OBJECT
+                },
+            ).then(result => {
+                limit = result.rows[0].TOTAL;
+                console.log("new Limit" + limit)
+                Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order).then(result => {
+                    res.json(result);
+                })
+            })
+
+        }
+        else {
             Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order).then(result => {
                 res.json(result);
             })
-        })
-
-    }
-    else {
-        Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order).then(result => {
-            res.json(result);
-        })
+        }
     }
 
 }
