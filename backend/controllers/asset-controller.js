@@ -482,7 +482,6 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         searchtext: searchString
     }
 
-    if (filters != undefined && filters.includes("Gdjfdskyuetr472V")) {
         try {
             worker.captureSearch(activity);
         } catch (err) {
@@ -516,9 +515,6 @@ exports.getAllAssetsByFilters2 = (req, res) => {
                 res.json(result);
             })
         }
-    } else {
-        res.send([]);
-    }
 
 }
 
