@@ -1113,8 +1113,8 @@ module.exports = class Asset {
         // REMOVE DUPLICATE ENTRIES
         let assetidtracker = {};
         let uniqueassetarray = assetsArray.filter(asset => {
-            if (!assetidtracker[asset.ASSET_ID]) {
-                assetidtracker[asset.ASSET_ID] = 1;
+            if (!assetidtracker[asset.WINSTORY_ID]) {
+                assetidtracker[asset.WINSTORY_ID] = 1;
                 return asset;
             }
         })
