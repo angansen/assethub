@@ -1033,6 +1033,7 @@ module.exports = class Asset {
                     }
                 })
             }
+            console.log(filtersasset.length);
             resolve(true);
         })
     }
