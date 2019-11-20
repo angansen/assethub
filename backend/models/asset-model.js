@@ -1033,6 +1033,9 @@ module.exports = class Asset {
 
 
     static fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, action) {
+        console.log("===================================");
+        console.log("HOST: "+host);
+        console.log("===================================")
         return new Promise((resolve, reject) => {
             if (filters.length > 0 && filters != "") {
                 let filterString = "'" + filters.toString().replace(/,/g, "','") + "'";
@@ -1127,6 +1130,7 @@ module.exports = class Asset {
         let promotedArray = [];
         return new Promise((resolve, reject) => {
             assetsArray.forEach(asset => {
+                
                 asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
                 asset.createdDate = asset.ASSET_CREATED_DATE;
             })
