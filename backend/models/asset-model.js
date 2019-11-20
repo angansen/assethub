@@ -1104,18 +1104,15 @@ module.exports = class Asset {
 
     static refineAssets(host, offset, limit, assetsArray, sortBy, order, action) {
 
-        console.log(" >>> "+assetsArray.length);
+        // REMOVE DUPLICATE ENTRIES
         let assetidtracker={};
         let uniqueassetarray=assetsArray.filter(asset=>{
-            console.log(JSON.stringify(asset));
             if(!assetidtracker[asset.ASSET_ID]){
                 assetidtracker[asset.ASSET_ID]=1;
                 return asset;
             }
         })
         assetsArray=uniqueassetarray;
-        console.log(" >>> >> "+assetsArray.length);
-
         let allAssetsObj = {};
         let tAssets = [];
         let allAssets = [];
@@ -1142,12 +1139,7 @@ module.exports = class Asset {
         let promotedArray = [];
         return new Promise((resolve, reject) => {
             assetsArray.forEach(asset => {
-                
-                // console.log("---------------- THUMBNAIL -------------------------")
-                // console.log(asset.ASSET_THUMBNAIL);
                 asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
-                console.log(asset.ASSET_ID);
-                // console.log("---------------- THUMBNAIL -------------------------")
                 asset.createdDate = asset.ASSET_CREATED_DATE;
             })
             const connection = getDb();

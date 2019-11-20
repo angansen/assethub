@@ -1110,6 +1110,16 @@ module.exports = class Asset {
     }
     static refineAssets(host, offset, limit, assetsArray, sortBy, order, action) {
 
+        // REMOVE DUPLICATE ENTRIES
+        let assetidtracker = {};
+        let uniqueassetarray = assetsArray.filter(asset => {
+            if (!assetidtracker[asset.ASSET_ID]) {
+                assetidtracker[asset.ASSET_ID] = 1;
+                return asset;
+            }
+        })
+        assetsArray = uniqueassetarray;
+
         let allAssetsObj = {};
         let tAssets = [];
         let allAssets = [];
