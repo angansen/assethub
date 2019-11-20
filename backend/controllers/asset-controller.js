@@ -482,7 +482,7 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         searchtext: searchString
     }
 
-    if (filters.includes("Gdjfdskyuetr472V")) {
+    if (filters != undefined && filters.includes("Gdjfdskyuetr472V")) {
         try {
             worker.captureSearch(activity);
         } catch (err) {

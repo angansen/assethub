@@ -489,7 +489,7 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         searchtext: searchString
     }
 
-    if (filters.includes("14983ddhswcdol")) {
+    if (filters != undefined && filters.includes("14983ddhswcdol")) {
         try {
             worker.captureSearch(activity);
         } catch (err) {
