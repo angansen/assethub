@@ -1731,19 +1731,15 @@ module.exports = class Asset {
                         })
                         .then(res => {
                             bannerObj.hubs = res;
-                            connection.query(`select activity_platform, count(*) from asset_user_activity group by activity_platform`, {},
+                            connection.query(`select activity_platform as platform, count(*) as count from asset_user_activity group by activity_platform`, {},
                                 {
                                     outFormat: oracledb.OBJECT
                                 })
                                 .then(res => {
                                     bannerObj.visit = res;
-
-
                                     resolve(bannerObj)
                                 })
-
                         })
-
                 })
                 .catch(err => {
                     reject(err)
