@@ -1342,7 +1342,7 @@ module.exports = class Asset {
 
             let queryString = "";
             let equalcheck="=";
-            if(data.length>1){
+            if(data.length>1&&data[0].ASSET_TYPE=='Asset Type'){
                 equalcheck="!=";
             }
 
