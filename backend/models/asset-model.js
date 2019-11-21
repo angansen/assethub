@@ -1307,7 +1307,7 @@ module.exports = class Asset {
         })
     }
 
-    // CREATE QUERY STRING BASED ON SELECTED FILTERS
+        // CREATE QUERY STRING BASED ON SELECTED FILTERS
     static convertsql(data) {
         console.log("----------  Converting SQL ASSET -------------");
 
@@ -1316,7 +1316,7 @@ module.exports = class Asset {
         return new Promise((resolve, reject) => {
             // CREATE SQL queries   
             data.forEach(val => {
-                let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select asset_id from asset_filter_asset_map where ";
+                let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where ";
                 filterTypeMap[val.FILTER_TYPE] = filterstring + " filter_id='" + val.FILTER_ID + "'";
             });
 
@@ -1324,15 +1324,41 @@ module.exports = class Asset {
 
             Object.keys(filterTypeMap).forEach(filterType => {
 
-                queryString = queryString.length > 0 ? queryString + " union " + filterTypeMap[filterType] : filterTypeMap[filterType];
+                queryString = queryString.length > 0 ? queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type' union " + filterTypeMap[filterType] : filterTypeMap[filterType];
             })
 
-            queryString = "select b.* from  (" + queryString + ") a,asset_details b where a.asset_id=b.asset_id and b.asset_status='Live'";
+            queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type') a,asset_details b where a.asset_id=b.asset_id and b.asset_status='Live'";
             console.log(queryString);
             // RETURN THE GENERATED QUERY 
             resolve(queryString);
         })
     }
+    // // CREATE QUERY STRING BASED ON SELECTED FILTERS
+    // static convertsql(data) {
+    //     console.log("----------  Converting SQL ASSET -------------");
+
+    //     let filterTypeMap = {};
+
+    //     return new Promise((resolve, reject) => {
+    //         // CREATE SQL queries   
+    //         data.forEach(val => {
+    //             let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select asset_id from asset_filter_asset_map where ";
+    //             filterTypeMap[val.FILTER_TYPE] = filterstring + " filter_id='" + val.FILTER_ID + "'";
+    //         });
+
+    //         let queryString = "";
+
+    //         Object.keys(filterTypeMap).forEach(filterType => {
+
+    //             queryString = queryString.length > 0 ? queryString + " union " + filterTypeMap[filterType] : filterTypeMap[filterType];
+    //         })
+
+    //         queryString = "select b.* from  (" + queryString + ") a,asset_details b where a.asset_id=b.asset_id and b.asset_status='Live'";
+    //         console.log(queryString);
+    //         // RETURN THE GENERATED QUERY 
+    //         resolve(queryString);
+    //     })
+    // }
 
 
     //Fetch asset model function

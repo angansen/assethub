@@ -1335,7 +1335,7 @@ module.exports = class Asset {
         return new Promise((resolve, reject) => {
             // CREATE SQL queries   
             data.forEach(val => {
-                let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP where ";
+                let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select c.WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where ";
                 filterTypeMap[val.FILTER_TYPE] = filterstring + " filter_id='" + val.FILTER_ID + "'";
             });
 
@@ -1343,15 +1343,41 @@ module.exports = class Asset {
 
             Object.keys(filterTypeMap).forEach(filterType => {
 
-                queryString = queryString.length > 0 ? queryString + " union " + filterTypeMap[filterType] : filterTypeMap[filterType];
+                queryString = queryString.length > 0 ? queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type' union " + filterTypeMap[filterType] : filterTypeMap[filterType];
             })
 
-            queryString = "select b.* from  (" + queryString + ") a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
+            queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
             console.log(queryString);
             // RETURN THE GENERATED QUERY 
             resolve(queryString);
         })
     }
+    // // CREATE QUERY STRING BASED ON SELECTED FILTERS
+    // static convertsql(data) {
+    //     console.log("----------  Converting SQL WIN -------------");
+
+    //     let filterTypeMap = {};
+
+    //     return new Promise((resolve, reject) => {
+    //         // CREATE SQL queries   
+    //         data.forEach(val => {
+    //             let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP where ";
+    //             filterTypeMap[val.FILTER_TYPE] = filterstring + " filter_id='" + val.FILTER_ID + "'";
+    //         });
+
+    //         let queryString = "";
+
+    //         Object.keys(filterTypeMap).forEach(filterType => {
+
+    //             queryString = queryString.length > 0 ? queryString + " union " + filterTypeMap[filterType] : filterTypeMap[filterType];
+    //         })
+
+    //         queryString = "select b.* from  (" + queryString + ") a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
+    //         console.log(queryString);
+    //         // RETURN THE GENERATED QUERY 
+    //         resolve(queryString);
+    //     })
+    // }
 
 
     //Fetch asset model function
