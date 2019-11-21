@@ -204,6 +204,11 @@ exports.updateWorkerResult = () => {
 
 exports.captureSearch = (activity) => {
 
+
+    console.log("============= FILTER ==============")
+    console.log(JSON.stringify(activity));
+    console.log("============= FILTER ==============")
+    
     if (activity.filters == undefined) {
         return;
     } else {
