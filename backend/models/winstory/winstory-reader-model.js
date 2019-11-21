@@ -1332,6 +1332,7 @@ module.exports = class Asset {
         console.log(JSON.stringify(data));
 
         let filterTypeMap = {};
+        let queryString = "";
 
         return new Promise((resolve, reject) => {
             // CREATE SQL queries   
