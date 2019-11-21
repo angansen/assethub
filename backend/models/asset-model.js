@@ -1363,14 +1363,14 @@ module.exports = class Asset {
                         outFormat: oracledb.OBJECT
                     },
                 ).then(assetlist => {
-                    console.log(JSON.stringify(assetlist));
+                    // console.log(JSON.stringify(assetlist));
 
                     let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
                     where activity_type='FREETEXT' 
                     and activity_performed_by='` + userEmail + `' 
                     group by activity_filter 
                     order by frequency desc 
-                    FETCH NEXT 3 ROWS ONLY;`
+                    FETCH NEXT 3 ROWS ONLY`
                     connection.query(fetchtopwordssql, {},
                         {
                             outFormat: oracledb.OBJECT
