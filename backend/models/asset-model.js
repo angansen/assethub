@@ -1005,7 +1005,6 @@ module.exports = class Asset {
         return new Promise((resolve) => {
             for (let i = 0; i < data.length; i++) {
 
-                console.log(data[i].ASSET_THUMBNAIL);
                 let combineContentToMatch = data[i].ASSET_TITLE +
                     data[i].ASSET_DESCRIPTION +
                     data[i].ASSET_USERCASE +
@@ -1033,9 +1032,7 @@ module.exports = class Asset {
 
 
     static fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, action) {
-        console.log("===================================");
-        console.log("HOST: " + host);
-        console.log("===================================")
+
         return new Promise((resolve, reject) => {
             if (filters.length > 0 && filters != "") {
                 let filterString = "'" + filters.toString().replace(/,/g, "','") + "'";
@@ -1062,7 +1059,6 @@ module.exports = class Asset {
                                         }).then(filterdata => {
                                             let filtersasset = [];
                                             this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
-                                                console.log("Content filter ended : " + filtersasset.length);
                                                 this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action).then(assets => {
                                                     resolve(assets);
                                                 })
@@ -1310,7 +1306,6 @@ module.exports = class Asset {
     // CREATE QUERY STRING BASED ON SELECTED FILTERS
     static convertsql(data) {
         console.log("----------  Converting SQL ASSET -------------");
-        console.log(JSON.stringify(data));
 
         let filterTypeMap = {};
         let queryString = "";
@@ -1907,7 +1902,7 @@ module.exports = class Asset {
                                                             winstorytypeCountArr = winstorycountArr.filter(r => r.FILTER_ID === f.FILTER_ID)
                                                             f.ASSET_COUNT = typeCountArr[0].CNT
                                                             f.WINSTORY_COUNT = winstorytypeCountArr[0].CNT
-                                                            console.log("f.FILTER_IMAGE" + ': ' + f.FILTER_IMAGE);
+                                                            // console.log("f.FILTER_IMAGE" + ': ' + f.FILTER_IMAGE);
                                                             f.FILTER_TYPE_IMAGE = 'http://' + host + '/' + f.FILTER_TYPE_IMAGE;
                                                             f.FILTER_IMAGE = 'http://' + host + '/' + f.FILTER_IMAGE;
                                                         })

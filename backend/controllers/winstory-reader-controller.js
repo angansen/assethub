@@ -488,6 +488,10 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         email: email,
         searchtext: searchString
     }
+    
+    console.log("============= Win Controller Activity ==============")
+    console.log(JSON.stringify(activity));
+    console.log("================== Activity ==========================")
 
     try {
         worker.captureSearch(activity);
