@@ -1034,7 +1034,7 @@ module.exports = class Asset {
 
     static fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, action) {
         console.log("===================================");
-        console.log("HOST: "+host);
+        console.log("HOST: " + host);
         console.log("===================================")
         return new Promise((resolve, reject) => {
             if (filters.length > 0 && filters != "") {
@@ -1105,14 +1105,14 @@ module.exports = class Asset {
     static refineAssets(host, offset, limit, assetsArray, sortBy, order, action) {
 
         // REMOVE DUPLICATE ENTRIES
-        let assetidtracker={};
-        let uniqueassetarray=assetsArray.filter(asset=>{
-            if(!assetidtracker[asset.ASSET_ID]){
-                assetidtracker[asset.ASSET_ID]=1;
+        let assetidtracker = {};
+        let uniqueassetarray = assetsArray.filter(asset => {
+            if (!assetidtracker[asset.ASSET_ID]) {
+                assetidtracker[asset.ASSET_ID] = 1;
                 return asset;
             }
         })
-        assetsArray=uniqueassetarray;
+        assetsArray = uniqueassetarray;
         let allAssetsObj = {};
         let tAssets = [];
         let allAssets = [];
@@ -1307,13 +1307,13 @@ module.exports = class Asset {
         })
     }
 
-        // CREATE QUERY STRING BASED ON SELECTED FILTERS
+    // CREATE QUERY STRING BASED ON SELECTED FILTERS
     static convertsql(data) {
         console.log("----------  Converting SQL ASSET -------------");
         console.log(JSON.stringify(data));
 
         let filterTypeMap = {};
-
+        let queryString = "";
         return new Promise((resolve, reject) => {
             // CREATE SQL queries   
             data.forEach(val => {
@@ -1321,12 +1321,13 @@ module.exports = class Asset {
                 filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "'";
             });
 
-            let queryString = "";
+
 
             Object.keys(filterTypeMap).forEach(filterType => {
 
                 queryString = queryString.length > 0 ? queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type' union " + filterTypeMap[filterType] : filterTypeMap[filterType];
             })
+
 
             queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type') a,asset_details b where a.asset_id=b.asset_id and b.asset_status='Live'";
             console.log(queryString);
@@ -1334,6 +1335,8 @@ module.exports = class Asset {
             resolve(queryString);
         })
     }
+
+
     // // CREATE QUERY STRING BASED ON SELECTED FILTERS
     // static convertsql(data) {
     //     console.log("----------  Converting SQL ASSET -------------");
@@ -1840,7 +1843,8 @@ module.exports = class Asset {
                     a.activity_type,
                     b.filter_name
                     from asset_search_activity a left join asset_filter b 
-                    on a.activity_filter=b.filter_id  
+                    on a.activity_filter=b.filter_id 
+                    where a.activity_performed_by='`+user_email`' 
                     group by a.activity_filter,a.activity_type,b.filter_name 
                     order by count(*) desc,a.activity_type`, [],
                         {
