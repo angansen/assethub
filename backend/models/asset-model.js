@@ -1380,7 +1380,7 @@ module.exports = class Asset {
                         let wordString=words.join().replace(/,/g," ");
                         console.log("Words > "+wordString);
                         let filteredbyword=[]
-                        filterAssetBySearchString(assetlist,[],wordString,filteredbyword);
+                        this.filterAssetBySearchString(assetlist,[],wordString,filteredbyword);
                         resolve(filteredbyword);
                     })
 
