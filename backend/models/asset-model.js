@@ -1376,8 +1376,8 @@ module.exports = class Asset {
                             outFormat: oracledb.OBJECT
                         },
                     ).then(words => {
-
-                        let wordString=words.join().replace(/,/g," ");
+                        console.log(JSON.stringify(words));
+                        let wordString=[];
                         console.log("Words > "+wordString);
                         let filteredbyword=[]
                         this.filterAssetBySearchString(assetlist,[],wordString,filteredbyword);
