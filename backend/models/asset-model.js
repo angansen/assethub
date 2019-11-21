@@ -1844,7 +1844,7 @@ module.exports = class Asset {
                     b.filter_name
                     from asset_search_activity a left join asset_filter b 
                     on a.activity_filter=b.filter_id 
-                    where a.activity_performed_by='`+user_email`' 
+                    where a.activity_performed_by='`+user_email+`' 
                     group by a.activity_filter,a.activity_type,b.filter_name 
                     order by count(*) desc,a.activity_type`, [],
                         {
