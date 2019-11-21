@@ -1342,8 +1342,8 @@ module.exports = class Asset {
 
             let queryString = "";
             let equalcheck="=";
-            console.log(data[0].ASSET_TYPE);
-            if(data.length>1&&data[0].ASSET_TYPE!="Asset Type"){
+            console.log(data[0].FILTER_TYPE);
+            if(data.length>1&&data[0].FILTER_TYPE!="Asset Type"){
                 equalcheck="!=";
             }
 
