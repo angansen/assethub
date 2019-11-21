@@ -1309,22 +1309,29 @@ module.exports = class Asset {
 
         let filterTypeMap = {};
         let queryString = "";
+        let reducedFilter = data.filter(filter => filter.FILTER_TYPE != "Asset Type");
+
+        data = reducedFilter;
+
         return new Promise((resolve, reject) => {
             // CREATE SQL queries   
-            data.forEach(val => {
-                let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where ";
-                filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "'";
-            });
+            if (data.length > 0) {
+                data.forEach(val => {
+                    let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where ";
+                    filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "'";
+                });
 
+                Object.keys(filterTypeMap).forEach(filterType => {
 
+                    queryString = queryString.length > 0 ? queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type' union " + filterTypeMap[filterType] : filterTypeMap[filterType];
+                })
 
-            Object.keys(filterTypeMap).forEach(filterType => {
+                queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type') a,asset_details b where a.asset_id=b.asset_id and b.asset_status='Live'";
 
-                queryString = queryString.length > 0 ? queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type' union " + filterTypeMap[filterType] : filterTypeMap[filterType];
-            })
+            } else {
+                queryString = "select b.* from  (select distinct ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where c.filter_id=d.filter_id and  d.filter_type='Asset Type') a,asset_details b where a.ASSET_ID=b.ASSET_ID and b.asset_status='Live'";
 
-
-            queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type') a,asset_details b where a.asset_id=b.asset_id and b.asset_status='Live'";
+            }
             console.log(queryString);
             // RETURN THE GENERATED QUERY 
             resolve(queryString);
@@ -1839,7 +1846,7 @@ module.exports = class Asset {
                     b.filter_name
                     from asset_search_activity a left join asset_filter b 
                     on a.activity_filter=b.filter_id 
-                    where a.activity_performed_by='`+user_email+`' 
+                    where a.activity_performed_by='`+ user_email + `' 
                     group by a.activity_filter,a.activity_type,b.filter_name 
                     order by count(*) desc,a.activity_type`, [],
                         {
