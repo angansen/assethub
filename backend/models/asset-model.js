@@ -1377,7 +1377,7 @@ module.exports = class Asset {
                         },
                     ).then(words => {
                         console.log(JSON.stringify(words));
-                        let wordString=words.map(word => word.ACTIVITY_FILTER).join().replace(/,/g, "','");
+                        let wordString=words.map(word => word.ACTIVITY_FILTER).join().replace(/,/g, " ");
                         console.log("Words > "+wordString);
                         let filteredbyword=[]
                         this.filterAssetBySearchString(assetlist,[],wordString,filteredbyword);
