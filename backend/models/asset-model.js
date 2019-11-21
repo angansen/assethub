@@ -1350,22 +1350,22 @@ module.exports = class Asset {
                     outFormat: oracledb.OBJECT
                 },
             ).then(filterList => {
-                console.log(JSON.stringify(filterList));
-                let filterids=filterList.map(filter=>filter.ASSET_FILTER_ID).join();
+                let filterids = filterList.map(filter => filter.ASSET_FILTER_ID).join();
                 console.log(JSON.stringify(filterids));
-                // console.log(filterids.join());
 
-                // // GET THE MAPPED ASSES FOR THE FILTERS
-                // let fetchPreferedFilterSql = "select asset_filter_id from asset_preferences where user_email='" + userEmail + "'";
-                // connection.query(fetchPreferedFilterSql, {},
-                //     {
-                //         outFormat: oracledb.OBJECT
-                //     },
-                // ).then(filterList => {
-                //     console.log(JSON.stringify(filterList));
-                //     resolve({ "status": "success" });
+                // GET THE MAPPED ASSES FOR THE FILTERS
+                let fetchPreferedFilterSql = `select b.* from asset_filter_asset_map a, asset_details b 
+                where a.filter_id in('`+filterids+`') 
+                and a.asset_id=b.asset_id;`;
+                connection.query(fetchPreferedFilterSql, {},
+                    {
+                        outFormat: oracledb.OBJECT
+                    },
+                ).then(assetlist => {
+                    console.log(JSON.stringify(assetlist));
+                    resolve(assetlist);
 
-                // })
+                })
 
             })
         })
