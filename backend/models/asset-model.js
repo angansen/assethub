@@ -1086,7 +1086,7 @@ module.exports = class Asset {
                             }).then(filterdata => {
                                 let filtersasset = [];
                                 this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
-                                    console.log("Content filter ended : " + filtersasset.length);
+                                    // console.log("Content filter ended : " + filtersasset.length);
                                     this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action).then(assets => {
                                         resolve(assets);
                                     })
@@ -1404,7 +1404,7 @@ module.exports = class Asset {
                     (d.asset_id=m.asset_id) where m.filter_id in (SELECT filter_id FROM ASSET_FILTER WHERE lower(FILTER_NAME) LIKE '%${searchString}%') UNION select asset_id from asset_details where (lower(ASSET_TITLE) LIKE '%${searchString}%' or lower(ASSET_DESCRIPTION) LIKE '%${searchString}%'))`;
                 options = {
                 }
-                console.log(sql);
+                // console.log(sql);
             } else if (filters[0]) {
                 //console.log("filters", filters[0])
 
@@ -1695,7 +1695,7 @@ module.exports = class Asset {
                                                                                 assetObj.INDUSTRY = res;
                                                                                 getPromoteById(assetId)
                                                                                     .then(res => {
-                                                                                        console.log(res);
+                                                                                        // console.log(res);
                                                                                         assetObj.PROMOTE = res.length == 0 ? false : true;
                                                                                         getSalesPlayByAssetId(assetId)
                                                                                             .then(res => {

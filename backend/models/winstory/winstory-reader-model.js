@@ -247,8 +247,8 @@ module.exports = class Asset {
             const connection = getDb();
             let filterObj = {};
             let filterArr = [];
-            console.log("------------------ SAVEING ASSET -----------------");
-            console.log(JSON.stringify(self));
+            // console.log("------------------ SAVEING ASSET -----------------");
+            // console.log(JSON.stringify(self));/
 
             if (this.assetId) {
 
@@ -314,7 +314,7 @@ module.exports = class Asset {
                     }
                     , function secondAction() {
                         if (oj.length > 0) {
-                            console.log("statement:", oj)
+                            // console.log("statement:", oj)
                             return connection.execute(`delete from ASSET_LINKS  WHERE WINSTORY_ID=:WINSTORY_ID`, [self.assetId]
                                 , {
                                     autoCommit: true
@@ -333,7 +333,7 @@ module.exports = class Asset {
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
-                            console.log(filterArr)
+                            // console.log(filterArr)
                             return connection.execute(`delete from asset_winstory_filter_winstory_map WHERE WINSTORY_ID=:WINSTORY_ID`, [self.assetId],
                                 {
                                     autocommit: true
@@ -399,8 +399,8 @@ module.exports = class Asset {
                     })
                 }
 
-                console.log("FilterArr", filterArr)
-                console.log("MODEL LINK2", oj)
+                // console.log("FilterArr", filterArr)
+                // console.log("MODEL LINK2", oj)
 
                 connection.transaction([
                     function firstAction() {
@@ -427,7 +427,7 @@ module.exports = class Asset {
                             )
                         }
                         else {
-                            console.log("oj is empty")
+                            // console.log("oj is empty")
                             return connection.query(`SELECT * from asset_links where link_active='true'`, {})
                         }
                     }, function thirdAction() {
@@ -468,7 +468,7 @@ module.exports = class Asset {
             let filterObj = {};
             let filterArr = [];
             console.log("------------------ SAVEING ASSET -----------------");
-            console.log(JSON.stringify(self));
+            // console.log(JSON.stringify(self));
 
             if (this.assetId) {
 
@@ -534,7 +534,7 @@ module.exports = class Asset {
                     }
                     , function secondAction() {
                         if (oj.length > 0) {
-                            console.log("statement:", oj)
+                            // console.log("statement:", oj)
                             return connection.execute(`delete from ASSET_LINKS  WHERE WINSTORY_ID=:WINSTORY_ID`, [self.assetId]
                                 , {
                                     autoCommit: true
@@ -553,7 +553,7 @@ module.exports = class Asset {
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
-                            console.log(filterArr)
+                            //console.log(filterArr)
                             return connection.execute(`delete from asset_winstory_filter_winstory_map WHERE WINSTORY_ID=:WINSTORY_ID`, [self.assetId],
                                 {
                                     autocommit: true
@@ -585,7 +585,7 @@ module.exports = class Asset {
             else {
                 this.assetId = uniqid.process('AH-');
                 assetid = this.assetId;
-                console.log(this.assetId, self.links)
+                //console.log(this.assetId, self.links)
                 if (!this.filters) {
                     this.filters = []
                 }
@@ -609,7 +609,7 @@ module.exports = class Asset {
                 }
                 let oj = this.links;
 
-                console.log("MODEL LINK1", oj)
+                //console.log("MODEL LINK1", oj)
                 if (!(oj === null)) {
                     oj.forEach(link => {
                         // linkObj={LINK_ID:uniqid.process(),WINSTORY_ID:assetid,...link}
@@ -619,8 +619,8 @@ module.exports = class Asset {
                     })
                 }
 
-                console.log("FilterArr", filterArr)
-                console.log("MODEL LINK2", oj)
+                //console.log("FilterArr", filterArr)
+                //console.log("MODEL LINK2", oj)
 
                 connection.transaction([
                     function firstAction() {
@@ -647,7 +647,7 @@ module.exports = class Asset {
                             )
                         }
                         else {
-                            console.log("oj is empty")
+                            //console.log("oj is empty")
                             return connection.query(`SELECT * from asset_links where link_active='true'`, {})
                         }
                     }, function thirdAction() {
@@ -686,17 +686,17 @@ module.exports = class Asset {
             const connection = getDb();
             //console.log(assetId+"/n",images)
             if (images.length > 1) {
-                console.log("multiple images")
+                //console.log("multiple images")
                 images.forEach(sampleFile => {
                     filesArray = generateFileName(sampleFile, assetId, filesArray, imageDescription);
                 })
             }
             else {
-                console.log("single image")
+                //console.log("single image")
                 const sampleFile = images;
                 filesArray = generateFileName(sampleFile, assetId, filesArray, imageDescription);
             }
-            console.log(filesArray)
+            //console.log(filesArray)
             connection.batchInsert(`INSERT INTO ASSET_IMAGES values(:IMAGE_ID,:WINSTORY_ID,:IMAGE_NAME,:IMAGEURL,:IMAGE_DESCRIPTION)`,
                 filesArray,
                 {
@@ -914,7 +914,7 @@ module.exports = class Asset {
                     outFormat: oracledb.Object
                 })
                 .then(res => {
-                    console.log(res)
+                    //console.log(res)
                     resolve({ msg: 'Image Deleted Successfully' })
                 })
         })
@@ -1033,14 +1033,14 @@ module.exports = class Asset {
                     }
                 })
             }
-            console.log(filtersasset.length);
+            //console.log(filtersasset.length);
             resolve(true);
         })
     }
 
 
     static fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, action) {
-        console.log(JSON.stringify(filters));
+        //console.log(JSON.stringify(filters));
         return new Promise((resolve, reject) => {
             if (filters.length > 0 && filters != "") {
                 let filterString = "'" + filters.toString().replace(/,/g, "','") + "'";
@@ -1069,7 +1069,7 @@ module.exports = class Asset {
                                         }).then(filterdata => {
                                             let filtersasset = [];
                                             this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
-                                                console.log("Content filter ended : " + filtersasset.length);
+                                                //console.log("Content filter ended : " + filtersasset.length);
                                                 this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action).then(assets => {
                                                     resolve(assets);
                                                 })
@@ -1097,7 +1097,7 @@ module.exports = class Asset {
                             }).then(filterdata => {
                                 let filtersasset = [];
                                 this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
-                                    console.log("Content filter ended : " + filtersasset.length);
+                                    //console.log("Content filter ended : " + filtersasset.length);
                                     this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action).then(assets => {
                                         resolve(assets);
                                     })
@@ -1329,7 +1329,7 @@ module.exports = class Asset {
     // CREATE QUERY STRING BASED ON SELECTED FILTERS
     static convertsql(data) {
         console.log("----------  Converting SQL WIN -------------");
-        console.log(JSON.stringify(data));
+        // console.log(JSON.stringify(data));
 
         let filterTypeMap = {};
         let queryString = "";
@@ -1424,7 +1424,7 @@ module.exports = class Asset {
             const connection = getDb();
             if (searchString2) {
                 let searchString = searchString2.toLowerCase();
-                console.log('FILTER Search start');
+                //console.log('FILTER Search start');
                 // select * from asset_details where asset_status='Live' and asset_id in(
                 //     select  d.asset_id from asset_details d join asset_filter_asset_map m on 
                 //     (d.asset_id=m.asset_id) where m.filter_id in (SELECT * FROM ASSET_FILTER WHERE lower(FILTER_NAME) LIKE '%${searchString2}%'))
@@ -1433,7 +1433,7 @@ module.exports = class Asset {
                     (d.WINSTORY_ID=m.WINSTORY_ID) where m.filter_id in (SELECT filter_id FROM ASSET_FILTER WHERE lower(FILTER_NAME) LIKE '%${searchString}%') UNION select WINSTORY_ID from asset_winstory_details where (lower(WINSTORY_NAME) LIKE '%${searchString}%' or lower(WINSTORY_USECASE) LIKE '%${searchString}%'))`;
                 options = {
                 }
-                console.log(sql);
+                //console.log(sql);
             } else if (filters[0]) {
                 var filterArr = [];
                 filterArr = filters[0].split(',')
@@ -1681,7 +1681,7 @@ module.exports = class Asset {
     }
 
     static WinsList(res) {
-        console.log('WinsList fn called');
+        // console.log('WinsList fn called');
         let assetsArray = res;
         let allAssetsObj = {};
         let tAssets = [];
@@ -1945,7 +1945,7 @@ module.exports = class Asset {
                                                                                                             filterArr = [...res]
                                                                                                             filterType = filterArr.map(a => a.FILTER_TYPE)
                                                                                                             filterType = [...new Set(filterType)]
-                                                                                                            console.log(filterType)
+                                                                                                            // console.log(filterType)
                                                                                                             filterType.forEach(type => {
                                                                                                                 filterTypeArr = filterArr.filter(f => f.FILTER_TYPE === type)
                                                                                                                 filterObj.TYPE = type;
@@ -2114,7 +2114,7 @@ module.exports = class Asset {
         })
     }
     static WinstoryLobsList() {
-        console.log('WinstoryLobs modal');
+       //console.log('WinstoryLobs modal');
         let typeArr = [];
         let filteredArr = [];
         let allFilters = [];
@@ -2564,7 +2564,7 @@ module.exports = class Asset {
         let industry = [];
         let industryArray = [];
         let promotedArray = []
-        console.log("Inside getWinsByLob: " + lob);
+        // console.log("Inside getWinsByLob: " + lob);
         return new Promise((resolve, reject) => {
             const connection = getDb();
             let lobQuerySql;
@@ -2589,7 +2589,7 @@ module.exports = class Asset {
                 })
                 .then(res => {
                     assetsArray = res
-                    console.log('Calling WinsList')
+                    // console.log('Calling WinsList')
                     //WinsList(res);
                     connection.query(promoteQuerySql, promoteQueryOptions,
                         {
@@ -2784,10 +2784,10 @@ module.exports = class Asset {
                                             statusArr = [...new Set(statusArr)];
                                             //console.log("status Array",statusArr)
                                             tempStatusArr = allStatusList.filter(s => statusArr.indexOf(s) === -1)
-                                            console.log("temp status arr", tempStatusArr)
+                                            // console.log("temp status arr", tempStatusArr)
                                             statusArr = [...statusArr, ...tempStatusArr]
                                             statusArr = [...new Set(statusArr)];
-                                            console.log("updated status arr", statusArr)
+                                            // console.log("updated status arr", statusArr)
                                             statusArr.forEach(status => {                                                             //loop each asset status type
                                                 //console.log(status + ' Array Length' + assetsArray.length);
                                                 filteredAssetsArray = assetsArray.filter(a => a.WINSTORY_STATUS === status)
