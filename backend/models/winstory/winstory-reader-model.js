@@ -1334,6 +1334,10 @@ module.exports = class Asset {
         let filterTypeMap = {};
         let queryString = "";
 
+        let reducedFilter=data.filter(filter=>filter.FILTER_TYPE!="Asset Type");
+
+        data=reducedFilter;
+        
         return new Promise((resolve, reject) => {
             // CREATE SQL queries   
             if (data.length > 0) {
