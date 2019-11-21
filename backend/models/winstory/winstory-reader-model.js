@@ -1335,23 +1335,28 @@ module.exports = class Asset {
 
         return new Promise((resolve, reject) => {
             // CREATE SQL queries   
-            data.forEach(val => {
-                let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select c.WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where ";
-                filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "'";
-            });
+            if (data.length > 0) {
+                data.forEach(val => {
+                    if (val.FILTER_TYPE != "Asset Type") {
+                        let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select c.WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where ";
+                        filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "'";
+                    }
+                });
 
-            let queryString = "";
-            let equalcheck = "!=";
-            if (data.length = 1 && data[0].FILTER_TYPE == "Asset Type") {
-                equalcheck = "=";
+
+                Object.keys(filterTypeMap).forEach(filterType => {
+
+                    queryString = queryString.length > 0 ? queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type' union " + filterTypeMap[filterType] : filterTypeMap[filterType];
+                })
+
+                queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
+
+            } else {
+                queryString = `select distinct WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where`;
+                queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type='Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
+
             }
 
-            Object.keys(filterTypeMap).forEach(filterType => {
-
-                queryString = queryString.length > 0 ? queryString + " and c.filter_id=d.filter_id and  d.filter_type" + equalcheck + "'Asset Type' union " + filterTypeMap[filterType] : filterTypeMap[filterType];
-            })
-
-            queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type" + equalcheck + "'Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
             console.log(queryString);
             // RETURN THE GENERATED QUERY 
             resolve(queryString);
