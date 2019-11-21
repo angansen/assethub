@@ -207,6 +207,7 @@ exports.captureSearch = (activity) => {
     if (activity.filters == undefined) {
         return;
     } else {
+        console.log(JSON.stringify(activity));
         activity.activity_id = uniqid.process('a-');
         activity.activitygroupid = uniqid.process('ag-');
         activity.filters = activity.filters.split(',');
