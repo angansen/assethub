@@ -1377,10 +1377,27 @@ module.exports = class Asset {
                         },
                     ).then(words => {
                         console.log(JSON.stringify(words));
-                        let wordString=words.map(word => word.ACTIVITY_FILTER).join().replace(/,/g, " ");
+                        let wordlist=words.map(word => word.ACTIVITY_FILTER);
                         console.log("Words > "+wordString);
                         let filteredbyword=[]
-                        this.filterAssetBySearchString(assetlist,[],wordString,filteredbyword);
+                       
+                        for (let i = 0; i < assetlist.length; i++) {
+
+                            let combineContentToMatch = assetlist[i].ASSET_TITLE +
+                            assetlist[i].ASSET_DESCRIPTION +
+                            assetlist[i].ASSET_USERCASE +
+                            assetlist[i].ASSET_CUSTOMER +
+                            assetlist[i].ASSET_ARCHITECTURE_DESCRIPTION
+                        
+                            combineContentToMatch = combineContentToMatch.toLowerCase();
+                            wordlist.forEach(word => {
+                                console.log(" >>> "+combineContentToMatch.indexOf(word);
+                                if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
+                                    filteredbyword.push(assetlist[i]);
+                                }
+                            })
+                        }
+
                         resolve(filteredbyword);
                     })
 
