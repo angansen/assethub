@@ -1339,32 +1339,22 @@ module.exports = class Asset {
     }
 
 
-    // // CREATE QUERY STRING BASED ON SELECTED FILTERS
-    // static convertsql(data) {
-    //     console.log("----------  Converting SQL ASSET -------------");
+    static fetchPreferedAssets = (userEmail) => {
+        return new Promise((resolve, reject) => {
+            let fetchPreferedFilterSql = "select asset_filter_id from asset_preferences where user_email='" + userEmail + "'";
+            connection.query(fetchPreferedFilterSql, {},
+                {
+                    outFormat: oracledb.OBJECT
+                },
+            ).then(filterList => {
+                console.log(JSON.stringify(filterList));
+                resolve({"status":"success"});
 
-    //     let filterTypeMap = {};
+            })
+        })
 
-    //     return new Promise((resolve, reject) => {
-    //         // CREATE SQL queries   
-    //         data.forEach(val => {
-    //             let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select asset_id from asset_filter_asset_map where ";
-    //             filterTypeMap[val.FILTER_TYPE] = filterstring + " filter_id='" + val.FILTER_ID + "'";
-    //         });
 
-    //         let queryString = "";
-
-    //         Object.keys(filterTypeMap).forEach(filterType => {
-
-    //             queryString = queryString.length > 0 ? queryString + " union " + filterTypeMap[filterType] : filterTypeMap[filterType];
-    //         })
-
-    //         queryString = "select b.* from  (" + queryString + ") a,asset_details b where a.asset_id=b.asset_id and b.asset_status='Live'";
-    //         console.log(queryString);
-    //         // RETURN THE GENERATED QUERY 
-    //         resolve(queryString);
-    //     })
-    // }
+    }
 
 
     //Fetch asset model function

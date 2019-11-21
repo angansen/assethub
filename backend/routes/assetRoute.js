@@ -41,7 +41,7 @@ router.post('/helpandsupport', assetController.saveHelpAndSupport);
 router.get('/allAssetsBySearchString', assetController.getAllAssetsBySearchString);
 router.get('/allAssetsFilters2', assetController.getAllAssetsByFilters);
 router.get('/allAssetsFilters', assetController.getAllAssetsByFilters2);
-router.get('/allPrefferedAssets/:user_email', assetController.getAllPreferredAssets);
+router.get('/allPrefferedAssets/:user_email', assetController.getAllPreferredAssets1);
 router.get('/allFilters', assetController.getAllFilters);
 router.post('/socialData', assetController.getSocialData);
 router.get('/favourites', assetController.getAllFavAssets);

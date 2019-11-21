@@ -481,7 +481,7 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         email: email,
         searchtext: searchString
     }
-    
+
     console.log("============= Asset Controller Activity ==============")
     console.log(JSON.stringify(activity));
     console.log("================== Activity ==========================")
@@ -572,7 +572,14 @@ exports.getAllAssetsByFilters = (req, res) => {
     }
 
 }
+exports.getAllPreferredAssets1 = (req, res) => {
+    const user_email = req.params.user_email;
 
+    Asset.fetchPreferedAssets(email)
+        .then(list => {
+            res.send(list);
+        })
+}
 
 exports.getAllPreferredAssets = (req, res) => {
     const offset = 0
