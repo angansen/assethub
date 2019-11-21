@@ -208,7 +208,7 @@ exports.captureSearch = (activity) => {
     console.log("============= FILTER ==============")
     console.log(JSON.stringify(activity));
     console.log("============= FILTER ==============")
-    
+
     if (activity.filters == undefined) {
         return;
     } else {
@@ -232,23 +232,28 @@ exports.captureSearch = (activity) => {
         })
 
 
-        if (activity.searchtext.length > 0) {
-            try {
-                const connection = getDb();
-                let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
-                let captureSearchActivityOptions = [activity.activity_id, activity.email, activity.searchtext, activity.activitygroupid, "FREETEXT"];
-                connection.execute(captureSearchActivitySql, captureSearchActivityOptions, {
-                    autoCommit: true
-                });
-            } catch (err) {
-                console.log(JSON.stringify(err));
-            };
+        if (activity.searchtext != undefined && activity.searchtext.length > 0) {
+            let words = activity.searchtext.trim().split(" ");
+
+            words.filter(word => {
+                try {
+                    const connection = getDb();
+                    let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
+                    let captureSearchActivityOptions = [activity.activity_id, activity.email, word, activity.activitygroupid, "FREETEXT"];
+                    connection.execute(captureSearchActivitySql, captureSearchActivityOptions, {
+                        autoCommit: true
+                    });
+                } catch (err) {
+                    console.log(JSON.stringify(err));
+                };
+            })
+
         }
     }
 }
 
 exports.captureSearch2 = (activity) => {
-    
+
     if (activity.filters == undefined) {
         return;
     } else {
@@ -272,7 +277,7 @@ exports.captureSearch2 = (activity) => {
 
 
         if (activity.searchtext.length > 0) {
-            let searchwords=activity.searchtext.trim().split(" ");
+            let searchwords = activity.searchtext.trim().split(" ");
             // activity.searchtext.trim().split(" ").fil
             try {
                 const connection = getDb();
@@ -399,9 +404,9 @@ let updateLobForDirectReportList = (leadermap, userList, lead, lob) => {
         return user.USER_MANAGER_EMAIL == lead.USER_EMAIL;
     })
     reports.forEach(user => {
-        if(leadermap[user.USER_EMAIL]==undefined){
+        if (leadermap[user.USER_EMAIL] == undefined) {
             user.USER_LOB = lead.LOB_LEADER_LOB;
-        }else{
+        } else {
             user.USER_LOB = leadermap[user.USER_EMAIL].USER_LOB;
         }
         updateLobForDirectReportList(leadermap, userList, user, lob);
