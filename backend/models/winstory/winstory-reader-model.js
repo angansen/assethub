@@ -1352,8 +1352,7 @@ module.exports = class Asset {
                 queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
 
             } else {
-                queryString = "select distinct WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where";
-                queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type='Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
+                queryString = "select b.* from  (select distinct WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where c.filter_id=d.filter_id and  d.filter_type='Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
 
             }
 
