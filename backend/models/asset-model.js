@@ -1350,7 +1350,7 @@ module.exports = class Asset {
                     outFormat: oracledb.OBJECT
                 },
             ).then(filterList => {
-                let filterids = filterList.map(filter => filter.ASSET_FILTER_ID).join();
+                let filterids = filterList.map(filter => filter.ASSET_FILTER_ID).join().replace(/,/g,"','");
                 console.log(JSON.stringify(filterids));
 
                 // GET THE MAPPED ASSES FOR THE FILTERS
