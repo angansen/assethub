@@ -1339,9 +1339,11 @@ module.exports = class Asset {
     }
 
 
-    static fetchPreferedAssets(userEmail){
+    static fetchPreferedAssets(userEmail) {
         const connection = getDb();
         return new Promise((resolve, reject) => {
+
+            // GET THE PREFERED FILTERS
             let fetchPreferedFilterSql = "select asset_filter_id from asset_preferences where user_email='" + userEmail + "'";
             connection.query(fetchPreferedFilterSql, {},
                 {
@@ -1349,7 +1351,21 @@ module.exports = class Asset {
                 },
             ).then(filterList => {
                 console.log(JSON.stringify(filterList));
-                resolve({"status":"success"});
+                let filterids=filterList.map(filter=>filter.ASSET_FILTER_ID);
+                console.log(JSON.stringify(filterids));
+                console.log(filterids.join());
+
+                // // GET THE MAPPED ASSES FOR THE FILTERS
+                // let fetchPreferedFilterSql = "select asset_filter_id from asset_preferences where user_email='" + userEmail + "'";
+                // connection.query(fetchPreferedFilterSql, {},
+                //     {
+                //         outFormat: oracledb.OBJECT
+                //     },
+                // ).then(filterList => {
+                //     console.log(JSON.stringify(filterList));
+                //     resolve({ "status": "success" });
+
+                // })
 
             })
         })
