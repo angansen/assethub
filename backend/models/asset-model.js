@@ -1354,10 +1354,11 @@ module.exports = class Asset {
                 console.log(JSON.stringify(filterids));
 
                 // GET THE MAPPED ASSES FOR THE FILTERS
-                let fetchPreferedFilterSql = `select b.* from asset_filter_asset_map a, asset_details b 
+                let fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
                 where a.filter_id in('`+filterids+`') 
                 and a.asset_id=b.asset_id`;
-                connection.query(fetchPreferedFilterSql, {},
+                console.log("> "+fetchAssetsSql);
+                connection.query(fetchAssetsSql, {},
                     {
                         outFormat: oracledb.OBJECT
                     },
