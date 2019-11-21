@@ -1378,7 +1378,6 @@ module.exports = class Asset {
                     ).then(words => {
                         console.log(JSON.stringify(words));
                         let wordlist=words.map(word => word.ACTIVITY_FILTER);
-                        console.log("Words > "+wordString);
                         let filteredbyword=[]
                        
                         for (let i = 0; i < assetlist.length; i++) {
