@@ -1340,6 +1340,7 @@ module.exports = class Asset {
 
 
     static fetchPreferedAssets(userEmail){
+        const connection = getDb();
         return new Promise((resolve, reject) => {
             let fetchPreferedFilterSql = "select asset_filter_id from asset_preferences where user_email='" + userEmail + "'";
             connection.query(fetchPreferedFilterSql, {},
