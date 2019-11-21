@@ -1341,18 +1341,17 @@ module.exports = class Asset {
             });
 
             let queryString = "";
-            let equalcheck="=";
-            console.log(data[0].FILTER_TYPE);
-            if(data.length>1&&data[0].FILTER_TYPE!="Asset Type"){
-                equalcheck="!=";
+            let equalcheck = "!=";
+            if (data.length = 1 && data[0].FILTER_TYPE == "Asset Type") {
+                equalcheck = "=";
             }
 
             Object.keys(filterTypeMap).forEach(filterType => {
 
-                queryString = queryString.length > 0 ? queryString + " and c.filter_id=d.filter_id and  d.filter_type"+equalcheck+"'Asset Type' union " + filterTypeMap[filterType] : filterTypeMap[filterType];
+                queryString = queryString.length > 0 ? queryString + " and c.filter_id=d.filter_id and  d.filter_type" + equalcheck + "'Asset Type' union " + filterTypeMap[filterType] : filterTypeMap[filterType];
             })
 
-            queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type"+equalcheck+"'Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
+            queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type" + equalcheck + "'Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
             console.log(queryString);
             // RETURN THE GENERATED QUERY 
             resolve(queryString);
