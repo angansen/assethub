@@ -1351,9 +1351,9 @@ module.exports = class Asset {
                 },
             ).then(filterList => {
                 console.log(JSON.stringify(filterList));
-                let filterids=filterList.map(filter=>filter.ASSET_FILTER_ID);
+                let filterids=filterList.map(filter=>filter.ASSET_FILTER_ID).join();
                 console.log(JSON.stringify(filterids));
-                console.log(filterids.join());
+                // console.log(filterids.join());
 
                 // // GET THE MAPPED ASSES FOR THE FILTERS
                 // let fetchPreferedFilterSql = "select asset_filter_id from asset_preferences where user_email='" + userEmail + "'";
