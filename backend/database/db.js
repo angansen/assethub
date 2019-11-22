@@ -94,7 +94,7 @@ async function getpoolconnection() {
 				}
 				pooldb = pool;
 				try {
-					pooldb.query(`SELECT count(username) FROM dba_users`, {},
+					pooldb.getConnection().query(`SELECT count(username) FROM dba_users`, {},
 						{
 							outFormat: oracledb.OBJECT
 						},
