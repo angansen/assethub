@@ -1368,6 +1368,10 @@ module.exports = class Asset {
 
     static fetchPreferedWins(host,userEmail) {
         let finalList = [];
+        const offset = 0
+        let limit;
+        let order;
+        let sortBy;
 
         const connection = getDb();
         return new Promise((resolve, reject) => {
@@ -1439,7 +1443,7 @@ module.exports = class Asset {
                                 })
                             }
                             console.log("Suggested wins : " + finalList.length);
-                            this.refineAssets(host, -1, 0, finalList, "", "", "").then(assets => {
+                            this.refineAssets(host, offset, limit, finalList, sortBy, order, action).then(assets => {
                                 resolve(assets);
                             })
                         })
