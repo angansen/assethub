@@ -64,7 +64,7 @@ Dbconnect.Dbconnect().then(res => {
       console.log("DB intiated : " + resp);
     })
   } catch (error) {
-    console.log(error);
+    console.log("Connection probbing is done. . .");
   }
 
 })
