@@ -489,9 +489,9 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         searchtext: searchString
     }
     
-    console.log("============= Win Controller Activity ==============")
-    console.log(JSON.stringify(activity));
-    console.log("================== Activity ==========================")
+    // console.log("============= Win Controller Activity ==============")
+    // console.log(JSON.stringify(activity));
+    // console.log("================== Activity ==========================")
 
     try {
         worker.captureSearch(activity);
