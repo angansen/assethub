@@ -84,6 +84,7 @@ async function getpoolconnection() {
 	return new Promise((resolve, reject) => {
 		oracledb.createPool(dbconnparam,
 			(err, pool) => {
+				console.log(JSON.stringify(pool));
 				if (err) {
 					console.log(
 						"ERROR: ",

@@ -54,18 +54,6 @@ app.get('/test', (req, res) => {
 
 Dbconnect.Dbconnect().then(res => {
   console.log(res);
-  try {
-    const connection = getDb();
-    connection.execute(`SELECT count(username) FROM dba_users`, {},
-      {
-        outFormat: oracledb.OBJECT
-      },
-    ).then(resp => {
-      console.log("DB intiated : " + resp);
-    })
-  } catch (error) {
-    console.log(error);
-  }
 
 })
   .catch(err => console.log(err))
