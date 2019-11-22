@@ -575,7 +575,7 @@ exports.getAllAssetsByFilters = (req, res) => {
 exports.getAllPreferredAssets1 = (req, res) => {
     const user_email = req.params.user_email;
 
-    Asset.fetchPreferedAssets(user_email)
+    Asset.fetchPreferedAssets(req.headers.host,user_email)
         .then(list => {
             res.send(list);
         })

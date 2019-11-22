@@ -1339,7 +1339,7 @@ module.exports = class Asset {
     }
 
 
-    static fetchPreferedAssets(userEmail) {
+    static fetchPreferedAssets(host,userEmail) {
         const connection = getDb();
         let finalList = [];
         return new Promise((resolve, reject) => {

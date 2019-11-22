@@ -1366,7 +1366,7 @@ module.exports = class Asset {
         })
     }
 
-    static fetchPreferedWins(userEmail) {
+    static fetchPreferedWins(host,userEmail) {
         let finalList = [];
 
         const connection = getDb();

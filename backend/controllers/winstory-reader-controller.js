@@ -573,7 +573,7 @@ exports.getAllAssetsByFilters = (req, res) => {
 exports.getAllPreferredWins1 = (req, res) => {
     const user_email = req.params.user_email;
 
-    winstoryreader.fetchPreferedWins(user_email)
+    winstoryreader.fetchPreferedWins(req.headers.host,user_email)
         .then(list => {
             res.send(list);
         })
