@@ -346,14 +346,15 @@ exports.mapFilters = (filter, host) => {
                                                         console.log("ASSET_FILTER View error: " + err);
                                                         resolve(err)
                                                     })
-                                            } else
-                                                resolve({ "status": "filter already mapped" })
+                                            }
 
                                         })
                                         .catch(err => {
                                             console.log("ASSET_FILTER View error: " + err);
                                             resolve(err)
                                         })
+                                } else {
+                                    resolve({ "status": "filter already mapped" })
                                 }
                             })
                             .catch(err => {
@@ -400,6 +401,8 @@ exports.mapFilters = (filter, host) => {
                                             console.log("ASSET_FILTER View error: " + err);
                                             resolve(err)
                                         })
+                                } else {
+                                    resolve({ "status": "filter already mapped" })
                                 }
                             })
                             .catch(err => {
