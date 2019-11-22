@@ -1432,14 +1432,16 @@ module.exports = class Asset {
 
                                 combineContentToMatch = combineContentToMatch.toLowerCase();
                                 wordlist.forEach(word => {
-                                    console.log(" >>> " + combineContentToMatch.indexOf(word));
+                                    // console.log(" >>> " + combineContentToMatch.indexOf(word));
                                     if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
                                         finalList.push(allwins[i]);
                                     }
                                 })
                             }
                             console.log("Suggested wins : " + finalList.length);
-                            resolve(finalList);
+                            this.refineAssets(host, -1, 0, finalList, "", "", "").then(assets => {
+                                resolve(assets);
+                            })
                         })
 
                     })

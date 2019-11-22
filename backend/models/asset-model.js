@@ -1405,7 +1405,10 @@ module.exports = class Asset {
                             }
 
                             console.log("Suggested assets : " + finalList.length);
-                            resolve(finalList);
+                            this.refineAssets(host, -1, 0, finalList, "", "", "").then(assets => {
+                                resolve(assets);
+                            })
+
                         })
 
                     })
