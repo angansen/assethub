@@ -1334,10 +1334,10 @@ module.exports = class Asset {
         let filterTypeMap = {};
         let queryString = "";
 
-        let reducedFilter=data.filter(filter=>filter.FILTER_TYPE!="Asset Type");
+        let reducedFilter = data.filter(filter => filter.FILTER_TYPE != "Asset Type");
 
-        data=reducedFilter;
-        
+        data = reducedFilter;
+
         return new Promise((resolve, reject) => {
             // CREATE SQL queries   
             if (data.length > 0) {
@@ -1365,32 +1365,81 @@ module.exports = class Asset {
             resolve(queryString);
         })
     }
-    // // CREATE QUERY STRING BASED ON SELECTED FILTERS
-    // static convertsql(data) {
-    //     console.log("----------  Converting SQL WIN -------------");
 
-    //     let filterTypeMap = {};
+    static fetchPreferedWins(userEmail) {
+        const connection = getDb();
+        return new Promise((resolve, reject) => {
 
-    //     return new Promise((resolve, reject) => {
-    //         // CREATE SQL queries   
-    //         data.forEach(val => {
-    //             let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP where ";
-    //             filterTypeMap[val.FILTER_TYPE] = filterstring + " filter_id='" + val.FILTER_ID + "'";
-    //         });
+            // GET THE PREFERED FILTERS
+            let fetchPreferedFilterSql = "select ASSET_FILTER_ID from ASSET_WINSTORY_PREFERENCES where USER_EMAIL='" + userEmail + "'";
+            connection.query(fetchPreferedFilterSql, {},
+                {
+                    outFormat: oracledb.OBJECT
+                },
+            ).then(filterList => {
+                let filterids = filterList.map(filter => filter.ASSET_FILTER_ID).join().replace(/,/g, "','");
+                console.log(JSON.stringify(filterids));
 
-    //         let queryString = "";
+                // GET THE MAPPED ASSES FOR THE FILTERS
+                let fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
+                where a.WINSTORY_ID in('`+ filterids + `') 
+                and a.WINSTORY_ID=b.WINSTORY_ID`;
+                console.log("> " + fetchAssetsSql);
+                connection.query(fetchAssetsSql, {},
+                    {
+                        outFormat: oracledb.OBJECT
+                    },
+                ).then(winList => {
+                    // console.log(JSON.stringify(assetlist));
 
-    //         Object.keys(filterTypeMap).forEach(filterType => {
+                    let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
+                    where activity_type='FREETEXT' 
+                    and activity_performed_by='` + userEmail + `' 
+                    group by activity_filter 
+                    order by frequency desc 
+                    FETCH NEXT 3 ROWS ONLY`
+                    connection.query(fetchtopwordssql, {},
+                        {
+                            outFormat: oracledb.OBJECT
+                        },
+                    ).then(words => {
+                        console.log(JSON.stringify(words));
+                        let wordlist = words.map(word => word.ACTIVITY_FILTER);
+                        let filteredbyword = []
 
-    //             queryString = queryString.length > 0 ? queryString + " union " + filterTypeMap[filterType] : filterTypeMap[filterType];
-    //         })
+                        for (let i = 0; i < winList.length; i++) {
+                            let combineContentToMatch = winList[i].WINSTORY_NAME +
+                                winList[i].WINSTORY_PARTNER +
+                                winList[i].WINSTORY_CUSTOMER_NAME +
+                                winList[i].WINSTORY_IMPERATIVE +
+                                winList[i].WINSTORY_CUSTOMER_IMPACT +
+                                winList[i].WINSTORY_BUSSINESS_DRIVER +
+                                winList[i].WINSTORY_SALES_PROCESS +
+                                winList[i].WINSTORY_USECASE +
+                                winList[i].WINSTORY_LESSON_LEARNT +
+                                winList[i].WINSTORY_SOLUTION_USECASE +
+                                winList[i].WINSTORY_COMPETIION +
+                                winList[i].WINSTORY_MAPPED_L2_FILTERS;
 
-    //         queryString = "select b.* from  (" + queryString + ") a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
-    //         console.log(queryString);
-    //         // RETURN THE GENERATED QUERY 
-    //         resolve(queryString);
-    //     })
-    // }
+                            combineContentToMatch = combineContentToMatch.toLowerCase();
+                            wordlist.forEach(word => {
+                                console.log(" >>> " + combineContentToMatch.indexOf(word));
+                                if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
+                                    filteredbyword.push(winList[i]);
+                                }
+                            })
+                        }
+                        console.log("Suggested wins : " + filteredbyword.length);
+                        resolve(filteredbyword);
+                    })
+
+                })
+
+            })
+        })
+
+
+    }
 
 
     //Fetch asset model function
@@ -2114,7 +2163,7 @@ module.exports = class Asset {
         })
     }
     static WinstoryLobsList() {
-       //console.log('WinstoryLobs modal');
+        //console.log('WinstoryLobs modal');
         let typeArr = [];
         let filteredArr = [];
         let allFilters = [];

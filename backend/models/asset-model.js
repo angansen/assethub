@@ -1396,7 +1396,7 @@ module.exports = class Asset {
                                 }
                             })
                         }
-                        console.log("Suggested asset : "+filteredbyword.length);
+                        console.log("Suggested assets : "+filteredbyword.length);
                         resolve(filteredbyword);
                     })
 

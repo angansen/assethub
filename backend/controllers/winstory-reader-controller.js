@@ -570,6 +570,15 @@ exports.getAllAssetsByFilters = (req, res) => {
     }
 }
 
+exports.getAllPreferredWins1 = (req, res) => {
+    const user_email = req.params.user_email;
+
+    winstoryreader.fetchPreferedWins(user_email)
+        .then(list => {
+            res.send(list);
+        })
+}
+
 
 exports.getAllPreferredWins = (req, res) => {
     const offset = 0
