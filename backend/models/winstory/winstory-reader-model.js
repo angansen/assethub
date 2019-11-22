@@ -1367,6 +1367,8 @@ module.exports = class Asset {
     }
 
     static fetchPreferedWins(userEmail) {
+        let finalList = [];
+
         const connection = getDb();
         return new Promise((resolve, reject) => {
 
