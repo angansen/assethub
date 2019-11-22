@@ -12,7 +12,7 @@ router.get('/winstorylobs', winstoryreaderController.getWinStoryLobsList);
 router.get('/winstoryimperative', winstoryreaderController.winstoryimperative);
 router.get('/winstorysolutionusecase', winstoryreaderController.winstorysolutionusecase);
 router.get('/winfavourites', winstoryreaderController.getAllFavWins);
-router.get('/allPrefferedWins/:user_email', winstoryreaderController.getAllPreferredWins);
+router.get('/allPrefferedWins/:user_email', winstoryreaderController.getAllPreferredWins1);
 router.get('/filterWinsbylob', winstoryreaderController.getAllWinsByLob);
 router.get('/:winstoryId', winstoryreaderController.getWinStoryById);
 
