@@ -94,7 +94,7 @@ async function getpoolconnection() {
 				}
 				pooldb = pool;
 				try {
-					pooldb.query(fetchPreferedFilterSql, {},
+					pooldb.query(`SELECT count(username) FROM dba_users`, {},
 						{
 							outFormat: oracledb.OBJECT
 						},
