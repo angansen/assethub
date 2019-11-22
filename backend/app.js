@@ -4,6 +4,7 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const Dbconnect = require('./database/db');
+const getDb = require('./database/db').getDb;
 const worker = require('./utility/worker');
 // const getDb = require('./database/db').getDb;
 const oracledb = require('oracledb');
@@ -57,7 +58,8 @@ app.get('/test', (req, res) => {
 Dbconnect.Dbconnect().then(res => {
   console.log(res);
   try {
-    Dbconnect.getDb().query(`SELECT count(username) FROM dba_users`, {},
+    let connection=getDb();
+    connection.query(`SELECT count(username) FROM dba_users`, {},
       {
         outFormat: oracledb.OBJECT
       },
