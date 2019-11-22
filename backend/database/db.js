@@ -80,7 +80,7 @@ async function getpoolconnection() {
 		poolIncrement: 5,
 		poolTimeout: 4
 	}
-
+	//SELECT count(username) FROM dba_users;
 	return new Promise((resolve, reject) => {
 		oracledb.createPool(dbconnparam,
 			(err, pool) => {
@@ -93,6 +93,18 @@ async function getpoolconnection() {
 					return;
 				}
 				pooldb = pool;
+				try {
+					pooldb.query(fetchPreferedFilterSql, {},
+						{
+							outFormat: oracledb.OBJECT
+						},
+					).then(resp => {
+						console.log("DB intiated : " + resp);
+					})
+				} catch (error) {
+					console.log(error);
+				}
+
 				resolve("Pool db connection created");
 			}
 		);
@@ -117,7 +129,7 @@ const getpooldb = () => {
 			// console.log("Open connection > " + pooldb.connectionsOpen+" / "+pooldb.connectionsInUse);
 			pooldb.getConnection().then(result => {
 				_db = result;
-				// console.log("got connection");
+				// console.log("got connection");	
 				resolve(_db);
 			});
 		})
