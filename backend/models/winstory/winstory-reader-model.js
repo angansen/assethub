@@ -1391,6 +1391,7 @@ module.exports = class Asset {
                     },
                 ).then(winList => {
                     // console.log(JSON.stringify(assetlist));
+                    finalList = [...winList];
 
                     let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
                     where activity_type='FREETEXT' 
@@ -1403,41 +1404,48 @@ module.exports = class Asset {
                             outFormat: oracledb.OBJECT
                         },
                     ).then(words => {
-                        console.log(JSON.stringify(words));
-                        let wordlist = words.map(word => word.ACTIVITY_FILTER);
-                        let filteredbyword = []
+                        let fetchtopwordssql = `select * from asset_details where asset_status='Live'`;
+                        connection.query(fetchtopwordssql, {},
+                            {
+                                outFormat: oracledb.OBJECT
+                            },
+                        ).then(allwins => {
+                            console.log(JSON.stringify(words));
+                            let wordlist = words.map(word => word.ACTIVITY_FILTER);
 
-                        for (let i = 0; i < winList.length; i++) {
-                            let combineContentToMatch = winList[i].WINSTORY_NAME +
-                                winList[i].WINSTORY_PARTNER +
-                                winList[i].WINSTORY_CUSTOMER_NAME +
-                                winList[i].WINSTORY_IMPERATIVE +
-                                winList[i].WINSTORY_CUSTOMER_IMPACT +
-                                winList[i].WINSTORY_BUSSINESS_DRIVER +
-                                winList[i].WINSTORY_SALES_PROCESS +
-                                winList[i].WINSTORY_USECASE +
-                                winList[i].WINSTORY_LESSON_LEARNT +
-                                winList[i].WINSTORY_SOLUTION_USECASE +
-                                winList[i].WINSTORY_COMPETIION +
-                                winList[i].WINSTORY_MAPPED_L2_FILTERS;
 
-                            combineContentToMatch = combineContentToMatch.toLowerCase();
-                            wordlist.forEach(word => {
-                                console.log(" >>> " + combineContentToMatch.indexOf(word));
-                                if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
-                                    filteredbyword.push(winList[i]);
-                                }
-                            })
-                        }
-                        console.log("Suggested wins : " + filteredbyword.length);
-                        resolve(filteredbyword);
+                            for (let i = 0; i < allwins.length; i++) {
+                                let combineContentToMatch = allwins[i].WINSTORY_NAME +
+                                    allwins[i].WINSTORY_PARTNER +
+                                    allwins[i].WINSTORY_CUSTOMER_NAME +
+                                    allwins[i].WINSTORY_IMPERATIVE +
+                                    allwins[i].WINSTORY_CUSTOMER_IMPACT +
+                                    allwins[i].WINSTORY_BUSSINESS_DRIVER +
+                                    allwins[i].WINSTORY_SALES_PROCESS +
+                                    allwins[i].WINSTORY_USECASE +
+                                    allwins[i].WINSTORY_LESSON_LEARNT +
+                                    allwins[i].WINSTORY_SOLUTION_USECASE +
+                                    allwins[i].WINSTORY_COMPETIION +
+                                    allwins[i].WINSTORY_MAPPED_L2_FILTERS;
+
+                                combineContentToMatch = combineContentToMatch.toLowerCase();
+                                wordlist.forEach(word => {
+                                    console.log(" >>> " + combineContentToMatch.indexOf(word));
+                                    if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
+                                        finalList.push(allwins[i]);
+                                    }
+                                })
+                            }
+                            console.log("Suggested wins : " + finalList.length);
+                            resolve(finalList);
+                        })
+
                     })
-
                 })
 
             })
-        })
 
+        })
 
     }
 

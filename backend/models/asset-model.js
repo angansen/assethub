@@ -1341,6 +1341,7 @@ module.exports = class Asset {
 
     static fetchPreferedAssets(userEmail) {
         const connection = getDb();
+        let finalList = [];
         return new Promise((resolve, reject) => {
 
             // GET THE PREFERED FILTERS
@@ -1364,7 +1365,7 @@ module.exports = class Asset {
                     },
                 ).then(assetlist => {
                     // console.log(JSON.stringify(assetlist));
-
+                    finalList = [...assetlist];
                     let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
                     where activity_type='FREETEXT' 
                     and activity_performed_by='` + userEmail + `' 
@@ -1376,33 +1377,41 @@ module.exports = class Asset {
                             outFormat: oracledb.OBJECT
                         },
                     ).then(words => {
-                        console.log(JSON.stringify(words));
-                        let wordlist=words.map(word => word.ACTIVITY_FILTER);
-                        let filteredbyword=[]
-                       
-                        for (let i = 0; i < assetlist.length; i++) {
+                        let fetchallLiveAssets = `select * from asset_details where asset_status='Live'`
+                        connection.query(fetchallLiveAssets, {},
+                            {
+                                outFormat: oracledb.OBJECT
+                            },
+                        ).then(allassets => {
+                            console.log(JSON.stringify(words));
+                            let wordlist = words.map(word => word.ACTIVITY_FILTER);
+                            let filteredbyword = []
 
-                            let combineContentToMatch = assetlist[i].ASSET_TITLE +
-                            assetlist[i].ASSET_DESCRIPTION +
-                            assetlist[i].ASSET_USERCASE +
-                            assetlist[i].ASSET_CUSTOMER +
-                            assetlist[i].ASSET_ARCHITECTURE_DESCRIPTION
-                        
-                            combineContentToMatch = combineContentToMatch.toLowerCase();
-                            wordlist.forEach(word => {
-                                console.log(" >>> "+combineContentToMatch.indexOf(word));
-                                if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
-                                    filteredbyword.push(assetlist[i]);
-                                }
-                            })
-                        }
-                        console.log("Suggested assets : "+filteredbyword.length);
-                        resolve(filteredbyword);
+                            for (let i = 0; i < allassets.length; i++) {
+
+                                let combineContentToMatch = allassets[i].ASSET_TITLE +
+                                    allassets[i].ASSET_DESCRIPTION +
+                                    allassets[i].ASSET_USERCASE +
+                                    allassets[i].ASSET_CUSTOMER +
+                                    allassets[i].ASSET_ARCHITECTURE_DESCRIPTION
+
+                                combineContentToMatch = combineContentToMatch.toLowerCase();
+                                wordlist.forEach(word => {
+                                    console.log(" >>> " + combineContentToMatch.indexOf(word));
+                                    if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
+                                        finalList.push(allassets[i]);
+                                    }
+                                })
+                            }
+
+                            console.log("Suggested assets : " + finalList.length);
+                            resolve(finalList);
+                        })
+
                     })
-
                 })
-
             })
+
         })
 
 
