@@ -1,4 +1,3 @@
-// var createError = require('http-errors');
 var express = require('express');
 // var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -6,13 +5,11 @@ var logger = require('morgan');
 const Dbconnect = require('./database/db');
 const getDb = require('./database/db').getDb;
 const worker = require('./utility/worker');
-// const getDb = require('./database/db').getDb;
 const oracledb = require('oracledb');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
 
 var log4js = require('log4js');
-// var log = log4js.getLogger("app");
 
 // var uniqid = require('uniqid');
 var SimpleOracleDB = require('simple-oracledb');
@@ -58,8 +55,8 @@ app.get('/test', (req, res) => {
 Dbconnect.Dbconnect().then(res => {
   console.log(res);
   try {
-    let connection=getDb();
-    connection.query(`SELECT count(username) FROM dba_users`, {},
+    const connection = getDb();
+    connection.execute(`SELECT count(username) FROM dba_users`, {},
       {
         outFormat: oracledb.OBJECT
       },
