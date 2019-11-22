@@ -1406,7 +1406,7 @@ module.exports = class Asset {
                             outFormat: oracledb.OBJECT
                         },
                     ).then(words => {
-                        let fetchtopwordssql = `select * from asset_details where asset_status='Live'`;
+                        let fetchtopwordssql = `select * from asset_winstory_details where winstory_status='Live'`;
                         connection.query(fetchtopwordssql, {},
                             {
                                 outFormat: oracledb.OBJECT
