@@ -56,8 +56,18 @@ app.get('/test', (req, res) => {
 
 Dbconnect.Dbconnect().then(res => {
   console.log(res);
-  // worker.scheduleldapjob();
-  // worker.scheduleLinkValidator();
+  try {
+    Dbconnect.getDb().query(`SELECT count(username) FROM dba_users`, {},
+      {
+        outFormat: oracledb.OBJECT
+      },
+    ).then(resp => {
+      console.log("DB intiated : " + resp);
+    })
+  } catch (error) {
+    console.log(error);
+  }
+
 })
   .catch(err => console.log(err))
 
