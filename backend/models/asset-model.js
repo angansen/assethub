@@ -1339,7 +1339,7 @@ module.exports = class Asset {
     }
 
 
-    static fetchPreferedAssets(host,userEmail) {
+    static fetchPreferedAssets(host, userEmail) {
         const offset = 0
         let limit;
         let order;
@@ -1409,7 +1409,7 @@ module.exports = class Asset {
                             }
 
                             console.log("Suggested assets : " + finalList.length);
-                            this.refineAssets(host, offset, limit, finalList, sortBy, order, action).then(assets => {
+                            this.refineAssets(host, offset, limit, finalList, sortBy, order, "").then(assets => {
                                 resolve(assets);
                             })
 

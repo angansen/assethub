@@ -1443,7 +1443,7 @@ module.exports = class Asset {
                                 })
                             }
                             console.log("Suggested wins : " + finalList.length);
-                            this.refineAssets(host, offset, limit, finalList, sortBy, order, action).then(assets => {
+                            this.refineAssets(host, offset, limit, finalList, sortBy, order,"").then(assets => {
                                 resolve(assets);
                             })
                         })
