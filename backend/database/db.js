@@ -30,9 +30,9 @@ const Dbconnect = () => {
 
 
 		// *** DEV DB2 CRED ***
-		user: "system",
-		password: "AssetHub#19_",
-		connectString: "db2.sb6.ah.oraclevcn.com:1521/ah01_iad353.sb6.ah.oraclevcn.com"
+		// user: "system",
+		// password: "AssetHub#19_",
+		// connectString: "db2.sb6.ah.oraclevcn.com:1521/ah01_iad353.sb6.ah.oraclevcn.com"
 
 
 		//// *** DEV DB1 CRED ***
@@ -61,19 +61,16 @@ const Dbconnect = () => {
 async function getpoolconnection() {
 
 	let dbconnparam = {
-		// *** DEV DB2 CRED ***
-		user: "system",
-		password: "AssetHub#19_",
-		connectString: "db2.sb6.ah.oraclevcn.com:1521/ah01_iad353.sb6.ah.oraclevcn.com",
-		//// *** DEV DB1 CRED ***
+		// *** DEV DB CRED ***
 		// user: "system",
 		// password: "AssetHub#19_",
-		// connectString: "db1.sb6.ah.oraclevcn.com:1521/ah01_iad3kb.sb6.ah.oraclevcn.com",
+		// connectString: "db2.sb6.ah.oraclevcn.com:1521/ah01_iad353.sb6.ah.oraclevcn.com",
+
 
 		//// *** PROD DB CRED ***
-		// user: "assethub",
-		// password: "AssetHub#19_",
-		// connectString: "db1.sb5.ahvcn.oraclevcn.com:1521/ah01_iad2gm.sb5.ahvcn.oraclevcn.com",
+		user: "assethub",
+		password: "AssetHub#19_",
+		connectString: "db1.sb5.ahvcn.oraclevcn.com:1521/ah01_iad2gm.sb5.ahvcn.oraclevcn.com",
 		_enableStats: true,
 		poolMax: 150,
 		poolMin: 20,
