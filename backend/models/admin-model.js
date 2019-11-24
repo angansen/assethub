@@ -313,6 +313,7 @@ exports.mapFilters = (filter, host) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
         if (filter.filter.length > 0) {
+            let mappedFlag = false;
             filter.filter.forEach(filterId => {
                 console.log(filterId);
                 if (filter.assets.length > 0) {
@@ -382,29 +383,19 @@ exports.mapFilters = (filter, host) => {
                         ]
                     };
                     console.log("Executing. . .");
-                    connection.executeMany(createLinksSql, bindassets, options, (err, result) => {
-                        console.log("Executed");
-                        if (err || result.rowsAffected == 0)
-                            console.log("Error while saving filters :" + err);
-                        else {
-                            console.log("Result is:", JSON.stringify(result));
-                            //resolve(result);
-                            // connection.execute(`UPDATE ASSET_FILTER SET FILTER_STATUS=:FILTER_STATUS  WHERE FILTER_ID=:FILTER_ID`, [1, data.new_filter_id],
-                            //     {
-                            //         outFormat: oracledb.Object,
-                            //         autoCommit: true
-                            //     })
-                            //     .then(res => {
-                            //         //resolve({ "status": "filter mapped" })
-                            //         resolve({ "status": 'Success', "message": "Filter remapped successfully" })
-                            //     })
-                            //     .catch(err => {
-                            //         console.log("ASSET_FILTER View error: " + err);
-                            //         resolve(err)
-                            //     })
-                        }
+                    if (bindassets.length > 0) {
+                        connection.executeMany(createLinksSql, bindassets, options, (err, result) => {
+                            console.log("Executed");
+                            if (err || result.rowsAffected == 0)
+                                console.log("Error while saving filters :" + err);
+                            else {
+                                mappedFlag = true;
+                                console.log("Result is:", JSON.stringify(result));
 
-                    });
+                            }
+
+                        });
+                    }
                 }
                 if (filter.wins.length > 0) {
                     let bindWins = [];
@@ -470,41 +461,30 @@ exports.mapFilters = (filter, host) => {
                         ]
                     };
                     console.log("Executing. . .");
-                    connection.executeMany(createLinksSql, bindWins, options, (err, result) => {
-                        console.log("Executed");
-                        if (err || result.rowsAffected == 0)
-                            console.log("Error while saving filters :" + err);
-                        else {
-                            console.log("Result is:", JSON.stringify(result));
-                            // let createLinksSql = `INSERT into ASSET_WINSTORY_FILTER_WINSTORY_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,WINSTORY_ID)  values(:0,:1,:2)`;
-                            // let options = {
-                            //     autoCommit: true,   // autocommit if there are no batch errors
-                            //     batchErrors: true,  // identify invalid records; start a transaction for valid ones
-                            //     bindDefs: [         // describes the data in 'binds'
-                            //         { type: oracledb.STRING, maxSize: 20 },
-                            //         { type: oracledb.STRING, maxSize: 20 },
-                            //         { type: oracledb.STRING, maxSize: 20 }
-                            //     ]
-                            // };
-                            // console.log("Executing. . .");
-                            // connection.executeMany(createLinksSql, bindWins, options, (err, result) => {
-                            //     console.log("Executed");
-                            //     if (err || result.rowsAffected == 0)
-                            //         console.log("Error while saving filters :" + err);
-                            //     else {
-                            //         console.log("Result is:", JSON.stringify(result));
+                    if (bindWins.length > 0) {
+                        connection.executeMany(createLinksSql, bindWins, options, (err, result) => {
+                            console.log("Executed");
+                            if (err || result.rowsAffected == 0)
+                                console.log("Error while saving filters :" + err);
+                            else {
+                                mappedFlag = true;
+                                console.log("Result is:", JSON.stringify(result));
 
-                            //     }
+                            }
 
-                            // });
-
-                        }
-
-                    });
+                        });
+                    }
                 }
-            })
 
+            })
+            if (mappedFlag) {
+                resolve({ "status": 'Success', "message": "Filter mapped successfully" })
+            } else {
+                resolve({ "status": 'Success', "message": "Filter already mapped" })
+            }
         }
+        else
+            resolve({ "status": 'Error', "message": "Incorrect Payload" })
     })
 }
 exports.unMapFilters = (filterId) => {
