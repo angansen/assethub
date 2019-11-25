@@ -68,7 +68,7 @@ async function checkMapping(data, query, filterId) {
     let bindassets = [];
     console.log('data.length: ' + data.length);
     for (let i = 0; i < data.length; i++) {
-        await mappingStatus(query, filterId, item).than(res => {
+        await mappingStatus(query, filterId, data[i]).than(res => {
             if (res.length == 0) {
                 let newId = uniqid.process();
                 let values = [];
