@@ -56,7 +56,7 @@ savefileto = (base64Image, filelocation) => {
         }
     });
 }
-checkMapping = async (query, filterId, item) => {
+async function checkMapping(query, filterId, item) {
     const connection = getDb();
     return connection.query(query, [filterId, item],
         {
