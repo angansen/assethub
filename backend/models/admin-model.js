@@ -64,7 +64,7 @@ async function checkMapping(data, query, filterId) {
             {
                 outFormat: oracledb.Object,
             }).then(res => {
-                if (res.rows.length == 0) {
+                if (res.length == 0) {
                     let newId = uniqid.process();
                     let values = [];
                     values.push(newId);
