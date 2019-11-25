@@ -1374,7 +1374,6 @@ module.exports = class Asset {
     // CREATE QUERY STRING BASED ON SELECTED FILTERS
     static convertsql2(data) {
         console.log("----------  Converting 2 SQL ASSET -------------");
-        console.log(JSON.stringify(data));
         let filterTypeMap = {};
         let queryString = "";
         let reducedFilter = data.filter(filter => filter.FILTER_TYPE != "Asset Type");

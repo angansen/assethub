@@ -35,6 +35,7 @@ const generateFileName = (sampleFile, assetId, filesArray, imageDescription) => 
 
 
 const dynamicSort = (tAssets, sortBy, order) => {
+    console.log("WIn Count :::: "+tAssets.length);
     if (sortBy && order === 'asc') {
         // //console.log("asc order")
         if (sortBy === 'ratings') {
@@ -1308,7 +1309,6 @@ module.exports = class Asset {
                                                                                                         var tmp = tAssets.slice(offset, limit)
                                                                                                         allObj.WINSTORIES = tmp;
                                                                                                         resolve(allObj);
-                                                                                                        //}
 
                                                                                                     })
                                                                                             })
@@ -1329,7 +1329,6 @@ module.exports = class Asset {
     // CREATE QUERY STRING BASED ON SELECTED FILTERS
     static convertsql2(data) {
         console.log("----------  Converting 2 SQL WIN -------------");
-        // console.log(JSON.stringify(data));
 
         let filterTypeMap = {};
         let queryString = "";
