@@ -72,10 +72,10 @@ async function checkMapping(data, query, filterId) {
                     values.push(filterId);
                     values.push(item);
                     bindassets.push(values);
-                    console.log(JSON.stringify(bindassets));
                 }
             })
     })
+    console.log(JSON.stringify(bindassets));
     return bindassets;
 }
 exports.addNewFilter = (filter, host) => {
