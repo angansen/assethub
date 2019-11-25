@@ -1387,7 +1387,7 @@ module.exports = class Asset {
             if (data.length > 0) {
                 data.forEach(val => {
                     let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " INTERSECT select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where " : "select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where ";
-                    filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "'";
+                    filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "' and c.filter_id=d.filter_id and  d.filter_type!='Asset Type'";
                 });
 
                 Object.keys(filterTypeMap).forEach(filterType => {
