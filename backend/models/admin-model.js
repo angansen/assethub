@@ -58,25 +58,23 @@ savefileto = (base64Image, filelocation) => {
 }
 async function mappingStatus(query, filterId, item) {
     const connection = getDb();
-    connection.query(query, [filterId, item],
+    return connection.query(query, [filterId, item],
         {
             outFormat: oracledb.Object,
-        }).then(res => {
-            return res.length
         })
+
 }
 async function checkMapping(data, query, filterId) {
     let bindassets = [];
     console.log('data.length: ' + data.length);
     data.forEach(item => {
         await mappingStatus(query, filterId, item).than(res => {
-            if (res == 0) {
+            if (res.length == 0) {
                 let newId = uniqid.process();
                 let values = [];
                 values.push(newId);
                 values.push(filterId);
                 values.push(item);
-                //return values;
                 bindassets.push(values);
             }
         });
@@ -85,7 +83,6 @@ async function checkMapping(data, query, filterId) {
     return bindassets;
 }
 exports.addNewFilter = (filter, host) => {
-    //console.log('addNewFilter request data: ' + JSON.stringify(filter));
     const connection = getDb();
     return new Promise((resolve, reject) => {
         if (filter.child_filter.length > 0) {
