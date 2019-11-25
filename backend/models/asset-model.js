@@ -1392,7 +1392,7 @@ module.exports = class Asset {
 
                 Object.keys(filterTypeMap).forEach(filterType => {
 
-                    queryString = queryString.length > 0 ? queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type' union " + filterTypeMap[filterType] : filterTypeMap[filterType];
+                    queryString = queryString.length > 0 ? queryString + " union " + filterTypeMap[filterType] : filterTypeMap[filterType];
                 })
 
                 queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type') a,asset_details b where a.asset_id=b.asset_id and b.asset_status='Live'";
