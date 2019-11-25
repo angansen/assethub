@@ -557,7 +557,6 @@ exports.getAllAssetsByFilters = (req, res) => {
 
     let host = req.headers.host;
     if (limit === '-1') {
-        console.log("-1 limit if")
         const connection = getDb();
         connection.execute(`SELECT count(*) total from ASSET_DETAILS where asset_status='Live'`, {},
             {
@@ -565,7 +564,6 @@ exports.getAllAssetsByFilters = (req, res) => {
             },
         ).then(result => {
             limit = result.rows[0].TOTAL;
-            console.log("new Limit" + limit)
             Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order).then(result => {
                 res.json(result);
             })

@@ -1372,13 +1372,14 @@ module.exports = class Asset {
 
     // CREATE QUERY STRING BASED ON SELECTED FILTERS
     static convertsql2(data) {
-        console.log("----------  Converting SQL ASSET -------------");
+        console.log("----------  Converting 2 SQL ASSET -------------");
 
         let filterTypeMap = {};
         let queryString = "";
         let reducedFilter = data.filter(filter => filter.FILTER_TYPE != "Asset Type");
 
         data = reducedFilter;
+        console.log(JSON.stringify(data));
 
         return new Promise((resolve, reject) => {
             // CREATE SQL queries   
