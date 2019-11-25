@@ -540,7 +540,7 @@ exports.getAllAssetsByFilters = (req, res) => {
         searchtext: searchString
     }
 
-    // console.log("============= Asset Controller Activity ==============")
+    console.log("============= Asset Controller Activity ==============")
     // console.log(JSON.stringify(activity));
     // console.log("================== Activity ==========================")
 
