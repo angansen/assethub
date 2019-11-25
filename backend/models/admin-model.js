@@ -68,16 +68,18 @@ async function checkMapping(data, query, filterId) {
     let bindassets = [];
     console.log('data.length: ' + data.length);
     data.forEach(item => {
-        let resutl = await mappingStatus(query, filterId, item).than(res => {
-            if (res.length == 0) {
-                let newId = uniqid.process();
-                let values = [];
-                values.push(newId);
-                values.push(filterId);
-                values.push(item);
-                bindassets.push(values);
-            }
-        });
+        let resutl = await mappingStatus(query, filterId, item);
+        console.log(resutl)
+        // .than(res => {
+        //     if (res.length == 0) {
+        //         let newId = uniqid.process();
+        //         let values = [];
+        //         values.push(newId);
+        //         values.push(filterId);
+        //         values.push(item);
+        //         bindassets.push(values);
+        //     }
+        // });
     })
     console.log(JSON.stringify(bindassets));
     return bindassets;
