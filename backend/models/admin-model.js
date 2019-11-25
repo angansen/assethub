@@ -73,7 +73,7 @@ async function checkMapping(data, query, filterId) {
             let values = [];
             values.push(newId);
             values.push(filterId);
-            values.push(item);
+            values.push(data[i]);
             bindassets.push(values);
         }
     }
