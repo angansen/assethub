@@ -346,60 +346,60 @@ exports.mapFilters = (filter, host) => {
                         console.log(JSON.stringify(res));
 
                     })
-                    filter.assets.forEach(item => {
+                    // filter.assets.forEach(item => {
 
-                        connection.execute(`Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`, [filterId, item],
-                            {
-                                outFormat: oracledb.Object,
-                                //autoCommit: true
-                            })
-                            .then(res => {
-                                if (res.rows.length == 0) {
-                                    let newId = uniqid.process();
-                                    let values = [];
-                                    values.push(newId);
-                                    values.push(filterId);
-                                    values.push(item);
-                                    bindassets.push(values);
+                    //     connection.execute(`Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`, [filterId, item],
+                    //         {
+                    //             outFormat: oracledb.Object,
+                    //             //autoCommit: true
+                    //         })
+                    //         .then(res => {
+                    //             if (res.rows.length == 0) {
+                    //                 let newId = uniqid.process();
+                    //                 let values = [];
+                    //                 values.push(newId);
+                    //                 values.push(filterId);
+                    //                 values.push(item);
+                    //                 bindassets.push(values);
 
 
-                                    // connection.execute(`INSERT into ASSET_FILTER_ASSET_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,ASSET_ID)  values(:0,:1,:2)`, [newId, filterId, item],
-                                    //     {
-                                    //         outFormat: oracledb.Object,
-                                    //         autoCommit: true
-                                    //     })
-                                    //     .then(res => {
-                                    //         if (res.rowsAffected > 0) {
-                                    //             connection.execute(`UPDATE ASSET_FILTER SET FILTER_STATUS=:FILTER_STATUS  WHERE FILTER_ID=:FILTER_ID`, [1, filterId],
-                                    //                 {
-                                    //                     outFormat: oracledb.Object,
-                                    //                     autoCommit: true
-                                    //                 })
-                                    //                 .then(res => {
-                                    //                     //resolve({ "status": "filter mapped" })
-                                    //                     resolve({ "status": 'Success', "message": "Filter mapped successfully" })
-                                    //                 })
-                                    //                 .catch(err => {
-                                    //                     console.log("ASSET_FILTER View error: " + err);
-                                    //                     resolve(err)
-                                    //                 })
-                                    //         }
+                    //                 // connection.execute(`INSERT into ASSET_FILTER_ASSET_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,ASSET_ID)  values(:0,:1,:2)`, [newId, filterId, item],
+                    //                 //     {
+                    //                 //         outFormat: oracledb.Object,
+                    //                 //         autoCommit: true
+                    //                 //     })
+                    //                 //     .then(res => {
+                    //                 //         if (res.rowsAffected > 0) {
+                    //                 //             connection.execute(`UPDATE ASSET_FILTER SET FILTER_STATUS=:FILTER_STATUS  WHERE FILTER_ID=:FILTER_ID`, [1, filterId],
+                    //                 //                 {
+                    //                 //                     outFormat: oracledb.Object,
+                    //                 //                     autoCommit: true
+                    //                 //                 })
+                    //                 //                 .then(res => {
+                    //                 //                     //resolve({ "status": "filter mapped" })
+                    //                 //                     resolve({ "status": 'Success', "message": "Filter mapped successfully" })
+                    //                 //                 })
+                    //                 //                 .catch(err => {
+                    //                 //                     console.log("ASSET_FILTER View error: " + err);
+                    //                 //                     resolve(err)
+                    //                 //                 })
+                    //                 //         }
 
-                                    //     })
-                                    //     .catch(err => {
-                                    //         console.log("ASSET_FILTER View error: " + err);
-                                    //         resolve(err)
-                                    //     })
-                                }
-                                // else {
-                                //     resolve({ "status": "filter already mapped" })
-                                // }
-                            })
-                            .catch(err => {
-                                console.log("ASSET_FILTER_ASSET_MAP View error: " + err);
-                                resolve(err)
-                            })
-                    })
+                    //                 //     })
+                    //                 //     .catch(err => {
+                    //                 //         console.log("ASSET_FILTER View error: " + err);
+                    //                 //         resolve(err)
+                    //                 //     })
+                    //             }
+                    //             // else {
+                    //             //     resolve({ "status": "filter already mapped" })
+                    //             // }
+                    //         })
+                    //         .catch(err => {
+                    //             console.log("ASSET_FILTER_ASSET_MAP View error: " + err);
+                    //             resolve(err)
+                    //         })
+                    // })
                     console.log(JSON.stringify(bindassets));
                     let createLinksSql = `Insert into ASSET_FILTER_ASSET_MAP (FILTER_ASSET_MAP_ID,FILTER_ID,ASSET_ID) values (:0,:1,:2)`;
                     let options = {
@@ -434,60 +434,60 @@ exports.mapFilters = (filter, host) => {
                         console.log(JSON.stringify(res));
 
                     })
-                    filter.wins.forEach(item => {
-                        console.log('Winstory_ID: ' + item);
-                        connection.query(`Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`, [filterId, item],
-                            {
-                                outFormat: oracledb.Object,
-                                //autoCommit: true
-                            })
-                            .then(res => {
-                                console.log('JSON.stringify(res.rows)');
-                                console.log(JSON.stringify(res.length));
-                                if (res.length == 0) {
-                                    let newId = uniqid.process();
-                                    let values = [];
-                                    values.push(newId);
-                                    values.push(filterId);
-                                    values.push(item);
-                                    bindWins.push(values);
-                                    console.log(JSON.stringify(bindWins));
+                    // filter.wins.forEach(item => {
+                    //     console.log('Winstory_ID: ' + item);
+                    //     connection.query(`Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`, [filterId, item],
+                    //         {
+                    //             outFormat: oracledb.Object,
+                    //             //autoCommit: true
+                    //         })
+                    //         .then(res => {
+                    //             console.log('JSON.stringify(res.rows)');
+                    //             console.log(JSON.stringify(res.length));
+                    //             if (res.length == 0) {
+                    //                 let newId = uniqid.process();
+                    //                 let values = [];
+                    //                 values.push(newId);
+                    //                 values.push(filterId);
+                    //                 values.push(item);
+                    //                 bindWins.push(values);
+                    //                 console.log(JSON.stringify(bindWins));
 
-                                    // connection.execute(`INSERT into ASSET_WINSTORY_FILTER_WINSTORY_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,WINSTORY_ID)  values(:0,:1,:2)`, [newId, filterId, item],
-                                    //     {
-                                    //         outFormat: oracledb.Object,
-                                    //         autoCommit: true
-                                    //     })
-                                    //     .then(res => {
-                                    //         if (res.rowsAffected > 0) {
-                                    //             connection.execute(`UPDATE ASSET_FILTER SET FILTER_STATUS=:FILTER_STATUS  WHERE FILTER_ID=:FILTER_ID`, [1, filterId],
-                                    //                 {
-                                    //                     outFormat: oracledb.Object,
-                                    //                     autoCommit: true
-                                    //                 })
-                                    //                 .then(res => {
-                                    //                     //resolve({ "status": "filter mapped" })
-                                    //                     resolve({ "status": 'Success', "message": "Filter mapped successfully" })
-                                    //                 })
-                                    //                 .catch(err => {
-                                    //                     console.log("ASSET_FILTER View error: " + err);
-                                    //                     resolve(err)
-                                    //                 })
-                                    //         } else
-                                    //             resolve({ "status": "filter already mapped" })
+                    //                 // connection.execute(`INSERT into ASSET_WINSTORY_FILTER_WINSTORY_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,WINSTORY_ID)  values(:0,:1,:2)`, [newId, filterId, item],
+                    //                 //     {
+                    //                 //         outFormat: oracledb.Object,
+                    //                 //         autoCommit: true
+                    //                 //     })
+                    //                 //     .then(res => {
+                    //                 //         if (res.rowsAffected > 0) {
+                    //                 //             connection.execute(`UPDATE ASSET_FILTER SET FILTER_STATUS=:FILTER_STATUS  WHERE FILTER_ID=:FILTER_ID`, [1, filterId],
+                    //                 //                 {
+                    //                 //                     outFormat: oracledb.Object,
+                    //                 //                     autoCommit: true
+                    //                 //                 })
+                    //                 //                 .then(res => {
+                    //                 //                     //resolve({ "status": "filter mapped" })
+                    //                 //                     resolve({ "status": 'Success', "message": "Filter mapped successfully" })
+                    //                 //                 })
+                    //                 //                 .catch(err => {
+                    //                 //                     console.log("ASSET_FILTER View error: " + err);
+                    //                 //                     resolve(err)
+                    //                 //                 })
+                    //                 //         } else
+                    //                 //             resolve({ "status": "filter already mapped" })
 
-                                    //     })
-                                    //     .catch(err => {
-                                    //         console.log("ASSET_FILTER View error: " + err);
-                                    //         resolve(err)
-                                    //     })
-                                }
-                            })
-                            .catch(err => {
-                                console.log("ASSET_WINSTORY_FILTER_WINSTORY_MAP View error: " + err);
-                                resolve(err)
-                            })
-                    })
+                    //                 //     })
+                    //                 //     .catch(err => {
+                    //                 //         console.log("ASSET_FILTER View error: " + err);
+                    //                 //         resolve(err)
+                    //                 //     })
+                    //             }
+                    //         })
+                    //         .catch(err => {
+                    //             console.log("ASSET_WINSTORY_FILTER_WINSTORY_MAP View error: " + err);
+                    //             resolve(err)
+                    //         })
+                    // })
                     console.log(JSON.stringify(bindWins));
                     let createLinksSql = `INSERT into ASSET_WINSTORY_FILTER_WINSTORY_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,WINSTORY_ID)  values(:0,:1,:2)`;
                     let options = {
