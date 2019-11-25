@@ -1905,8 +1905,19 @@ module.exports = class Asset {
                                     outFormat: oracledb.OBJECT
                                 })
                                 .then(res => {
-                                    bannerObj.visit = res;
-                                    resolve(bannerObj)
+                                    if (res.length > 0) {
+                                        bannerObj.visit = res;
+                                        resolve(bannerObj)
+                                    } else {
+
+                                        bannerObj.visit.push({
+                                            m: 0
+                                        });
+                                        bannerObj.visit.push({
+                                            w: 0
+                                        });
+                                        resolve(bannerObj)
+                                    }
                                 })
                         })
                 })
