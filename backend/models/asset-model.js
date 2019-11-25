@@ -1386,7 +1386,7 @@ module.exports = class Asset {
             // CREATE SQL queries   
             if (data.length > 0) {
                 data.forEach(val => {
-                    let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " INTERSECT " : "select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where ";
+                    let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " INTERSECT select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where " : "select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where ";
                     filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "'";
                 });
 
