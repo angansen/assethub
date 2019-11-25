@@ -407,6 +407,7 @@ exports.mapFilters = (filter, host) => {
                                 //autoCommit: true
                             })
                             .then(res => {
+                                console.log(JSON.stringify(res.rows));
                                 if (res.rows.length == 0) {
                                     let newId = uniqid.process();
                                     let values = [];
