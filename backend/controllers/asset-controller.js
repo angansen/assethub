@@ -573,7 +573,7 @@ exports.getAllAssetsByFilters = (req, res) => {
 
     }
     else {
-        Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order).then(result => {
+        Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order).then(result => {
             res.json(result);
         })
     }
