@@ -58,29 +58,27 @@ savefileto = (base64Image, filelocation) => {
 }
 async function mappingStatus(query, filterId, item) {
     const connection = getDb();
-    return connection.query(query, [filterId, item],
+    connection.query(query, [filterId, item],
         {
             outFormat: oracledb.Object,
-        })
+        }).than(res => {
+            if (res.length == 0) {
+                let newId = uniqid.process();
+                let values = [];
+                values.push(newId);
+                values.push(filterId);
+                values.push(item);
+                return values
+                //bindassets.push(values);
+            }
+        });
 }
 async function checkMapping(data, query, filterId) {
     let bindassets = [];
-    const connection = getDb();
     console.log('data.length: ' + data.length);
     for (let i = 0; i < data.length; i++) {
-        await connection.query(query, [filterId, data[i]],
-            {
-                outFormat: oracledb.Object,
-            }).than(res => {
-                if (res.length == 0) {
-                    let newId = uniqid.process();
-                    let values = [];
-                    values.push(newId);
-                    values.push(filterId);
-                    values.push(item);
-                    bindassets.push(values);
-                }
-            });
+        bindassets.push(await mappingStatus(query, filterId, data[i]));
+
     }
     console.log(JSON.stringify(bindassets));
     return bindassets;
