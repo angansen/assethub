@@ -401,14 +401,15 @@ exports.mapFilters = (filter, host) => {
                     let bindWins = [];
                     filter.wins.forEach(item => {
                         console.log('Winstory_ID: ' + item);
-                        connection.execute(`Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`, [filterId, item],
+                        connection.query(`Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`, [filterId, item],
                             {
                                 outFormat: oracledb.Object,
                                 //autoCommit: true
                             })
                             .then(res => {
-                                console.log(JSON.stringify(res.rows));
-                                if (res.rows.length == 0) {
+                                console.log('JSON.stringify(res.rows)');
+                                console.log(JSON.stringify(res));
+                                if (res.length == 0) {
                                     let newId = uniqid.process();
                                     let values = [];
                                     values.push(newId);
