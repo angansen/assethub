@@ -60,7 +60,7 @@ async function checkMapping(data, query, filterId) {
     const connection = getDb();
     let bindassets = [];
     data.forEach(item => {
-        await connection.query(query, [filterId, item],
+        connection.query(query, [filterId, item],
             {
                 outFormat: oracledb.Object,
             }).then(res => {
