@@ -56,7 +56,7 @@ savefileto = (base64Image, filelocation) => {
         }
     });
 }
-function mappingStatus(query, filterId, item) {
+async function mappingStatus(query, filterId, item) {
     const connection = getDb();
     connection.query(query, [filterId, item],
         {
