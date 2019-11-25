@@ -1303,6 +1303,73 @@ module.exports = class Asset {
         })
     }
 
+    static fetchAssets3(host, offset, limit, filters, searchString, sortBy, order, action) {
+
+        return new Promise((resolve, reject) => {
+            if (filters.length > 0 && filters != "") {
+                let filterString = "'" + filters.toString().replace(/,/g, "','") + "'";
+                const connection = getDb();
+                let fetchfilterDetailssql = `select filter_name,filter_type,filter_id from asset_filter where filter_id in(` + filterString + `)`;
+                let fetchfilterDetailsOption = {};
+
+                connection.query(fetchfilterDetailssql, fetchfilterDetailsOption,
+                    {
+                        outFormat: oracledb.OBJECT
+                    }).then(data => {
+                        this.convertsql(data).then(query => {
+                            const connection = getDb();
+                            connection.query(query, {},
+                                {
+                                    outFormat: oracledb.OBJECT
+                                }).then(data => {
+                                    // WE ARE THE GETTING THE FILTERED ASSETS BASED ON SELECTION
+                                    let fetchAllFilterSQL = `select a.filter_id,a.filter_name,a.filter_type,b.asset_id from asset_filter a, asset_filter_asset_map b where a.filter_id=b.filter_id and a.filter_status=1`;
+
+                                    connection.query(fetchAllFilterSQL, {},
+                                        {
+                                            outFormat: oracledb.OBJECT
+                                        }).then(filterdata => {
+                                            let filtersasset = [];
+                                            this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
+                                                this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action).then(assets => {
+                                                    resolve(assets);
+                                                })
+                                            })
+                                        })
+                                })
+
+                        })
+                    }).catch(err => {
+                        console.log("error > " + JSON.stringify(err));
+                    })
+            } else {
+                const connection = getDb();
+                let query = "SELECT * FROM ASSET_DETAILS WHERE asset_status='Live'";
+                connection.query(query, {},
+                    {
+                        outFormat: oracledb.OBJECT
+                    }).then(data => {
+                        // WE ARE THE GETTING THE FILTERED ASSETS BASED ON SELECTION
+                        let fetchAllFilterSQL = `select a.filter_id,a.filter_name,a.filter_type,b.asset_id from asset_filter a, asset_filter_asset_map b where a.filter_id=b.filter_id and a.filter_status=1`;
+
+                        connection.query(fetchAllFilterSQL, {},
+                            {
+                                outFormat: oracledb.OBJECT
+                            }).then(filterdata => {
+                                let filtersasset = [];
+                                this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
+                                    // console.log("Content filter ended : " + filtersasset.length);
+                                    this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action).then(assets => {
+                                        resolve(assets);
+                                    })
+                                })
+                            })
+
+                    })
+            }
+        });
+    }
+
     // CREATE QUERY STRING BASED ON SELECTED FILTERS
     static convertsql(data) {
         console.log("----------  Converting SQL ASSET -------------");

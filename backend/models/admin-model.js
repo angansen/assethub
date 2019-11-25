@@ -400,6 +400,7 @@ exports.mapFilters = (filter, host) => {
                 if (filter.wins.length > 0) {
                     let bindWins = [];
                     filter.wins.forEach(item => {
+                        console.log('Winstory_ID: ' + item);
                         connection.execute(`Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`, [filterId, item],
                             {
                                 outFormat: oracledb.Object,
@@ -449,7 +450,7 @@ exports.mapFilters = (filter, host) => {
                                 resolve(err)
                             })
                     })
-                    console.log(JSON.stringify(bindassets));
+                    console.log(JSON.stringify(bindWins));
                     let createLinksSql = `INSERT into ASSET_WINSTORY_FILTER_WINSTORY_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,WINSTORY_ID)  values(:0,:1,:2)`;
                     let options = {
                         autoCommit: true,   // autocommit if there are no batch errors
@@ -461,6 +462,7 @@ exports.mapFilters = (filter, host) => {
                         ]
                     };
                     console.log("Executing. . .");
+                    console.log('bindWins.length:- ' + bindWins.length);
                     if (bindWins.length > 0) {
                         connection.executeMany(createLinksSql, bindWins, options, (err, result) => {
                             console.log("Executed");
