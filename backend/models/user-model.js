@@ -463,8 +463,4 @@ const purgeUserRecords2 = () => {
     }).catch(err => {
         // console.log("User record truncation  failed at db level request : " + JSON.stringify(err));
     })
-
-
 }
-
-
