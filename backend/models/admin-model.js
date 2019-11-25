@@ -56,12 +56,25 @@ savefileto = (base64Image, filelocation) => {
         }
     });
 }
-async function checkMapping(query, filterId, item) {
+async function checkMapping(data, query, filterId) {
     const connection = getDb();
-    return connection.query(query, [filterId, item],
-        {
-            outFormat: oracledb.Object,
-        })
+    let bindassets = [];
+    data.forEach(item => {
+        await connection.query(query, [filterId, item],
+            {
+                outFormat: oracledb.Object,
+            }).then(res => {
+                if (res.rows.length == 0) {
+                    let newId = uniqid.process();
+                    let values = [];
+                    values.push(newId);
+                    values.push(filterId);
+                    values.push(item);
+                    bindassets.push(values);
+                }
+            })
+    })
+    return bindassets;
 }
 exports.addNewFilter = (filter, host) => {
     //console.log('addNewFilter request data: ' + JSON.stringify(filter));
@@ -325,18 +338,14 @@ exports.mapFilters = (filter, host) => {
                 console.log(filterId);
                 if (filter.assets.length > 0) {
                     let bindassets = [];
+                    let sql = `Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`;
+                    checkMapping(filter.assets, sql, filterId).than(res => {
+                        console.log('checkMapping: ');
+                        console.log(JSON.stringify(res));
+
+                    })
                     filter.assets.forEach(item => {
-                        let sql = `Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`;
-                        // await checkMapping(sql, filterId, item).than(res => {
-                        //     if (res.rows.length == 0) {
-                        //         let newId = uniqid.process();
-                        //         let values = [];
-                        //         values.push(newId);
-                        //         values.push(filterId);
-                        //         values.push(item);
-                        //         bindassets.push(values);
-                        //     }
-                        // })
+
                         connection.execute(`Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`, [filterId, item],
                             {
                                 outFormat: oracledb.Object,
@@ -417,6 +426,12 @@ exports.mapFilters = (filter, host) => {
                 }
                 if (filter.wins.length > 0) {
                     let bindWins = [];
+                    let sql = `Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`;
+                    checkMapping(filter.wins, sql, filterId).than(res => {
+                        console.log('checkMapping: ');
+                        console.log(JSON.stringify(res));
+
+                    })
                     filter.wins.forEach(item => {
                         console.log('Winstory_ID: ' + item);
                         connection.query(`Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`, [filterId, item],
