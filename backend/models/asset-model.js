@@ -1044,7 +1044,7 @@ module.exports = class Asset {
                     {
                         outFormat: oracledb.OBJECT
                     }).then(data => {
-                        this.convertsql(data).then(query => {
+                        this.convertsql2(data).then(query => {
                             const connection = getDb();
                             connection.query(query, {},
                                 {
