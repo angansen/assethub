@@ -56,7 +56,7 @@ savefileto = (base64Image, filelocation) => {
         }
     });
 }
-async function mappingStatus(query, filterId, item) {
+let mappingStatus = async function (query, filterId, item) {
     const connection = getDb();
     return connection.query(query, [filterId, item],
         {
@@ -68,7 +68,7 @@ async function checkMapping(data, query, filterId) {
     let bindassets = [];
     console.log('data.length: ' + data.length);
     data.forEach(item => {
-        await mappingStatus(query, filterId, item).than(res => {
+        let resutl = await mappingStatus(query, filterId, item).than(res => {
             if (res.length == 0) {
                 let newId = uniqid.process();
                 let values = [];
