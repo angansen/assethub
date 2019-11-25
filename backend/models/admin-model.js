@@ -56,13 +56,12 @@ savefileto = (base64Image, filelocation) => {
         }
     });
 }
-let mappingStatus = async function (query, filterId, item) {
+async function mappingStatus(query, filterId, item) {
     const connection = getDb();
     return connection.query(query, [filterId, item],
         {
             outFormat: oracledb.Object,
         })
-
 }
 async function checkMapping(data, query, filterId) {
     let bindassets = [];
