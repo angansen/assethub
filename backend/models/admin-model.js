@@ -56,6 +56,13 @@ savefileto = (base64Image, filelocation) => {
         }
     });
 }
+checkMapping = async (query, filterId, item) => {
+    const connection = getDb();
+    return connection.query(query, [filterId, item],
+        {
+            outFormat: oracledb.Object,
+        })
+}
 exports.addNewFilter = (filter, host) => {
     //console.log('addNewFilter request data: ' + JSON.stringify(filter));
     const connection = getDb();
@@ -319,6 +326,17 @@ exports.mapFilters = (filter, host) => {
                 if (filter.assets.length > 0) {
                     let bindassets = [];
                     filter.assets.forEach(item => {
+                        let sql = `Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`;
+                        await checkMapping(sql, filterId, item).than(res => {
+                            if (res.rows.length == 0) {
+                                let newId = uniqid.process();
+                                let values = [];
+                                values.push(newId);
+                                values.push(filterId);
+                                values.push(item);
+                                bindassets.push(values);
+                            }
+                        })
                         connection.execute(`Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`, [filterId, item],
                             {
                                 outFormat: oracledb.Object,

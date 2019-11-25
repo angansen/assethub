@@ -523,21 +523,26 @@ exports.getAllAssetsByFilters2 = (req, res) => {
 }
 
 exports.getAllAssetsByFilters = (req, res) => {
-    var obj = {};
-    obj.filters = [];
-    const offset = req.header('offset');
+
+    // var obj = {};
+    // obj.filters = [];
+    let offset = req.header('offset');
     let limit = req.header('limit');
-    const filters = req.header('filters');
-    const searchString = req.header('searchString')
-    const order = req.header('order');
-    const sortBy = req.header('sortBy');
-    const email = req.header('user_email');
+    let filters = req.header('filters');
+    let searchString = req.header('searchString')
+    let order = req.header('order');
+    let sortBy = req.header('sortBy');
+    let email = req.header('user_email');
 
     let activity = {
         filters: filters,
         email: email,
         searchtext: searchString
     }
+
+    // console.log("============= Asset Controller Activity ==============")
+    // console.log(JSON.stringify(activity));
+    // console.log("================== Activity ==========================")
 
     try {
         worker.captureSearch(activity);
@@ -547,7 +552,9 @@ exports.getAllAssetsByFilters = (req, res) => {
 
     console.log("Host:- " + req.headers.host);
 
-    obj.filters.push(filters)
+    searchString = searchString == undefined ? "" : searchString;
+    filters = filters == undefined ? [] : filters;
+
     let host = req.headers.host;
     if (limit === '-1') {
         console.log("-1 limit if")
@@ -559,23 +566,22 @@ exports.getAllAssetsByFilters = (req, res) => {
         ).then(result => {
             limit = result.rows[0].TOTAL;
             console.log("new Limit" + limit)
-            Asset.fetchAssets(host, offset, limit, obj.filters, searchString, sortBy, order).then(result => {
+            Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order).then(result => {
                 res.json(result);
             })
         })
 
     }
     else {
-        Asset.fetchAssets(host, offset, limit, obj.filters, searchString, sortBy, order).then(result => {
+        Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order).then(result => {
             res.json(result);
         })
     }
-
 }
 exports.getAllPreferredAssets1 = (req, res) => {
     const user_email = req.params.user_email;
 
-    Asset.fetchPreferedAssets(req.headers.host,user_email)
+    Asset.fetchPreferedAssets(req.headers.host, user_email)
         .then(list => {
             res.send(list);
         })
