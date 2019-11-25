@@ -65,18 +65,22 @@ async function mappingStatus(query, filterId, item) {
 }
 async function checkMapping(data, query, filterId) {
     let bindassets = [];
+    const connection = getDb();
     console.log('data.length: ' + data.length);
     for (let i = 0; i < data.length; i++) {
-        await mappingStatus(query, filterId, data[i]).than(res => {
-            if (res.length == 0) {
-                let newId = uniqid.process();
-                let values = [];
-                values.push(newId);
-                values.push(filterId);
-                values.push(item);
-                bindassets.push(values);
-            }
-        });
+        await connection.query(query, [filterId, data[i]],
+            {
+                outFormat: oracledb.Object,
+            }).than(res => {
+                if (res.length == 0) {
+                    let newId = uniqid.process();
+                    let values = [];
+                    values.push(newId);
+                    values.push(filterId);
+                    values.push(item);
+                    bindassets.push(values);
+                }
+            });
     }
     console.log(JSON.stringify(bindassets));
     return bindassets;
