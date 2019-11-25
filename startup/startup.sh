@@ -1,9 +1,9 @@
-echo Do you wish to sync with git repository? Press 'y' or 'n'
-read issync
-if [ $issync == "y" ]; then
-        echo "syncing with repository"
+#echo Do you wish to sync with git repository? Press 'y' or 'n'
+#read issync
+#if [ $issync == "y" ]; then
+#        echo "syncing with repository"
 	sh /u01/ahweb/gitsync.sh
-fi
+#fi
 
 pm2 stop assethubbackend
 pm2 start /u01/ahweb/backend/bin/assethubbackend --watch
