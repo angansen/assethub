@@ -408,7 +408,7 @@ exports.mapFilters = (filter, host) => {
                             })
                             .then(res => {
                                 console.log('JSON.stringify(res.rows)');
-                                console.log(JSON.stringify(res));
+                                console.log(JSON.stringify(res.length));
                                 if (res.length == 0) {
                                     let newId = uniqid.process();
                                     let values = [];
@@ -416,6 +416,7 @@ exports.mapFilters = (filter, host) => {
                                     values.push(filterId);
                                     values.push(item);
                                     bindWins.push(values);
+                                    console.log(JSON.stringify(bindWins));
 
                                     // connection.execute(`INSERT into ASSET_WINSTORY_FILTER_WINSTORY_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,WINSTORY_ID)  values(:0,:1,:2)`, [newId, filterId, item],
                                     //     {
