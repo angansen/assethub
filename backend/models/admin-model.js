@@ -69,6 +69,10 @@ async function checkMapping(data, query, filterId) {
     let bindassets = [];
     console.log('data.length: ' + data.length);
     data.forEach(item => {
+        let result = await mappingStatus;
+
+        // "Now it's done!"
+        console.log(result);
         await mappingStatus(query, filterId, item).than(res => {
             if (res == 0) {
                 let newId = uniqid.process();
@@ -76,7 +80,7 @@ async function checkMapping(data, query, filterId) {
                 values.push(newId);
                 values.push(filterId);
                 values.push(item);
-                return values;
+                //return values;
                 bindassets.push(values);
             }
         });
