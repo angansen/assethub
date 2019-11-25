@@ -56,7 +56,8 @@ savefileto = (base64Image, filelocation) => {
         }
     });
 }
-async function mappingStatus(query, filterId, item) {
+function mappingStatus(query, filterId, item) {
+    const connection = getDb();
     connection.query(query, [filterId, item],
         {
             outFormat: oracledb.Object,
@@ -65,14 +66,9 @@ async function mappingStatus(query, filterId, item) {
         })
 }
 async function checkMapping(data, query, filterId) {
-    const connection = getDb();
     let bindassets = [];
     console.log('data.length: ' + data.length);
     data.forEach(item => {
-        let result = await mappingStatus;
-
-        // "Now it's done!"
-        console.log(result);
         await mappingStatus(query, filterId, item).than(res => {
             if (res == 0) {
                 let newId = uniqid.process();
