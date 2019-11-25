@@ -1308,10 +1308,11 @@ module.exports = class Asset {
         return new Promise((resolve, reject) => {
             if (filters.length > 0 && filters != "") {
                 let filterString = "'" + filters.toString().replace(/,/g, "','") + "'";
+
                 const connection = getDb();
                 let fetchfilterDetailssql = `select filter_name,filter_type,filter_id from asset_filter where filter_id in(` + filterString + `)`;
                 let fetchfilterDetailsOption = {};
-
+                console.log(fetchfilterDetailssql);
                 connection.query(fetchfilterDetailssql, fetchfilterDetailsOption,
                     {
                         outFormat: oracledb.OBJECT
