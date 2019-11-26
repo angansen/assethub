@@ -376,6 +376,7 @@ batchMapping = (type, binddata) => {
 }
 exports.mapFilters = (filter) => {
     const connection = getDb();
+    console.log('calling checkMapping: wins');
     return new Promise((resolve, reject) => {
         if (filter.filter.length > 0) {
             let filterStatus;
