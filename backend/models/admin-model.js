@@ -329,6 +329,7 @@ async function checkMapping(data, query, filterId) {
             bindassets.push(values);
         }
     }
+    console.log('bindassets.length: ' + bindassets.length);
     console.log(JSON.stringify(bindassets));
     return bindassets;
 }
