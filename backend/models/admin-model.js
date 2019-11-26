@@ -315,7 +315,7 @@ async function mappingStatus(query, filterId, item) {
             outFormat: oracledb.Object,
         })
 }
-async function checkMapping(type, data, query, filterId) {
+async function checkMapping(data, query, filterId) {
     let bindassets = [];
     console.log('data.length: ' + data.length);
     for (let i = 0; i < data.length; i++) {
@@ -376,7 +376,7 @@ batchMapping = (type, binddata) => {
 }
 exports.mapFilters = (filter) => {
     const connection = getDb();
-    console.log('calling checkMapping: wins');
+    console.log('called mapFilters');
     return new Promise((resolve, reject) => {
         if (filter.filter.length > 0) {
             let filterStatus;
@@ -390,7 +390,7 @@ exports.mapFilters = (filter) => {
                     let bindassets = [];
                     console.log('calling checkMapping: assets');
                     let sql = `Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`;
-                    checkMapping("assets", filter.assets, sql, filterId).then(res => {
+                    checkMapping(filter.assets, sql, filterId).then(res => {
                         if (res.length == 0) {
                             resolve({ "status": 'Success', "message": "Filter already mapped" })
                         } else {
@@ -427,7 +427,7 @@ exports.mapFilters = (filter) => {
                     let bindWins = [];
                     console.log('calling checkMapping: wins');
                     let sql = `Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`;
-                    checkMapping("wins", filter.wins, sql, filterId).then(res => {
+                    checkMapping(filter.wins, sql, filterId).then(res => {
                         if (res.length == 0) {
                             resolve({ "status": 'Success', "message": "Filter already mapped" })
                         } else {
