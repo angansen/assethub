@@ -1028,13 +1028,10 @@ module.exports = class Asset {
                                 isMatch=false;
                                 break;
                             }
-
                             if(isMatch){
                                 filtersasset.push(data[i]);
                             }
-
                         }
-
                     } else if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
                         filtersasset.push(data[i]);
                     }

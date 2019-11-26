@@ -1049,7 +1049,7 @@ module.exports = class Asset {
                     }
                 })
             }
-            //console.log(filtersasset.length);
+            console.log(data.length+ " > Filtered By Search : "+filtersasset.length);
             resolve(true);
         })
     }
