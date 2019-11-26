@@ -1020,28 +1020,9 @@ module.exports = class Asset {
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
                 wordlist.forEach(word => {
-                    if (word.indexOf("+") != -1) {
-
-                        let isMatch = true;
-                        let wordFragment = word.split("+");
-                        for (let i = 0; i < wordFragment.length; i++) {
-                            if (combineContentToMatch.indexOf(wordFragment) == -1) {// MATCH FOUND
-                                isMatch = false;
-                                break;
-                            } else {
-                                isMatch = true;
-                            }
-                        }
-                        if (isMatch) {
-                            filtersasset.push(data[i]);
-                        }
-
-                    } else {
-                        if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
-                            filtersasset.push(data[i]);
-                        }
+                    if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
+                        filtersasset.push(data[i]);
                     }
-
                 })
             }
             resolve(true);
