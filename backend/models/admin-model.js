@@ -564,9 +564,8 @@ exports.unMapFilters = (filter) => {
                             else {
                                 mappedFlag = true;
                                 console.log("Result is:", JSON.stringify(result));
-
+                                resolve({ "status": 'Success', "message": "Filter unmapped successfully" })
                             }
-
                         });
                     }
 
@@ -598,7 +597,7 @@ exports.unMapFilters = (filter) => {
                             else {
                                 mappedFlag = true;
                                 console.log("Result is:", JSON.stringify(result));
-
+                                resolve({ "status": 'Success', "message": "Filter unmapped successfully" })
                             }
 
                         });
@@ -607,11 +606,11 @@ exports.unMapFilters = (filter) => {
                 }
             })
 
-            if (mappedFlag) {
-                resolve({ "status": 'Success', "message": "Filter unmapped successfully" })
-            } else {
-                resolve({ "status": 'Success', "message": "Filter already unmapped" })
-            }
+            // if (mappedFlag) {
+            //     resolve({ "status": 'Success', "message": "Filter unmapped successfully" })
+            // } else {
+            //     resolve({ "status": 'Success', "message": "Filter already unmapped" })
+            // }
         }
         else
             resolve({ "status": 'Error', "message": "Incorrect Payload" })
