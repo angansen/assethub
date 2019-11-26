@@ -351,8 +351,8 @@ batchMapping = (type, binddata) => {
         ]
     };
     console.log("Executing. . .");
-    console.log('bindWins.length:- ' + bindWins.length);
-    if (bindWins.length > 0) {
+    console.log('bindWins.length:- ' + binddata.length);
+    if (binddata.length > 0) {
         connection.executeMany(createLinksSql, binddata, options, (err, result) => {
             console.log("Executed");
             if (err || result.rowsAffected == 0) {
@@ -555,11 +555,6 @@ exports.mapFilters = (filter, host) => {
                 }
 
             })
-            if (mappedFlag) {
-                resolve({ "status": 'Success', "message": "Filter mapped successfully" })
-            } else {
-                resolve({ "status": 'Success', "message": "Filter already mapped" })
-            }
         }
         else
             resolve({ "status": 'Error', "message": "Incorrect Payload" })
