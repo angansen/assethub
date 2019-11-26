@@ -445,7 +445,7 @@ exports.mapFilters = (filter) => {
 
                             });
                         } else {
-                            resolve({ "status": 'error', "message": "Filter already mapped" })
+                            resolve({ "status": 'Success', "message": "Filter already mapped" })
                         }
                     })
                         .catch(console.error)
