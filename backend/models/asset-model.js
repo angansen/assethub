@@ -1020,7 +1020,22 @@ module.exports = class Asset {
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
                 wordlist.forEach(word => {
-                    if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
+                    if (word.includes("+")) {
+                        let isMatch=true;
+                        let wordfrag=word.split("+");
+                        for(let i=0;i<wordfrag.length;i++){
+                            if (combineContentToMatch.indexOf(wordfrag[i]) == -1){
+                                isMatch=false;
+                                break;
+                            }
+
+                            if(isMatch){
+                                filtersasset.push(data[i]);
+                            }
+
+                        }
+
+                    } else if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
                         filtersasset.push(data[i]);
                     }
                 })
