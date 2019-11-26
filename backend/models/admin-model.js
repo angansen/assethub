@@ -471,7 +471,8 @@ exports.mapFilters = (filter, host) => {
                     let sql = `Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`;
                     checkMapping("wins", filter.wins, sql, filterId)
                     //.than(res => {
-                    console.log('checkMapping: ');
+                    console.log('checkMapping: ').then(console.log)
+                        .catch(console.error)
                     //console.log(JSON.stringify(res));
                     //})
                     //bindWins = await checkMapping(filter.wins, sql, filterId);
