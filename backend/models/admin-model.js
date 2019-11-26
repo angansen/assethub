@@ -375,6 +375,7 @@ batchMapping = (type, binddata) => {
     })
 }
 updateFilterStatus = (data) => {
+    const connection = getDb();
     let createLinksSql = `UPDATE ASSET_FILTER SET FILTER_STATUS=:FILTER_STATUS  WHERE FILTER_ID=:FILTER_ID`;
     let options = {
         autoCommit: true,   // autocommit if there are no batch errors
