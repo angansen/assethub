@@ -469,10 +469,10 @@ exports.mapFilters = (filter, host) => {
                     let bindWins = [];
                     console.log('calling checkMapping: wins');
                     let sql = `Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`;
-                    checkMapping("wins", filter.wins, sql, filterId)
-                    //.than(res => {
-                    console.log('checkMapping: ').then(console.log)
+                    checkMapping("wins", filter.wins, sql, filterId).then(console.log)
                         .catch(console.error)
+                    //.than(res => {
+                    console.log('checkMapping:')
                     //console.log(JSON.stringify(res));
                     //})
                     //bindWins = await checkMapping(filter.wins, sql, filterId);
