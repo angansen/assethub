@@ -430,13 +430,14 @@ exports.mapFilters = (filter, host) => {
                 if (filter.wins.length > 0) {
                     let bindWins = [];
                     let sql = `Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`;
-                    checkMapping(filter.wins, sql, filterId).than(console.log);
+                    checkMapping(filter.wins, sql, filterId).than(res => {
+                        console.log('checkMapping: ');
+                        console.log(JSON.stringify(res));
 
-                    //     res => {
-                    //     console.log('checkMapping: ');
-                    //     console.log(JSON.stringify(res));
-
-                    // })
+                    })
+                    bindWins = checkMapping(filter.wins, sql, filterId);
+                    console.log('*******************checkMapping Executed*************************');
+                    console.log(JSON.stringify(bindWins));
                     // filter.wins.forEach(item => {
                     //     console.log('Winstory_ID: ' + item);
                     //     connection.query(`Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`, [filterId, item],
