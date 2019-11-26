@@ -368,6 +368,8 @@ batchMapping = (type, binddata) => {
                 }
 
             });
+        } else {
+            resolve({ "status": 'Success', "message": "Filter already mapped" })
         }
     })
 }

@@ -1946,11 +1946,11 @@ module.exports = class Asset {
                                     } else {
 
                                         bannerObj.visit.push({
-                                            PLATFORM:m,
+                                            PLATFORM:"m",
                                             COUNT: 0
                                         });
                                         bannerObj.visit.push({
-                                            PLATFORM:w,
+                                            PLATFORM:"w",
                                             COUNT: 0
                                         });
                                         resolve(bannerObj)
