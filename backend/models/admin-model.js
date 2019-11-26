@@ -559,8 +559,10 @@ exports.unMapFilters = (filter) => {
                     if (bindAssets.length > 0) {
                         connection.executeMany(createLinksSql, bindAssets, options, (err, result) => {
                             console.log("Executed");
-                            if (err || result.rowsAffected == 0)
+                            if (err || result.rowsAffected == 0) {
                                 console.log("Error while saving filters :" + err);
+                                resolve({ "status": 'Success', "message": "Filter already unmapped" })
+                            }
                             else {
                                 mappedFlag = true;
                                 console.log("Result is:", JSON.stringify(result));
@@ -592,8 +594,10 @@ exports.unMapFilters = (filter) => {
                     if (bindWins.length > 0) {
                         connection.executeMany(createLinksSql, bindWins, options, (err, result) => {
                             console.log("Executed");
-                            if (err || result.rowsAffected == 0)
+                            if (err || result.rowsAffected == 0) {
                                 console.log("Error while saving filters :" + err);
+                                resolve({ "status": 'Success', "message": "Filter already unmapped" })
+                            }
                             else {
                                 mappedFlag = true;
                                 console.log("Result is:", JSON.stringify(result));
