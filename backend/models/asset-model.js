@@ -1016,13 +1016,25 @@ module.exports = class Asset {
                         combineContentToMatch += filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
 
-                let wordlist = searchString.split(" ");
+                let wordlist = searchString.split(/,| /);
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
                 wordlist.forEach(word => {
-                    if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
-                        filtersasset.push(data[i]);
+                    if (word.indexOf("+") != -1) {
+
+                        word.split("+").forEach(wordFragment => {
+                            if (combineContentToMatch.indexOf(wordFragment) == -1) {// MATCH FOUND
+                                break;
+                            }
+                            filtersasset.push(data[i]);
+                        })
+
+                    } else {
+                        if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
+                            filtersasset.push(data[i]);
+                        }
                     }
+
                 })
             }
             resolve(true);
