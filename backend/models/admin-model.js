@@ -56,30 +56,6 @@ savefileto = (base64Image, filelocation) => {
         }
     });
 }
-async function mappingStatus(query, filterId, item) {
-    const connection = getDb();
-    return connection.query(query, [filterId, item],
-        {
-            outFormat: oracledb.Object,
-        })
-}
-async function checkMapping(data, query, filterId) {
-    let bindassets = [];
-    console.log('data.length: ' + data.length);
-    for (let i = 0; i < data.length; i++) {
-        let result = await mappingStatus(query, filterId, data[i]);
-        if (result.length == 0) {
-            let newId = uniqid.process();
-            let values = [];
-            values.push(newId);
-            values.push(filterId);
-            values.push(data[i]);
-            bindassets.push(values);
-        }
-    }
-    console.log(JSON.stringify(bindassets));
-    return bindassets;
-}
 exports.addNewFilter = (filter, host) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
@@ -332,6 +308,33 @@ deletefilterimage = (filepath) => {
 
 }
 
+async function mappingStatus(query, filterId, item) {
+    const connection = getDb();
+    return connection.query(query, [filterId, item],
+        {
+            outFormat: oracledb.Object,
+        })
+}
+async function checkMapping(data, query, filterId) {
+
+    return new Promise((resolve, reject) => {
+        let bindassets = [];
+        console.log('data.length: ' + data.length);
+        for (let i = 0; i < data.length; i++) {
+            let result = await mappingStatus(query, filterId, data[i]);
+            if (result.length == 0) {
+                let newId = uniqid.process();
+                let values = [];
+                values.push(newId);
+                values.push(filterId);
+                values.push(data[i]);
+                bindassets.push(values);
+            }
+        }
+        console.log(JSON.stringify(bindassets));
+        resolve(bindassets);
+    })
+}
 exports.mapFilters = (filter, host) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
@@ -347,6 +350,7 @@ exports.mapFilters = (filter, host) => {
                         console.log(JSON.stringify(res));
 
                     })
+                    con
                     // filter.assets.forEach(item => {
 
                     //     connection.execute(`Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`, [filterId, item],
