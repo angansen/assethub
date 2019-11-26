@@ -374,6 +374,32 @@ batchMapping = (type, binddata) => {
         }
     })
 }
+updateFilterStatus = (data) => {
+    let createLinksSql = `UPDATE ASSET_FILTER SET FILTER_STATUS=:FILTER_STATUS  WHERE FILTER_ID=:FILTER_ID`;
+    let options = {
+        autoCommit: true,   // autocommit if there are no batch errors
+        batchErrors: true,  // identify invalid records; start a transaction for valid ones
+        bindDefs: [         // describes the data in 'binds'
+            { type: oracledb.STRING, maxSize: 20 },
+            { type: oracledb.NUMBER }
+        ]
+    };
+    console.log("Executing. . .");
+    console.log('bindWins.length:- ' + res.length);
+    connection.executeMany(createLinksSql, data, options, (err, result) => {
+        console.log("Executed");
+        if (err || result.rowsAffected == 0) {
+            console.log("Error while saving filters :" + err);
+            console.log({ "status": 'Success', "message": "Filter already mapped" })
+        }
+        else {
+            mappedFlag = true;
+            console.log("Result is:", JSON.stringify(result));
+            console.log({ "status": 'Success', "message": "Filter mapped successfully" })
+        }
+
+    });
+}
 exports.mapFilters = (filter) => {
     const connection = getDb();
     console.log('called mapFilters');
@@ -391,9 +417,7 @@ exports.mapFilters = (filter) => {
                     console.log('calling checkMapping: assets');
                     let sql = `Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`;
                     checkMapping(filter.assets, sql, filterId).then(res => {
-                        if (res.length == 0) {
-                            resolve({ "status": 'Success', "message": "Filter already mapped" })
-                        } else {
+                        if (res.length > 0) {
                             let createLinksSql = `INSERT into ASSET_FILTER_ASSET_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,ASSET_ID)  values(:0,:1,:2)`;
                             let options = {
                                 autoCommit: true,   // autocommit if there are no batch errors
@@ -415,6 +439,7 @@ exports.mapFilters = (filter) => {
                                 else {
                                     mappedFlag = true;
                                     console.log("Result is:", JSON.stringify(result));
+                                    updateFilterStatus(filterStatus);
                                     resolve({ "status": 'Success', "message": "Filter mapped successfully" })
                                 }
 
@@ -428,9 +453,7 @@ exports.mapFilters = (filter) => {
                     console.log('calling checkMapping: wins');
                     let sql = `Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`;
                     checkMapping(filter.wins, sql, filterId).then(res => {
-                        if (res.length == 0) {
-                            resolve({ "status": 'Success', "message": "Filter already mapped" })
-                        } else {
+                        if (res.length > 0) {
                             let createLinksSql = `INSERT into ASSET_WINSTORY_FILTER_WINSTORY_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,WINSTORY_ID)  values(:0,:1,:2)`;
                             let options = {
                                 autoCommit: true,   // autocommit if there are no batch errors
@@ -450,7 +473,7 @@ exports.mapFilters = (filter) => {
                                     resolve({ "status": 'Success', "message": "Filter already mapped" })
                                 }
                                 else {
-                                    mappedFlag = true;
+                                    updateFilterStatus(filterStatus);
                                     console.log("Result is:", JSON.stringify(result));
                                     resolve({ "status": 'Success', "message": "Filter mapped successfully" })
                                 }
