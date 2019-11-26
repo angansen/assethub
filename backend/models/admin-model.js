@@ -552,7 +552,8 @@ exports.unMapFilters = (filter) => {
                 ]
             };
             console.log("Executing. . .");
-            if (bindWins.length > 0) {
+            console.log(JSON.stringify(bindAssets));
+            if (bindAssets.length > 0) {
                 connection.executeMany(createLinksSql, bindAssets, options, (err, result) => {
                     console.log("Executed");
                     if (err || result.rowsAffected == 0)
