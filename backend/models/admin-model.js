@@ -334,7 +334,8 @@ async function checkMapping(type, data, query, filterId) {
     batchMapping(type, bindassets);
 }
 batchMapping = (type, binddata) => {
-    let createLinksSql
+    const connection = getDb();
+    let createLinksSql;
     if (type == 'wins') {
         createLinksSql = `INSERT into ASSET_WINSTORY_FILTER_WINSTORY_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,WINSTORY_ID)  values(:0,:1,:2)`;
     }
