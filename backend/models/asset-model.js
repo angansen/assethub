@@ -1940,16 +1940,18 @@ module.exports = class Asset {
                                     outFormat: oracledb.OBJECT
                                 })
                                 .then(res => {
-                                    if (res.length > 0) {
+                                    if (res.length < 0) {
                                         bannerObj.visit = res;
                                         resolve(bannerObj)
                                     } else {
 
                                         bannerObj.visit.push({
-                                            m: 0
+                                            PLATFORM:m,
+                                            COUNT: 0
                                         });
                                         bannerObj.visit.push({
-                                            w: 0
+                                            PLATFORM:w,
+                                            COUNT: 0
                                         });
                                         resolve(bannerObj)
                                     }
