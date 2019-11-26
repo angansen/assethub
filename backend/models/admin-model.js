@@ -342,6 +342,7 @@ exports.mapFilters = (filter, host) => {
                 console.log(filterId);
                 if (filter.assets.length > 0) {
                     let bindassets = [];
+                    console.log('calling checkMapping: assets');
                     let sql = `Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`;
                     checkMapping(filter.assets, sql, filterId).than(res => {
                         console.log('checkMapping: ');
@@ -430,7 +431,7 @@ exports.mapFilters = (filter, host) => {
                 }
                 if (filter.wins.length > 0) {
                     let bindWins = [];
-                    console.log('calling checkMapping: ');
+                    console.log('calling checkMapping: wins');
                     let sql = `Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`;
                     checkMapping(filter.wins, sql, filterId).than(res => {
                         console.log('checkMapping: ');

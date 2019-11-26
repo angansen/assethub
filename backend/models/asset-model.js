@@ -11,7 +11,6 @@ const generateFileName = (sampleFile, assetId, filesArray, imageDescription) => 
     let imgObject = {};
     let fname = sampleFile.name.split('.')[0];
     fname = fname.replace(/ /g, '');
-
     const ftype = sampleFile.name.split('.')[1];
     const uniqueId = uniqid();
     const finalFname = fname + uniqueId.concat('.', ftype);
