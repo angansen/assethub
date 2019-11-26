@@ -35,7 +35,7 @@ const generateFileName = (sampleFile, assetId, filesArray, imageDescription) => 
 
 
 const dynamicSort = (tAssets, sortBy, order) => {
-    console.log("WIn Count :::: " + tAssets.length);
+    console.log("WIn Count :::: "+tAssets.length);
     if (sortBy && order === 'asc') {
         // //console.log("asc order")
         if (sortBy === 'ratings') {
@@ -1030,15 +1030,15 @@ module.exports = class Asset {
                 combineContentToMatch = combineContentToMatch.toLowerCase();
                 wordlist.forEach(word => {
                     if (word.includes("+")) {
-                        let isMatch = true;
-                        let wordfrag = word.split("+");
-                        for (let i = 0; i < wordfrag.length; i++) {
-                            if (combineContentToMatch.indexOf(wordfrag[i].toLowerCase()) == -1) {
-                                isMatch = false;
+                        let isMatch=true;
+                        let wordfrag=word.split("+");
+                        for(let i=0;i<wordfrag.length;i++){
+                            if (combineContentToMatch.indexOf(wordfrag[i].toLowerCase()) == -1){
+                                isMatch=false;
                                 break;
                             }
 
-                            if (isMatch) {
+                            if(isMatch){
                                 filtersasset.push(data[i]);
                             }
 
@@ -1049,7 +1049,7 @@ module.exports = class Asset {
                     }
                 })
             }
-            console.log(data.length+ " > Filtered By Search : "+filtersasset.length);
+            //console.log(filtersasset.length);
             resolve(true);
         })
     }
@@ -1418,7 +1418,7 @@ module.exports = class Asset {
         })
     }
 
-    static fetchPreferedWins(host, userEmail) {
+    static fetchPreferedWins(host,userEmail) {
         let finalList = [];
         const offset = 0
         let limit;
@@ -1495,7 +1495,7 @@ module.exports = class Asset {
                                 })
                             }
                             console.log("Suggested wins : " + finalList.length);
-                            this.refineAssets(host, offset, limit, finalList, sortBy, order, "").then(assets => {
+                            this.refineAssets(host, offset, limit, finalList, sortBy, order,"").then(assets => {
                                 resolve(assets);
                             })
                         })
