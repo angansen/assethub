@@ -534,39 +534,43 @@ exports.mapFilters = (filter, host) => {
 exports.unMapFilters = (filter) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
-        if (filter.assets.length > 0) {
-            let bindAssets = []
-            filter.assets.forEach(id => {
-                let values = [];
-                values.push(filter.filter_id);
-                values.push(id);
-                bindAssets.push(values);
-            })
-            let createLinksSql = `DELETE FROM ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:ASSET_ID`;
-            let options = {
-                autoCommit: true,   // autocommit if there are no batch errors
-                batchErrors: true,  // identify invalid records; start a transaction for valid ones
-                bindDefs: [         // describes the data in 'binds'
-                    { type: oracledb.STRING, maxSize: 20 },
-                    { type: oracledb.STRING, maxSize: 20 },
-                ]
-            };
-            console.log("Executing. . .");
-            console.log(JSON.stringify(bindAssets));
-            if (bindAssets.length > 0) {
-                connection.executeMany(createLinksSql, bindAssets, options, (err, result) => {
-                    console.log("Executed");
-                    if (err || result.rowsAffected == 0)
-                        console.log("Error while saving filters :" + err);
-                    else {
-                        mappedFlag = true;
-                        console.log("Result is:", JSON.stringify(result));
+        if (filter.filter.length > 0) {
+            filter.filter.forEach(filterId => {
+                if (filter.assets.length > 0) {
+                    let bindAssets = []
+                    filter.assets.forEach(id => {
+                        let values = [];
+                        values.push(filterId);
+                        values.push(id);
+                        bindAssets.push(values);
+                    })
+                    let createLinksSql = `DELETE FROM ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:ASSET_ID`;
+                    let options = {
+                        autoCommit: true,   // autocommit if there are no batch errors
+                        batchErrors: true,  // identify invalid records; start a transaction for valid ones
+                        bindDefs: [         // describes the data in 'binds'
+                            { type: oracledb.STRING, maxSize: 20 },
+                            { type: oracledb.STRING, maxSize: 20 },
+                        ]
+                    };
+                    console.log("Executing. . .");
+                    console.log(JSON.stringify(bindAssets));
+                    if (bindAssets.length > 0) {
+                        connection.executeMany(createLinksSql, bindAssets, options, (err, result) => {
+                            console.log("Executed");
+                            if (err || result.rowsAffected == 0)
+                                console.log("Error while saving filters :" + err);
+                            else {
+                                mappedFlag = true;
+                                console.log("Result is:", JSON.stringify(result));
 
+                            }
+
+                        });
                     }
 
-                });
-            }
-
+                }
+            })
         }
 
 
