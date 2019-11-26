@@ -331,6 +331,7 @@ async function checkMapping(type, data, query, filterId) {
     }
     console.log('bindassets.length: ' + bindassets.length);
     console.log(JSON.stringify(bindassets));
+    return bindassets;
     batchMapping(type, bindassets);
 }
 batchMapping = (type, binddata) => {
