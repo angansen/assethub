@@ -374,7 +374,7 @@ batchMapping = (type, binddata) => {
         }
     })
 }
-exports.mapFilters = (filter, host) => {
+exports.mapFilters = (filter) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
         if (filter.filter.length > 0) {

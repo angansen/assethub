@@ -55,7 +55,7 @@ exports.editFilter = (req, res) => {
 
 exports.mapFilter = (req, res) => {
     console.log('Admin get filters' + JSON.stringify(res.body));
-    admin.mapFilters(req.body, req.headers.host)
+    admin.mapFilters(req.body)
         .then(result => {
             res.json(result)
         })

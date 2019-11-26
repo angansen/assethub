@@ -1940,7 +1940,7 @@ module.exports = class Asset {
                                     outFormat: oracledb.OBJECT
                                 })
                                 .then(res => {
-                                    if (res.length < 0) {
+                                    if (res.length > 0) {
                                         bannerObj.visit = res;
                                         resolve(bannerObj)
                                     } else {
