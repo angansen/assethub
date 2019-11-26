@@ -596,7 +596,7 @@ exports.mapFilters = (filter, host) => {
                     //         .catch(err => {
                     //             console.log("ASSET_WINSTORY_FILTER_WINSTORY_MAP View error: " + err);
                     //             resolve(err)
-                    //         })
+                    //         }) 
                     // })
                     // console.log(JSON.stringify(bindWins));
                     // let createLinksSql = `INSERT into ASSET_WINSTORY_FILTER_WINSTORY_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,WINSTORY_ID)  values(:0,:1,:2)`;
