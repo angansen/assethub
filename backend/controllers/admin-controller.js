@@ -64,8 +64,8 @@ exports.mapFilter = (req, res) => {
         })
 }
 exports.unMapFilter = (req, res) => {
-    console.log('Admin get filters' + res);
-    admin.unMapFilters(req.body.filter_id)
+    console.log('Admin get filters' + req.body.filter_id);
+    admin.unMapFilters(req.body)
         .then(result => {
             res.json(result)
         })

@@ -531,47 +531,82 @@ exports.mapFilters = (filter, host) => {
             resolve({ "status": 'Error', "message": "Incorrect Payload" })
     })
 }
-exports.unMapFilters = (filterId) => {
+exports.unMapFilters = (filter) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
-        connection.execute(`DELETE FROM ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID `, [filterId],
-            {
-                outFormat: oracledb.Object,
-                autoCommit: true
+        if (filter.assets.length > 0) {
+            let bindAssets = []
+            filter.assets.forEach(id => {
+                let values = [];
+                values.push(filter.filter_id);
+                values.push(id);
+                bindAssets.push(values);
             })
-            .then(res => {
-                //resolve({ "status": "filter deleted" })
-                connection.execute(`DELETE FROM ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID`, [filterId],
-                    {
-                        outFormat: oracledb.Object,
-                        autoCommit: true
-                    })
-                    .then(res => {
-                        //resolve({ "status": "filter unmapped" })
-                        connection.execute(`UPDATE ASSET_FILTER SET FILTER_STATUS=:FILTER_STATUS  WHERE FILTER_ID=:FILTER_ID`, [0, filterId],
-                            {
-                                outFormat: oracledb.Object,
-                                autoCommit: true
-                            })
-                            .then(res => {
-                                //resolve({ "status": "filter mapped" })
-                                resolve({ "status": 'Success', "message": "Filter unmapped successfully" })
-                            })
-                            .catch(err => {
-                                console.log("ASSET_FILTER View error: " + err);
-                                resolve(err)
-                            })
-                        //resolve({ "status": 'Success', "message": "Filter unmapped successfully" })
-                    })
-                    .catch(err => {
-                        console.log("ASSET_WINSTORY_FILTER_WINSTORY_MAP View error: " + err);
-                        resolve(err)
-                    })
-            })
-            .catch(err => {
-                console.log("ASSET_FILTER_ASSET_MAP View error: " + err);
-                resolve(err)
-            })
+            let createLinksSql = `DELETE FROM ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:ASSET_ID`;
+            let options = {
+                autoCommit: true,   // autocommit if there are no batch errors
+                batchErrors: true,  // identify invalid records; start a transaction for valid ones
+                bindDefs: [         // describes the data in 'binds'
+                    { type: oracledb.STRING, maxSize: 20 },
+                    { type: oracledb.STRING, maxSize: 20 },
+                ]
+            };
+            console.log("Executing. . .");
+            if (bindWins.length > 0) {
+                connection.executeMany(createLinksSql, bindAssets, options, (err, result) => {
+                    console.log("Executed");
+                    if (err || result.rowsAffected == 0)
+                        console.log("Error while saving filters :" + err);
+                    else {
+                        mappedFlag = true;
+                        console.log("Result is:", JSON.stringify(result));
+
+                    }
+
+                });
+            }
+
+        }
+
+
+        // connection.execute(`DELETE FROM ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID `, [filterId],
+        //     {
+        //         outFormat: oracledb.Object,
+        //         autoCommit: true
+        //     })
+        //     .then(res => {
+        //         //resolve({ "status": "filter deleted" })
+        //         connection.execute(`DELETE FROM ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID`, [filterId],
+        //             {
+        //                 outFormat: oracledb.Object,
+        //                 autoCommit: true
+        //             })
+        //             .then(res => {
+        //                 //resolve({ "status": "filter unmapped" })
+        //                 connection.execute(`UPDATE ASSET_FILTER SET FILTER_STATUS=:FILTER_STATUS  WHERE FILTER_ID=:FILTER_ID`, [0, filterId],
+        //                     {
+        //                         outFormat: oracledb.Object,
+        //                         autoCommit: true
+        //                     })
+        //                     .then(res => {
+        //                         //resolve({ "status": "filter mapped" })
+        //                         resolve({ "status": 'Success', "message": "Filter unmapped successfully" })
+        //                     })
+        //                     .catch(err => {
+        //                         console.log("ASSET_FILTER View error: " + err);
+        //                         resolve(err)
+        //                     })
+        //                 //resolve({ "status": 'Success', "message": "Filter unmapped successfully" })
+        //             })
+        //             .catch(err => {
+        //                 console.log("ASSET_WINSTORY_FILTER_WINSTORY_MAP View error: " + err);
+        //                 resolve(err)
+        //             })
+        //     })
+        //     .catch(err => {
+        //         console.log("ASSET_FILTER_ASSET_MAP View error: " + err);
+        //         resolve(err)
+        //     })
     })
 }
 exports.reMapFilters = (data) => {
