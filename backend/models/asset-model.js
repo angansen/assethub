@@ -1024,7 +1024,7 @@ module.exports = class Asset {
                         let isMatch=true;
                         let wordfrag=word.split("+");
                         for(let i=0;i<wordfrag.length;i++){
-                            if (combineContentToMatch.indexOf(wordfrag[i]) == -1){
+                            if (combineContentToMatch.indexOf(wordfrag[i].toLowerCase()) == -1){
                                 isMatch=false;
                                 break;
                             }
@@ -1035,7 +1035,7 @@ module.exports = class Asset {
 
                         }
 
-                    } else if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
+                    } else if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
                         filtersasset.push(data[i]);
                     }
                 })
