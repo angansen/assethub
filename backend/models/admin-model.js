@@ -379,7 +379,7 @@ exports.mapFilters = (filter) => {
     console.log('called mapFilters');
     return new Promise((resolve, reject) => {
         if (filter.filter.length > 0) {
-            let filterStatus;
+            let filterStatus = [];
             filter.filter.forEach(filterId => {
                 let Filtervalues = [];
                 Filtervalues.push(1);
