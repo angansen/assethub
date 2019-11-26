@@ -444,6 +444,8 @@ exports.mapFilters = (filter) => {
                                 }
 
                             });
+                        } else {
+                            resolve({ "status": 'Success', "message": "Filter already mapped" })
                         }
                     })
                         .catch(console.error)
@@ -479,6 +481,8 @@ exports.mapFilters = (filter) => {
                                 }
 
                             });
+                        } else {
+                            resolve({ "status": 'Success', "message": "Filter already mapped" })
                         }
                     })
                         .catch(console.error)
