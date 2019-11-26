@@ -470,7 +470,37 @@ exports.mapFilters = (filter, host) => {
                     let bindWins = [];
                     console.log('calling checkMapping: wins');
                     let sql = `Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`;
-                    checkMapping("wins", filter.wins, sql, filterId).then(res => { console.log(res); console.log("res"); })
+                    checkMapping("wins", filter.wins, sql, filterId).then(res => {
+                        if (res.length == 0) {
+                            resolve({ "status": 'Success', "message": "Filter already mapped" })
+                        } else {
+                            let createLinksSql = `INSERT into ASSET_WINSTORY_FILTER_WINSTORY_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,WINSTORY_ID)  values(:0,:1,:2)`;
+                            let options = {
+                                autoCommit: true,   // autocommit if there are no batch errors
+                                batchErrors: true,  // identify invalid records; start a transaction for valid ones
+                                bindDefs: [         // describes the data in 'binds'
+                                    { type: oracledb.STRING, maxSize: 20 },
+                                    { type: oracledb.STRING, maxSize: 20 },
+                                    { type: oracledb.STRING, maxSize: 20 }
+                                ]
+                            };
+                            console.log("Executing. . .");
+                            console.log('bindWins.length:- ' + res.length);
+                            connection.executeMany(createLinksSql, res, options, (err, result) => {
+                                console.log("Executed");
+                                if (err || result.rowsAffected == 0) {
+                                    console.log("Error while saving filters :" + err);
+                                    resolve({ "status": 'Success', "message": "Filter already mapped" })
+                                }
+                                else {
+                                    mappedFlag = true;
+                                    console.log("Result is:", JSON.stringify(result));
+                                    resolve({ "status": 'Success', "message": "Filter mapped successfully" })
+                                }
+
+                            });
+                        }
+                    })
                         .catch(console.error)
                     //.than(res => {
                     console.log('checkMapping:')
