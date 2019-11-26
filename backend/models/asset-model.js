@@ -1040,7 +1040,7 @@ module.exports = class Asset {
                     }
                 })
             }
-            console.log("Filtered By Search : "+filtersasset.length);
+            console.log(data.length+ " > Filtered By Search : "+filtersasset.length);
             resolve(true);
         })
     }
