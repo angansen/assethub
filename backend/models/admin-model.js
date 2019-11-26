@@ -333,7 +333,7 @@ async function checkMapping(data, query, filterId) {
     console.log(JSON.stringify(bindassets));
     return bindassets;
 }
-exports.mapFilters = (filter, host) => {
+exports.mapFilters = async (filter, host) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
         if (filter.filter.length > 0) {
