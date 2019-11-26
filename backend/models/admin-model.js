@@ -378,14 +378,49 @@ exports.mapFilters = (filter, host) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
         if (filter.filter.length > 0) {
-            let mappedFlag = false;
+            let filterStatus;
             filter.filter.forEach(filterId => {
+                let Filtervalues = [];
+                Filtervalues.push(1);
+                Filtervalues.push(filterId);
+                filterStatus.push(Filtervalues);
                 console.log(filterId);
                 if (filter.assets.length > 0) {
                     let bindassets = [];
                     console.log('calling checkMapping: assets');
                     let sql = `Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`;
-                    checkMapping("assets", filter.assets, sql, filterId);
+                    checkMapping("assets", filter.assets, sql, filterId).then(res => {
+                        if (res.length == 0) {
+                            resolve({ "status": 'Success', "message": "Filter already mapped" })
+                        } else {
+                            let createLinksSql = `INSERT into ASSET_FILTER_ASSET_MAP(FILTER_ASSET_MAP_ID,FILTER_ID,ASSET_ID)  values(:0,:1,:2)`;
+                            let options = {
+                                autoCommit: true,   // autocommit if there are no batch errors
+                                batchErrors: true,  // identify invalid records; start a transaction for valid ones
+                                bindDefs: [         // describes the data in 'binds'
+                                    { type: oracledb.STRING, maxSize: 20 },
+                                    { type: oracledb.STRING, maxSize: 20 },
+                                    { type: oracledb.STRING, maxSize: 20 }
+                                ]
+                            };
+                            console.log("Executing. . .");
+                            console.log('bindWins.length:- ' + res.length);
+                            connection.executeMany(createLinksSql, res, options, (err, result) => {
+                                console.log("Executed");
+                                if (err || result.rowsAffected == 0) {
+                                    console.log("Error while saving filters :" + err);
+                                    resolve({ "status": 'Success', "message": "Filter already mapped" })
+                                }
+                                else {
+                                    mappedFlag = true;
+                                    console.log("Result is:", JSON.stringify(result));
+                                    resolve({ "status": 'Success', "message": "Filter mapped successfully" })
+                                }
+
+                            });
+                        }
+                    })
+                        .catch(console.error)
                     // filter.assets.forEach(item => {
 
                     //     connection.execute(`Select * from ASSET_FILTER_ASSET_MAP where FILTER_ID=:FILTER_ID AND ASSET_ID=:assetid`, [filterId, item],
