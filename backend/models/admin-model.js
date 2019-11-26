@@ -318,22 +318,24 @@ async function mappingStatus(query, filterId, item) {
 async function checkMapping(data, query, filterId) {
     let bindassets = [];
     console.log('data.length: ' + data.length);
-    for (let i = 0; i < data.length; i++) {
-        let result = await mappingStatus(query, filterId, data[i]);
-        if (result.length == 0) {
-            let newId = uniqid.process();
-            let values = [];
-            values.push(newId);
-            values.push(filterId);
-            values.push(data[i]);
-            bindassets.push(values);
+    return new Promise((resolve, reject) => {
+        for (let i = 0; i < data.length; i++) {
+            let result = await mappingStatus(query, filterId, data[i]);
+            if (result.length == 0) {
+                let newId = uniqid.process();
+                let values = [];
+                values.push(newId);
+                values.push(filterId);
+                values.push(data[i]);
+                bindassets.push(values);
+            }
         }
-    }
-    console.log('bindassets.length: ' + bindassets.length);
-    console.log(JSON.stringify(bindassets));
-    return bindassets;
+        console.log('bindassets.length: ' + bindassets.length);
+        console.log(JSON.stringify(bindassets));
+        resolve(bindassets);
+    })
 }
-exports.mapFilters = async (filter, host) => {
+exports.mapFilters = (filter, host) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
         if (filter.filter.length > 0) {
@@ -433,11 +435,11 @@ exports.mapFilters = async (filter, host) => {
                     let bindWins = [];
                     console.log('calling checkMapping: wins');
                     let sql = `Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`;
-                    // checkMapping(filter.wins, sql, filterId).than(res => {
-                    //     console.log('checkMapping: ');
-                    //     console.log(JSON.stringify(res));
-                    // })
-                    bindWins = await checkMapping(filter.wins, sql, filterId);
+                    checkMapping(filter.wins, sql, filterId).than(res => {
+                        console.log('checkMapping: ');
+                        console.log(JSON.stringify(res));
+                    })
+                    //bindWins = await checkMapping(filter.wins, sql, filterId);
                     console.log('*******************checkMapping Executed*************************');
                     console.log(JSON.stringify(bindWins));
                     // filter.wins.forEach(item => {
