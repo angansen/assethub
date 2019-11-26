@@ -316,24 +316,21 @@ async function mappingStatus(query, filterId, item) {
         })
 }
 async function checkMapping(data, query, filterId) {
-
-    return new Promise((resolve, reject) => {
-        let bindassets = [];
-        console.log('data.length: ' + data.length);
-        for (let i = 0; i < data.length; i++) {
-            let result = await mappingStatus(query, filterId, data[i]);
-            if (result.length == 0) {
-                let newId = uniqid.process();
-                let values = [];
-                values.push(newId);
-                values.push(filterId);
-                values.push(data[i]);
-                bindassets.push(values);
-            }
+    let bindassets = [];
+    console.log('data.length: ' + data.length);
+    for (let i = 0; i < data.length; i++) {
+        let result = await mappingStatus(query, filterId, data[i]);
+        if (result.length == 0) {
+            let newId = uniqid.process();
+            let values = [];
+            values.push(newId);
+            values.push(filterId);
+            values.push(data[i]);
+            bindassets.push(values);
         }
-        console.log(JSON.stringify(bindassets));
-        resolve(bindassets);
-    })
+    }
+    console.log(JSON.stringify(bindassets));
+    return bindassets;
 }
 exports.mapFilters = (filter, host) => {
     const connection = getDb();
