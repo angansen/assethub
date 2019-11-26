@@ -1022,12 +1022,19 @@ module.exports = class Asset {
                 wordlist.forEach(word => {
                     if (word.indexOf("+") != -1) {
 
-                        word.split("+").forEach(wordFragment => {
+                        let isMatch = true;
+                        let wordFragment = word.split("+");
+                        for (let i = 0; i < wordFragment.length; i++) {
                             if (combineContentToMatch.indexOf(wordFragment) == -1) {// MATCH FOUND
+                                isMatch = false;
                                 break;
+                            } else {
+                                isMatch = true;
                             }
+                        }
+                        if (isMatch) {
                             filtersasset.push(data[i]);
-                        })
+                        }
 
                     } else {
                         if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
