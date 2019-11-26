@@ -385,7 +385,6 @@ updateFilterStatus = (data) => {
         ]
     };
     console.log("Executing. . .");
-    console.log('bindWins.length:- ' + res.length);
     connection.executeMany(createLinksSql, data, options, (err, result) => {
         console.log("Executed");
         if (err || result.rowsAffected == 0) {
@@ -445,7 +444,7 @@ exports.mapFilters = (filter) => {
 
                             });
                         } else {
-                            resolve({ "status": 'Success', "message": "Filter already mapped" })
+                            resolve({ "status": 'error', "message": "Filter already mapped" })
                         }
                     })
                         .catch(console.error)
