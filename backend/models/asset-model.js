@@ -309,12 +309,12 @@ module.exports = class Asset {
                                 }
                             ).then(res => {
                                 console.log("Old linked clear");
-                                connection.executeMany(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID) values(
-                                    :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:ASSET_ID)`,
+                                connection.executeMany(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID,LINK_ACTIVE) values(
+                                    :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:ASSET_ID,'true')`,
                                     oj, {
                                     autoCommit: true
                                 }).then(linkres => {
-                                    console.log("2nd update Links batch succesfully executed : "+JSON.stringify(linkres));
+                                    console.log("2nd update Links batch succesfully executed : " + JSON.stringify(linkres));
                                 }).catch(err => {
                                     console.log("Links batch insert failed");
                                 })
@@ -322,7 +322,7 @@ module.exports = class Asset {
                         }
                         else {
                             return connection.query(`SELECT * from asset_links  where link_active='true'`, {})
-                                
+
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
@@ -410,14 +410,22 @@ module.exports = class Asset {
                     }
                     , function secondAction() {
                         if (oj.length > 0) {
-                            return connection.batchInsert(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID) values(
-                :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:ASSET_ID)`,
-                                oj, {
-                                autocommit: true
-                            }
-                            ).catch(err => {
-                                console.log("Second action error " + err);
-                                reject({ msg: "Asset creation failed on second step" });
+                            console.log(JSON.stringify(oj));
+                            return connection.execute(`delete from ASSET_LINKS  WHERE ASSET_ID=:ASSET_ID`, [self.assetId]
+                                , {
+                                    autoCommit: true
+                                }
+                            ).then(res => {
+                                console.log("Old linked clear");
+                                connection.executeMany(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID,LINK_ACTIVE) values(
+                                    :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:ASSET_ID,'true')`,
+                                    oj, {
+                                    autoCommit: true
+                                }).then(linkres => {
+                                    console.log("2nd update Links batch succesfully executed : " + JSON.stringify(linkres));
+                                }).catch(err => {
+                                    console.log("Links batch insert failed");
+                                })
                             })
                         }
                         else {
