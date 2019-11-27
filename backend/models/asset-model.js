@@ -314,7 +314,7 @@ module.exports = class Asset {
                                     oj, {
                                     autoCommit: true
                                 }).then(linkres => {
-                                    console.log("2nd update Links batch succesfully executed : "=JSON.stringify(linkres));
+                                    console.log("2nd update Links batch succesfully executed : "+JSON.stringify(linkres));
                                 }).catch(err => {
                                     console.log("Links batch insert failed");
                                 })
