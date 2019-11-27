@@ -308,16 +308,21 @@ module.exports = class Asset {
                                     autoCommit: true
                                 }
                             ).then(res => {
-                                //console.log('2nd update done(Asset links updated)' + res)
+                                console.log("Old linked clear");
                                 connection.executeMany(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID) values(
                                     :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:ASSET_ID)`,
                                     oj, {
                                     autoCommit: true
+                                }).then(linkres => {
+                                    console.log("2nd update Links batch succesfully executed")
+                                }).catch(err => {
+                                    console.log("Links batch insert failed");
                                 })
                             })
                         }
                         else {
                             return connection.query(`SELECT * from asset_links  where link_active='true'`, {})
+                                
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
@@ -332,7 +337,7 @@ module.exports = class Asset {
                                     {
                                         outFormat: oracledb.Object
                                     }).then(res => {
-                                        console.log("filters inserted successfully")
+                                        console.log("3rd update filters inserted successfully")
                                     })
                             })
                         }
