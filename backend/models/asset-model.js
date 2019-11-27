@@ -674,7 +674,7 @@ module.exports = class Asset {
     }
 
 
-    static uploadImages(host, assetId, images, imageDescription) {
+    static uploadImages(assetId, images, imageDescription) {
         return new Promise((resolve, reject) => {
             let filesArray = [];
             const connection = getDb();
@@ -710,8 +710,6 @@ module.exports = class Asset {
     static uploadThumbnail(assetId, thumbnail) {
         return new Promise((resolve, reject) => {
             console.log("inside thumnnail function")
-            console.log(JSON.stringify(thumbnail));
-
             try {
 
                 const connection = getDb();
@@ -730,24 +728,24 @@ module.exports = class Asset {
                         return res.status(500).send(err);
                     }
                 })
-            //     connection.update(`UPDATE ASSET_DETAILS set 
-            // ASSET_THUMBNAIL=:ASSET_THUMBNAIL
-            //  WHERE ASSET_ID=:ASSET_ID`, [content, assetId],
-            //         {
-            //             autoCommit: true
-            //         }
-            //     ).then(res => {
-            //         //console.log("thumbnail inserted Successfully")
-            //         //console.log(res)
-            //         resolve("working");
-            //     })
+                connection.update(`UPDATE ASSET_DETAILS set 
+            ASSET_THUMBNAIL=:ASSET_THUMBNAIL
+             WHERE ASSET_ID=:ASSET_ID`, [content, assetId],
+                    {
+                        autoCommit: true
+                    }
+                ).then(res => {
+                    //console.log("thumbnail inserted Successfully")
+                    //console.log(res)
+                    resolve("working");
+                })
             } catch (error) {
-                reject({msg:"Thumnail saving error"});
+                reject({ msg: "Thumnail saving error" });
             }
         })
     }
 
-    static uploadVideo(host, assetId, video) {
+    static uploadVideo(assetId, video) {
         return new Promise((resolve, reject) => {
             //console.log("inside video function")
             const connection = getDb();
