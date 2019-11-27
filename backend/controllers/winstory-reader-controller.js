@@ -517,7 +517,7 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         })
     }
     else {
-        winstoryreader.fetchAssets(req.headers.host, offset, limit, filters, searchString, sortBy, order).then(result => {
+        winstoryreader.fetchAssets2(req.headers.host, offset, limit, filters, searchString, sortBy, order).then(result => {
             res.json(result);
         })
     }
