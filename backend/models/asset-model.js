@@ -302,7 +302,7 @@ module.exports = class Asset {
                     }
                     , function secondAction() {
                         if (oj.length > 0) {
-                            //console.log("statement:", oj)
+                            console.log(JSON.stringify(oj));
                             return connection.execute(`delete from ASSET_LINKS  WHERE ASSET_ID=:ASSET_ID`, [self.assetId]
                                 , {
                                     autoCommit: true
@@ -314,7 +314,7 @@ module.exports = class Asset {
                                     oj, {
                                     autoCommit: true
                                 }).then(linkres => {
-                                    console.log("2nd update Links batch succesfully executed")
+                                    console.log("2nd update Links batch succesfully executed : "=JSON.stringify(linkres));
                                 }).catch(err => {
                                     console.log("Links batch insert failed");
                                 })
