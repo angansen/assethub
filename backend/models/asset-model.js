@@ -2055,9 +2055,10 @@ module.exports = class Asset {
                             let traceunique = "";
                             sugestionsarr = result.filter(suggest => {
                                 console.log(traceunique);
-                                console.log(suggest.ACTIVITY_FILTER + " - " + suggest.FILTER_NAME + " - " + traceunique.toLowerCase().indexOf(suggest.FILTER_NAME.toLowerCase()));
-                                if (traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.toLowerCase()) == -1 && traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.toLowerCase()) == -1) {
-                                    traceunique += suggest.FILTER_NAME + suggest.ACTIVITY_FILTER;
+                                console.log(suggest.ACTIVITY_FILTER + " - " + suggest.FILTER_NAME );
+                                console.log(traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.toLowerCase())+ " - " + traceunique.toLowerCase().indexOf(suggest.FILTER_NAME.toLowerCase()))
+                                if (traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.trim().toLowerCase()) == -1 && traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.trim().toLowerCase()) == -1) {
+                                    traceunique += suggest.FILTER_NAME.trim() + suggest.ACTIVITY_FILTER.trim();
                                     return suggest;
                                 }
                             })
