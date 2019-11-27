@@ -45,6 +45,7 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
                 console.log('Result:' + result)
                 if (result.length > 0) {
                     console.log("multiple reviewers")
+                    console.log(JSON.stringify(result));
                     asset_reviewer_name = result.map(o => o.USER_NAME)
                     asset_reviewer_name = asset_reviewer_name.join(';')
                     asset_reviewer_email = result.map(o => o.USER_EMAIL)
@@ -52,6 +53,7 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
                 }
                 else {
                     console.log("single reviewer")
+                    console.log(JSON.stringify(result[0]));
                     asset_reviewer_name = result[0].USER_NAME;
                     asset_reviewer_email = result[0].USER_EMAIL;
                 }
