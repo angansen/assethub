@@ -710,6 +710,7 @@ module.exports = class Asset {
     static uploadThumbnail(assetId, thumbnail) {
         return new Promise((resolve, reject) => {
             console.log("inside thumnnail function")
+            console.log(JSON.stringify(thumbnail));
 
             try {
 
@@ -729,17 +730,17 @@ module.exports = class Asset {
                         return res.status(500).send(err);
                     }
                 })
-                connection.update(`UPDATE ASSET_DETAILS set 
-            ASSET_THUMBNAIL=:ASSET_THUMBNAIL
-             WHERE ASSET_ID=:ASSET_ID`, [content, assetId],
-                    {
-                        autoCommit: true
-                    }
-                ).then(res => {
-                    //console.log("thumbnail inserted Successfully")
-                    //console.log(res)
-                    resolve("working")
-                })
+            //     connection.update(`UPDATE ASSET_DETAILS set 
+            // ASSET_THUMBNAIL=:ASSET_THUMBNAIL
+            //  WHERE ASSET_ID=:ASSET_ID`, [content, assetId],
+            //         {
+            //             autoCommit: true
+            //         }
+            //     ).then(res => {
+            //         //console.log("thumbnail inserted Successfully")
+            //         //console.log(res)
+            //         resolve("working");
+            //     })
             } catch (error) {
                 reject({msg:"Thumnail saving error"});
             }
