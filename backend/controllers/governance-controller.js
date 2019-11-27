@@ -114,9 +114,12 @@ const sendEmailForAssetStatusChange=(assetId,status)=>{
                 asset_owners_name=result.rows.map(o=>o.USER_NAME)
                 asset_owners_name=asset_owners_name.join(';')
             }
-            else{
+            else if(result.rows[0]!=undefined){
                 asset_owners=result.rows[0].USER_EMAIL;
                 asset_owners_name=result.rows[0].USER_NAME
+            }else{
+                console.log("no reviewer found to notify");
+                return;
             }
             return asset_owners;
         })
