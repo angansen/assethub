@@ -1014,9 +1014,8 @@ module.exports = class Asset {
                         combineContentToMatch += filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
 
-                let wordlist = searchString.split(/,| (?:[ ]+[ ])/);
-
-                console.log("----- ASSET  WORD SPLIT ------")
+                let wordlist = searchString.split(/,| /);
+                console.log("----- WIN  WORD SPLIT ------")
                 console.log(JSON.stringify(wordlist));
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
@@ -1298,7 +1297,7 @@ module.exports = class Asset {
                                                                                                 allObj.TOTALCOUNT = allAssets.length;
                                                                                                 tAssets = allAssets.slice(offset, limit);
                                                                                                 dynamicSort(tAssets, sortBy, order)
-                                                                                                
+
                                                                                                 allObj.ASSETS = tAssets;
                                                                                                 console.log("Asset Count :::: " + tAssets.length);
                                                                                                 resolve(allObj);
