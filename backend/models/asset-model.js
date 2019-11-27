@@ -707,9 +707,9 @@ module.exports = class Asset {
 
 
 
-    static uploadThumbnail(host, assetId, thumbnail) {
+    static uploadThumbnail(assetId, thumbnail) {
         return new Promise((resolve, reject) => {
-            //console.log("inside thumnnail function")
+            console.log("inside thumnnail function")
 
             try {
 

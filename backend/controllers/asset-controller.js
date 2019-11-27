@@ -437,7 +437,7 @@ exports.postAssetImage = (req, res) => {
                 })
                 .catch(err => {
                     console.log(err)
-                    res.json(err)
+                    res.status(500).json(err)
                 })
         }
         else if (type === 'coverVideo') {
