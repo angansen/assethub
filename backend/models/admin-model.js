@@ -160,19 +160,41 @@ exports.deleteFilterbyId = (filterId, host) => {
                         autoCommit: true
                     })
                     .then(res => {
-                        connection.execute(`DELETE from ASSET_FILTER where FILTER_ID=:FILTER_ID`, [filterId],
+                        let getfilters = `select filter_type_image,filter_image from asset_filter where FILTER_ID=:FILTER_ID`;
+                        // console.log(getfilters);
+                        connection.query(getfilters, [filterId],
                             {
-                                outFormat: oracledb.Object,
-                                autoCommit: true
+                                outFormat: oracledb.Object
+                                // autoCommit: true
                             })
-                            .then(res => {
-                                //resolve({ "status": "filter deleted" })
-                                resolve({ "status": 'Success', "message": "Filter deleted successfully" })
+                            .then(dbfeed => {
+                                console.log("deleting filter icons : ");
+                                dbfeed.filter(fileobj => {
+                                    console.log(fileobj.FILTER_TYPE_IMAGE + " --- " + fileobj.FILTER_IMAGE);
+                                    let filtertypeimage = path.join(__dirname, '../../../..', 'mnt/ahfs', '/' + fileobj.FILTER_IMAGE);
+                                    //let filterimage = path.join(__dirname, '../../../..', 'mnt/ahfs', '/' + fileobj.FILTER_TYPE_IMAGE);
+                                    deletefilterimage(filtertypeimage);
+                                    //deletefilterimage(filterimage);
+                                })
                             })
                             .catch(err => {
-                                console.log("ASSET_FILTER View error: " + err);
-                                resolve(err)
+                                console.log(JSON.stringify(err));
                             })
+                            .finally(obj => {
+                                connection.execute(`DELETE from ASSET_FILTER where FILTER_ID=:FILTER_ID`, [filterId],
+                                    {
+                                        outFormat: oracledb.Object,
+                                        autoCommit: true
+                                    })
+                                    .then(res => {
+                                        //resolve({ "status": "filter deleted" })
+                                        resolve({ "status": 'Success', "message": "Filter deleted successfully" })
+                                    })
+                                    .catch(err => {
+                                        console.log("ASSET_FILTER View error: " + err);
+                                        resolve(err)
+                                    })
+                            });
                     })
                     .catch(err => {
                         console.log("ASSET_WINSTORY_FILTER_WINSTORY_MAP View error: " + err);
