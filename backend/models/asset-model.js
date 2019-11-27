@@ -273,6 +273,7 @@ module.exports = class Asset {
                     })
                 }
 
+                console.log("Option SQL : "+JSON.stringify(self));
                 connection.transaction([
                     function firstAction() {
                         return connection.update(`UPDATE ASSET_DETAILS set 
@@ -2054,19 +2055,18 @@ module.exports = class Asset {
                         .then(result => {
                             let traceunique = "";
                             sugestionsarr = result.filter(suggest => {
-                                console.log(traceunique);
-                                console.log(suggest.ACTIVITY_FILTER + " - " + suggest.FILTER_NAME);
-                                console.log(traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.trim().toLowerCase()) + " - " + traceunique.toLowerCase().indexOf(suggest.FILTER_NAME.toLowerCase()))
+                                // console.log(traceunique);
+                                // console.log(suggest.ACTIVITY_FILTER + " - " + suggest.FILTER_NAME);
+                                // console.log(traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.trim().toLowerCase()) + " - " + traceunique.toLowerCase().indexOf(suggest.FILTER_NAME.toLowerCase()))
                                 if (traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.trim().toLowerCase()) == -1 && traceunique.toLowerCase().indexOf(suggest.FILTER_NAME.toLowerCase()) == -1) {
-                                    console.log("IN");
+                                    // console.log("IN");
                                     traceunique += suggest.FILTER_NAME.trim() + suggest.ACTIVITY_FILTER.trim();
                                     traceunique = traceunique.replace(/ /g, "");
                                     return suggest;
-                                } else
-                                    console.log("NOT IN");
+                                }
 
                             })
-                            console.log(traceunique);
+                            // console.log(traceunique);
 
 
 
