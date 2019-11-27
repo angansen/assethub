@@ -2041,7 +2041,7 @@ module.exports = class Asset {
                     a.activity_filter,
                     count(*) as count,
                     a.activity_type,
-                    b.filter_name
+                    nvl(b.filter_name,' ') as filter_name 
                     from asset_search_activity a left join asset_filter b 
                     on a.activity_filter=b.filter_id 
                     where a.activity_performed_by='`+ user_email + `'  
@@ -2054,7 +2054,7 @@ module.exports = class Asset {
                         .then(result => {
                             let traceunique = "";
                             sugestionsarr = result.filter(suggest => {
-                                if (!traceunique.toLowerCase().includes(suggest.FILTER_NAME.toLowerCase())) {
+                                if (suggest.FILTER_NAME != null && !traceunique.toLowerCase().includes(suggest.FILTER_NAME.toLowerCase())) {
                                     traceunique += suggest.FILTER_NAME;
                                     return suggest;
                                 }
