@@ -35,7 +35,7 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
     return new Promise((resolve, reject) => {
         const connection = getDb();
         assetCreatedEmailOptions.push(assetId)
-        console.log("asset :> "+assetId);
+        console.log("asset :> " + assetId);
 
         connection.query(assetCreatedEmailSql, assetCreatedEmailOptions,
             {
@@ -52,11 +52,13 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
                     asset_reviewer_email = result.map(o => o.USER_EMAIL)
                     asset_reviewer_email = asset_reviewer_email.join(';')
                 }
-                else {
+                else if (result[0] != undefined) {
                     console.log("single reviewer")
                     console.log(JSON.stringify(result[0]));
                     asset_reviewer_name = result[0].USER_NAME;
                     asset_reviewer_email = result[0].USER_EMAIL;
+                } else {
+                    reject("No reviewer for the location");
                 }
                 return asset_reviewer_email;
             })
@@ -150,7 +152,7 @@ exports.postAsset = (req, res) => {
             })
     })
         .catch(err => {
-            err.status="FAILED";
+            err.status = "FAILED";
             res.status(500).json(err);
             console.log(err)
         });;
@@ -256,7 +258,7 @@ exports.postEditAsset = (req, res) => {
         let updationResult = result
         res.json(updationResult);
         sendEmailOnAssetCreation(assetId, owner, assetCreatedEmailSql, assetCreatedEmailOptions, 'update').then(result => {
-            // console.log(result)
+            console.log(result)
         })
             .catch(err => {
                 console.log(err)
