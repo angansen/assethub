@@ -91,12 +91,12 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
 
 exports.postAsset = (req, res) => {
     const assetId = null;
-    console.log(req.body);
+    // console.log(req.body);
 
     const title = req.body.title
-    console.log(title);
+    // console.log(title);
     const description = req.body.description;
-    console.log(description);
+    // console.log(description);
 
     const userCase = req.body.userCase;
     const customer = req.body.customer;
@@ -119,7 +119,7 @@ exports.postAsset = (req, res) => {
         connect by regexp_substr(asset_owner, '[^,]+', 1, level) is not null) and user_location is not null) `;
     let assetCreatedEmailOptions = [];
 
-    console.log(filters)
+    // console.log(filters)
 
     if (!req.body.links) {
         req.body.links = null;

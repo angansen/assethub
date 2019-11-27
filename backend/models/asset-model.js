@@ -235,8 +235,8 @@ module.exports = class Asset {
             const connection = getDb();
             let filterObj = {};
             let filterArr = [];
-            //console.log("------------------ SAVEING ASSET -----------------");
-            //console.log(JSON.stringify(self));
+            console.log("------------------ SAVEING ASSET -----------------");
+            console.log(JSON.stringify(self));
 
             if (this.assetId) {
 
@@ -378,19 +378,13 @@ module.exports = class Asset {
                 }
                 let oj = this.links;
 
-                //console.log("MODEL LINK1", oj)
                 if (!(oj === null)) {
                     oj.forEach(link => {
-                        // linkObj={LINK_ID:uniqid.process(),ASSET_ID:assetid,...link}
-                        // return linkObj
+
                         link.LINK_ID = uniqid.process();
                         link.ASSET_ID = assetid;
                     })
                 }
-
-                //console.log("FilterArr", filterArr)
-                //console.log("MODEL LINK2", oj)
-
                 connection.transaction([
                     function firstAction() {
                         return connection.insert(`INSERT into ASSET_DETAILS(ASSET_ID,ASSET_TITLE,ASSET_DESCRIPTION,
@@ -404,6 +398,8 @@ module.exports = class Asset {
                                 outFormat: oracledb.Object
                             }).then(res => {
                                 console.log('1st insert done(Asset details inserted)')
+                            }).catch(err => {
+                                console.log("First Action error " + err);
                             })
                     }
                     , function secondAction() {
@@ -413,7 +409,9 @@ module.exports = class Asset {
                                 oj, {
                                 autocommit: true
                             }
-                            )
+                            ).catch(err => {
+                                console.log("Second action error " + err);
+                            })
                         }
                         else {
                             //console.log("oj is empty")
@@ -427,6 +425,8 @@ module.exports = class Asset {
                                     outFormat: oracledb.Object
                                 }).then(res => {
                                     console.log("filters inserted successfully")
+                                }).catch(err => {
+                                    console.log("Third action error " + err);
                                 })
                         }
                         else {
@@ -441,7 +441,7 @@ module.exports = class Asset {
                         resolve({ Asset_ID: assetid })
                     })
                     .catch(err => {
-                        console.log(err)
+                        console.log("onTransactionResults : " + err);
                     })
 
             }
@@ -1019,14 +1019,14 @@ module.exports = class Asset {
                 combineContentToMatch = combineContentToMatch.toLowerCase();
                 wordlist.forEach(word => {
                     if (word.includes("+")) {
-                        let isMatch=true;
-                        let wordfrag=word.split("+");
-                        for(let i=0;i<wordfrag.length;i++){
-                            if (combineContentToMatch.indexOf(wordfrag[i].trim().toLowerCase()) == -1){
-                                isMatch=false;
+                        let isMatch = true;
+                        let wordfrag = word.split("+");
+                        for (let i = 0; i < wordfrag.length; i++) {
+                            if (combineContentToMatch.indexOf(wordfrag[i].trim().toLowerCase()) == -1) {
+                                isMatch = false;
                                 break;
                             }
-                            if(isMatch){
+                            if (isMatch) {
                                 filtersasset.push(data[i]);
                             }
                         }
@@ -1035,7 +1035,7 @@ module.exports = class Asset {
                     }
                 })
             }
-            console.log(data.length+ " > Filtered By Search : "+filtersasset.length);
+            console.log(data.length + " > Filtered By Search : " + filtersasset.length);
             resolve(true);
         })
     }
@@ -1118,7 +1118,7 @@ module.exports = class Asset {
                 return asset;
             }
         })
-        console.log("Limit : "+limit);
+        console.log("Limit : " + limit);
         assetsArray = uniqueassetarray;
         let allAssetsObj = {};
         let tAssets = [];
@@ -1292,7 +1292,7 @@ module.exports = class Asset {
                                                                                                 })
 
                                                                                                 let allObj = {};
-                                                                                                
+
                                                                                                 tAssets = allAssets.slice(offset, limit);
                                                                                                 dynamicSort(tAssets, sortBy, order)
                                                                                                 allObj.TOTALCOUNT = tAssets.length;
