@@ -1014,7 +1014,10 @@ module.exports = class Asset {
                         combineContentToMatch += filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
 
-                let wordlist = searchString.split(/,| /);
+                let wordlist = searchString.split(/,| (?:[ ]+[ ])/);
+
+                console.log("----- ASSET  WORD SPLIT ------")
+                console.log(JSON.stringify(wordlist));
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
                 wordlist.forEach(word => {
@@ -1022,7 +1025,7 @@ module.exports = class Asset {
                         let isMatch = true;
                         let wordfrag = word.split("+");
                         for (let i = 0; i < wordfrag.length; i++) {
-                            if (combineContentToMatch.indexOf(wordfrag[i].trim().toLowerCase()) == -1) {
+                            if (combineContentToMatch.indexOf(wordfrag[i].toLowerCase()) == -1) {
                                 isMatch = false;
                                 break;
                             }
@@ -1030,7 +1033,7 @@ module.exports = class Asset {
                                 filtersasset.push(data[i]);
                             }
                         }
-                    } else if (combineContentToMatch.indexOf(word.trim().toLowerCase()) != -1) {// MATCH FOUND
+                    } else if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
                         filtersasset.push(data[i]);
                     }
                 })
