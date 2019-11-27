@@ -2054,8 +2054,8 @@ module.exports = class Asset {
                         .then(result => {
                             let traceunique = "";
                             sugestionsarr = result.filter(suggest => {
-                                if (!traceunique.toLowerCase().includes(suggest.FILTER_NAME.toLowerCase())) {
-                                    traceunique += suggest.FILTER_NAME;
+                                if (!traceunique.toLowerCase().includes(suggest.FILTER_NAME.toLowerCase()) || !traceunique.toLowerCase().includes(suggest.ACTIVITY_FILTER.toLowerCase())) {
+                                    traceunique += suggest.FILTER_NAME + suggest.ACTIVITY_FILTER;
                                     return suggest;
                                 }
                             })
