@@ -402,9 +402,7 @@ updateFilterStatus = (data) => {
 }
 exports.mapFilters = (filter) => {
     const connection = getDb();
-    console.log('called mapFilters');
     return new Promise((resolve, reject) => {
-
         if (filter.filter.length > 0) {
             let count = filter.filter.length;
             let filterStatus = [];
