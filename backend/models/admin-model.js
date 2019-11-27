@@ -404,7 +404,9 @@ exports.mapFilters = (filter) => {
     const connection = getDb();
     console.log('called mapFilters');
     return new Promise((resolve, reject) => {
+
         if (filter.filter.length > 0) {
+            let count = filter.filter.length;
             let filterStatus = [];
             filter.filter.forEach(filterId => {
                 let Filtervalues = [];
@@ -439,19 +441,21 @@ exports.mapFilters = (filter) => {
                                 else {
                                     mappedFlag = true;
                                     console.log("Result is:", JSON.stringify(result));
-                                    updateFilterStatus(filterStatus);
-                                    resolve({ "status": 'Success', "message": "Filter mapped successfully" })
+                                    //updateFilterStatus(filterStatus);
+                                    if (count - 1 == 0)
+                                        resolve({ "status": 'Success', "message": "Filter mapped successfully" })
                                 }
 
                             });
                         } else {
-                            resolve({ "status": 'Success', "message": "Filter already mapped" })
+                            if (count - 1 == 0)
+                                resolve({ "status": 'Success', "message": "Filter already mapped" })
                         }
                     })
                         .catch(console.error)
                 }
                 if (filter.wins.length > 0) {
-                    let bindWins = [];
+
                     console.log('calling checkMapping: wins');
                     let sql = `Select * from ASSET_WINSTORY_FILTER_WINSTORY_MAP where FILTER_ID=:FILTER_ID AND WINSTORY_ID=:WINSTORY_ID`;
                     checkMapping(filter.wins, sql, filterId).then(res => {
@@ -477,12 +481,14 @@ exports.mapFilters = (filter) => {
                                 else {
                                     updateFilterStatus(filterStatus);
                                     console.log("Result is:", JSON.stringify(result));
-                                    resolve({ "status": 'Success', "message": "Filter mapped successfully" })
+                                    if (count - 1 == 0)
+                                        resolve({ "status": 'Success', "message": "Filter mapped successfully" })
                                 }
 
                             });
                         } else {
-                            resolve({ "status": 'Success', "message": "Filter already mapped" })
+                            if (count - 1 == 0)
+                                resolve({ "status": 'Success', "message": "Filter already mapped" })
                         }
                     })
                         .catch(console.error)
