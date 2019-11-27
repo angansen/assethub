@@ -400,6 +400,7 @@ module.exports = class Asset {
                                 console.log('1st insert done(Asset details inserted)')
                             }).catch(err => {
                                 console.log("First Action error " + err);
+                                reject({msg:"Asset creation failed on first step"});
                             })
                     }
                     , function secondAction() {
@@ -411,6 +412,7 @@ module.exports = class Asset {
                             }
                             ).catch(err => {
                                 console.log("Second action error " + err);
+                                reject({msg:"Asset creation failed on second step"});
                             })
                         }
                         else {
@@ -427,6 +429,7 @@ module.exports = class Asset {
                                     console.log("filters inserted successfully")
                                 }).catch(err => {
                                     console.log("Third action error " + err);
+                                    reject({msg:"Asset creation failed on third step"});
                                 })
                         }
                         else {
@@ -442,6 +445,7 @@ module.exports = class Asset {
                     })
                     .catch(err => {
                         console.log("onTransactionResults : " + err);
+                        reject({msg:"Asset creation failed on transaction failure"});
                     })
 
             }
