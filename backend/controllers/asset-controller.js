@@ -35,6 +35,7 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
     return new Promise((resolve, reject) => {
         const connection = getDb();
         assetCreatedEmailOptions.push(assetId)
+        console.log("asset :> "+assetId);
 
         connection.query(assetCreatedEmailSql, assetCreatedEmailOptions,
             {
