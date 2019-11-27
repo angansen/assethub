@@ -273,7 +273,7 @@ module.exports = class Asset {
                     })
                 }
 
-                console.log("Option SQL : "+JSON.stringify(self));
+                console.log("Option SQL : " + JSON.stringify(self));
                 connection.transaction([
                     function firstAction() {
                         return connection.update(`UPDATE ASSET_DETAILS set 
@@ -384,7 +384,7 @@ module.exports = class Asset {
                         link.ASSET_ID = assetid;
                     })
                 }
-                console.log("Option SQL : "+JSON.stringify(self));
+                console.log("Option SQL : " + JSON.stringify(self));
                 connection.transaction([
                     function firstAction() {
                         return connection.insert(`INSERT into ASSET_DETAILS(ASSET_ID,ASSET_TITLE,ASSET_DESCRIPTION,
@@ -710,33 +710,39 @@ module.exports = class Asset {
     static uploadThumbnail(host, assetId, thumbnail) {
         return new Promise((resolve, reject) => {
             //console.log("inside thumnnail function")
-            const connection = getDb();
-            let fname = thumbnail.name.split('.')[0];
-            fname = fname.replace(/ /g, '');
 
-            const ftype = thumbnail.name.split('.')[1];
-            const uniqueId = uniqid();
-            const finalFname = fname + uniqueId.concat('.', ftype);
-            //console.log(finalFname)
-            const uploadPath = path.join(__dirname, '../../../..', 'mnt/ahfs/', finalFname);
-            var content = `${finalFname}`
-            //console.log(content)
-            thumbnail.mv(uploadPath, function (err) {
-                if (err) {
-                    return res.status(500).send(err);
-                }
-            })
-            connection.update(`UPDATE ASSET_DETAILS set 
+            try {
+
+                const connection = getDb();
+                let fname = thumbnail.name.split('.')[0];
+                fname = fname.replace(/ /g, '');
+
+                const ftype = thumbnail.name.split('.')[1];
+                const uniqueId = uniqid();
+                const finalFname = fname + uniqueId.concat('.', ftype);
+                //console.log(finalFname)
+                const uploadPath = path.join(__dirname, '../../../..', 'mnt/ahfs/', finalFname);
+                var content = `${finalFname}`
+                //console.log(content)
+                thumbnail.mv(uploadPath, function (err) {
+                    if (err) {
+                        return res.status(500).send(err);
+                    }
+                })
+                connection.update(`UPDATE ASSET_DETAILS set 
             ASSET_THUMBNAIL=:ASSET_THUMBNAIL
              WHERE ASSET_ID=:ASSET_ID`, [content, assetId],
-                {
-                    autoCommit: true
-                }
-            ).then(res => {
-                //console.log("thumbnail inserted Successfully")
-                //console.log(res)
-                resolve("working")
-            })
+                    {
+                        autoCommit: true
+                    }
+                ).then(res => {
+                    //console.log("thumbnail inserted Successfully")
+                    //console.log(res)
+                    resolve("working")
+                })
+            } catch (error) {
+                reject({msg:"Thumnail saving error"});
+            }
         })
     }
 

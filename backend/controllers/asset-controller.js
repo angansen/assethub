@@ -52,7 +52,7 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
                     asset_reviewer_email = result.map(o => o.USER_EMAIL)
                     asset_reviewer_email = asset_reviewer_email.join(';')
                 }
-                else if (result[0] != undefined) {
+                else if (result[0]!=undefined) {
                     console.log("single reviewer")
                     console.log(JSON.stringify(result[0]));
                     asset_reviewer_name = result[0].USER_NAME;
