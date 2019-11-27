@@ -68,9 +68,12 @@ const sendEmailForAssetStatusChange=(assetId,status)=>{
             asset_reviewer_name=result.rows.map(reviewer=>reviewer.USER_NAME);
             asset_reviewer_name=asset_reviewer_name.join(',');
           }
-          else
+          else if(result.rows[0]!=undefined)
           {
             asset_reviewer_name=result.rows[0].USER_NAME;
+          }else{
+              console.log("no reviewer found to notify");
+              return;
           }
          const review_comment=JSON.parse(result.rows[0].ASSET_REVIEW_NOTE);
          if(review_comment.length>0)
