@@ -1292,10 +1292,10 @@ module.exports = class Asset {
                                                                                                 })
 
                                                                                                 let allObj = {};
-
+                                                                                                allObj.TOTALCOUNT = allAssets.length;
                                                                                                 tAssets = allAssets.slice(offset, limit);
                                                                                                 dynamicSort(tAssets, sortBy, order)
-                                                                                                allObj.TOTALCOUNT = tAssets.length;
+                                                                                                
                                                                                                 allObj.ASSETS = tAssets;
                                                                                                 console.log("Asset Count :::: " + tAssets.length);
                                                                                                 resolve(allObj);
