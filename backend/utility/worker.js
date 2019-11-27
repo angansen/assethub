@@ -205,13 +205,12 @@ exports.updateWorkerResult = () => {
 exports.captureSearch = (activity) => {
 
 
-    // console.log("============= FILTER ==============")
-    // console.log(JSON.stringify(activity));
-    // console.log("============= FILTER ==============")
+    console.log("============= FILTER ==============")
+    console.log(JSON.stringify(activity));
+    console.log("============= FILTER ==============")
 
-    if (activity.filters == undefined) {
-        return;
-    } else {
+    if (activity.filters != undefined) {
+
         console.log(JSON.stringify(activity));
         activity.activity_id = uniqid.process('a-');
         activity.activitygroupid = uniqid.process('ag-');
@@ -230,26 +229,27 @@ exports.captureSearch = (activity) => {
             };
 
         })
-
-
-        if (activity.searchtext != undefined && activity.searchtext.length > 0) {
-            let words = activity.searchtext.trim().split(" ");
-
-            words.filter(word => {
-                try {
-                    const connection = getDb();
-                    let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
-                    let captureSearchActivityOptions = [activity.activity_id, activity.email, word, activity.activitygroupid, "FREETEXT"];
-                    connection.execute(captureSearchActivitySql, captureSearchActivityOptions, {
-                        autoCommit: true
-                    });
-                } catch (err) {
-                    console.log(JSON.stringify(err));
-                };
-            })
-
-        }
     }
+
+
+    if (activity.searchtext != undefined && activity.searchtext.length > 0) {
+        let words = activity.searchtext.trim().split(" ");
+
+        words.filter(word => {
+            try {
+                const connection = getDb();
+                let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER,filter_name, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
+                let captureSearchActivityOptions = [activity.activity_id, activity.email, word, word, activity.activitygroupid, "FREETEXT"];
+                connection.execute(captureSearchActivitySql, captureSearchActivityOptions, {
+                    autoCommit: true
+                });
+            } catch (err) {
+                console.log(JSON.stringify(err));
+            };
+        })
+
+    }
+
 }
 
 exports.captureSearch2 = (activity) => {

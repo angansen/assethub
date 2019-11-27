@@ -2052,12 +2052,16 @@ module.exports = class Asset {
                             outFormat: oracledb.OBJECT
                         })
                         .then(result => {
-                            sugestionsarr = result;
-                            // console.log(JSON.stringify(countArr));
-                            // result.forEach(filter => {
-                            //     sugestionsarr.push(filter);
-                            // })
-                            //console.log(JSON.stringify(countArr));
+                            let traceunique = "";
+                            sugestionsarr = result.filter(suggest => {
+                                if (!traceunique.toLowerCase().includes(suggest.FILTER_NAME.toLowerCase())) {
+                                    traceunique += suggest.FILTER_NAME;
+                                    return suggest;
+                                }
+                            })
+
+
+
                             connection.query(`select distinct f.filter_id,count(asset_id) cnt from asset_filter f full outer join 
                             (select m.filter_id,d.asset_id from asset_filter_asset_map m join ASSET_DETAILS d on 
                             (m.asset_id=d.asset_id) where d.ASSET_STATUS='Live') a on (f.filter_id=a.filter_id) group by f.filter_id`, [],
