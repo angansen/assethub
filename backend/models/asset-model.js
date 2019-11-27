@@ -2054,11 +2054,12 @@ module.exports = class Asset {
                         .then(result => {
                             let traceunique = "";
                             sugestionsarr = result.filter(suggest => {
-                                if (suggest.FILTER_NAME != null && !traceunique.toLowerCase().includes(suggest.FILTER_NAME.toLowerCase())) {
+                                if (!traceunique.toLowerCase().includes(suggest.FILTER_NAME.toLowerCase())) {
                                     traceunique += suggest.FILTER_NAME;
                                     return suggest;
                                 }
                             })
+                            console.log(traceunique);
 
 
 
