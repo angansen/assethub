@@ -400,7 +400,7 @@ module.exports = class Asset {
                                 console.log('1st insert done(Asset details inserted)')
                             }).catch(err => {
                                 console.log("First Action error " + err);
-                                reject({msg:"Asset creation failed on first step"});
+                                reject({ msg: "Asset creation failed on first step" });
                             })
                     }
                     , function secondAction() {
@@ -412,7 +412,7 @@ module.exports = class Asset {
                             }
                             ).catch(err => {
                                 console.log("Second action error " + err);
-                                reject({msg:"Asset creation failed on second step"});
+                                reject({ msg: "Asset creation failed on second step" });
                             })
                         }
                         else {
@@ -429,7 +429,7 @@ module.exports = class Asset {
                                     console.log("filters inserted successfully")
                                 }).catch(err => {
                                     console.log("Third action error " + err);
-                                    reject({msg:"Asset creation failed on third step"});
+                                    reject({ msg: "Asset creation failed on third step" });
                                 })
                         }
                         else {
@@ -445,7 +445,7 @@ module.exports = class Asset {
                     })
                     .catch(err => {
                         console.log("onTransactionResults : " + err);
-                        reject({msg:"Asset creation failed on transaction failure"});
+                        reject({ msg: "Asset creation failed on transaction failure" });
                     })
 
             }
@@ -1017,7 +1017,7 @@ module.exports = class Asset {
                     .map((filter) => {
                         combineContentToMatch += filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
-                searchString=searchString.replace(/ /g,"");
+                searchString = searchString.replace(/ /g, "");
                 let wordlist = searchString.split(/,/);
                 console.log("----- WIN  WORD SPLIT ------")
                 console.log(JSON.stringify(wordlist));
@@ -2052,11 +2052,11 @@ module.exports = class Asset {
                             outFormat: oracledb.OBJECT
                         })
                         .then(result => {
-                            countArr = result;
-                            console.log(JSON.stringify(countArr));
-                            result.forEach(filter => {
-                                sugestionsarr.push(filter);
-                            })
+                            sugestionsarr = result;
+                            // console.log(JSON.stringify(countArr));
+                            // result.forEach(filter => {
+                            //     sugestionsarr.push(filter);
+                            // })
                             //console.log(JSON.stringify(countArr));
                             connection.query(`select distinct f.filter_id,count(asset_id) cnt from asset_filter f full outer join 
                             (select m.filter_id,d.asset_id from asset_filter_asset_map m join ASSET_DETAILS d on 
