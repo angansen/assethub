@@ -2059,6 +2059,7 @@ module.exports = class Asset {
                                 console.log(traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.toLowerCase())+ " - " + traceunique.toLowerCase().indexOf(suggest.FILTER_NAME.toLowerCase()))
                                 if (traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.trim().toLowerCase()) == -1 && traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.trim().toLowerCase()) == -1) {
                                     traceunique += suggest.FILTER_NAME.trim() + suggest.ACTIVITY_FILTER.trim();
+                                    traceunique=traceunique.replace(/ /g,"");
                                     return suggest;
                                 }
                             })
