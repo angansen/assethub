@@ -386,6 +386,7 @@ module.exports = class Asset {
                         link.ASSET_ID = assetid;
                     })
                 }
+                console.log("Option SQL : "+JSON.stringify(self));
                 connection.transaction([
                     function firstAction() {
                         return connection.insert(`INSERT into ASSET_DETAILS(ASSET_ID,ASSET_TITLE,ASSET_DESCRIPTION,
