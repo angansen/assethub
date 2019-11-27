@@ -1017,8 +1017,8 @@ module.exports = class Asset {
                     .map((filter) => {
                         combineContentToMatch += filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
-
-                let wordlist = searchString.split(/,| /);
+                searchString=searchString.replace(/ /g,"");
+                let wordlist = searchString.split(/,/);
                 console.log("----- WIN  WORD SPLIT ------")
                 console.log(JSON.stringify(wordlist));
 
