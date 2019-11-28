@@ -2120,7 +2120,7 @@ module.exports = class Asset {
                                                     });
                                                     typeArr.forEach(type => {
                                                         console.log(JSON.stringify(type));
-                                                        console.log(JSON.stringify(filterObj));
+                                                        console.log(JSON.stringify(filters));
                                                         if (filterObj != undefined) {
                                                             filteredArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && !f.FILTER_NAME.toLowerCase().includes('other'));
 
