@@ -1025,8 +1025,13 @@ module.exports = class Asset {
                         combineContentToMatch += filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
 
-                let wordlist = searchString.split(/,| /);
+                searchString = searchString.replace(/ /g, "");
+                let wordlist = searchString.split(/,/);
+                console.log("----- WIN  WORD SPLIT ------")
+                console.log(JSON.stringify(wordlist));
 
+
+                combineContentToMatch = combineContentToMatch.toLowerCase();
                 combineContentToMatch = combineContentToMatch.toLowerCase();
                 wordlist.forEach(word => {
                     if (word.includes("+")) {
@@ -1037,13 +1042,10 @@ module.exports = class Asset {
                                 isMatch = false;
                                 break;
                             }
-
                             if (isMatch) {
                                 filtersasset.push(data[i]);
                             }
-
                         }
-
                     } else if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
                         filtersasset.push(data[i]);
                     }
