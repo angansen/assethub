@@ -2869,7 +2869,7 @@ module.exports = class Asset {
         let tempStatusArr = [];
         return new Promise((resolve, reject) => {
             const connection = getDb();
-            connection.query(`select * from ASSET_WINSTORY_DETAILS where WINSTORY_CREATED_BY=:WINSTORY_CREATED_BY`, [user_email],
+            connection.query(`select * from ASSET_WINSTORY_DETAILS where WINSTORY_CREATED_BY like '%:WINSTORY_CREATED_BY%'`, [user_email],
                 {
                     outFormat: oracledb.OBJECT
                 })
