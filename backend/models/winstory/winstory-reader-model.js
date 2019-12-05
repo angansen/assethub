@@ -1028,7 +1028,7 @@ module.exports = class Asset {
                 // searchString = searchString.replace(/ /g, "");
                 let wordlist = searchString.split(/ |,/);
                 // console.log("----- WIN  WORD SPLIT ------")
-                console.log(JSON.stringify("Captured Words ==== > " +wordlist));
+                console.log(JSON.stringify("Captured Words ==== > " + wordlist));
 
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
@@ -1349,7 +1349,11 @@ module.exports = class Asset {
         let filterTypeMap = {};
         let queryString = "";
 
-        let reducedFilter = data.filter(filter => filter.FILTER_TYPE != "Asset Type");
+        let reducedFilter = data.filter(filter => {
+            if (filter.FILTER_ID.indexOf("14983ddhswcdol") != -1 && filter.FILTER_ID.indexOf("Gdjfdskyuetr472V") != -1) {
+                return filter;
+            }
+        }
 
         data = reducedFilter;
 

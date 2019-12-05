@@ -1355,7 +1355,7 @@ module.exports = class Asset {
                         outFormat: oracledb.OBJECT
                     }).then(data => {
                         this.convertsql2(data).then(query => {
-                            
+
                             const connection = getDb();
                             connection.query(query, {},
                                 {
@@ -1414,7 +1414,11 @@ module.exports = class Asset {
         console.log("----------  Converting 2 SQL ASSET -------------");
         let filterTypeMap = {};
         let queryString = "";
-        let reducedFilter = data.filter(filter => filter.FILTER_TYPE != "Asset Type");
+        let reducedFilter = data.filter(filter => {
+            if (filter.FILTER_ID.indexOf("14983ddhswcdol") != -1 && filter.FILTER_ID.indexOf("Gdjfdskyuetr472V") != -1) {
+                return filter;
+            }
+        }
 
         data = reducedFilter;
         console.log(JSON.stringify(data));
