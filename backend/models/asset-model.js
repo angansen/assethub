@@ -273,7 +273,6 @@ module.exports = class Asset {
                     })
                 }
 
-                console.log("Option SQL : " + JSON.stringify(self));
                 connection.transaction([
                     function firstAction() {
                         return connection.update(`UPDATE ASSET_DETAILS set 
@@ -291,9 +290,11 @@ module.exports = class Asset {
         ASSET_LOCATION=:ASSET_LOCATION,
         ASSET_OWNER=:ASSET_OWNER,
         ASSET_STATUS=:ASSET_STATUS,
-        ASSET_ARCHITECTURE_DESCRIPTION=:ASSET_ARCHITECTURE_DESCRIPTION WHERE ASSET_ID=:ASSET_ID`,
+        ASSET_ARCHITECTURE_DESCRIPTION=:ASSET_ARCHITECTURE_DESCRIPTION,
+        ASSET_TYPE=:ASSET_TYPE
+             WHERE ASSET_ID=:ASSET_ID`,
                             [self.title, self.description, self.usercase, self.customer, self.createdBy.toLowerCase(),
-                            self.scrmId, self.oppId, new Date(), self.modifiedBy, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), 'Pending Review', self.asset_architecture_description, self.assetId],
+                            self.scrmId, self.oppId, new Date(), self.modifiedBy, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), 'Pending Review', self.asset_architecture_description, self.asset_type, self.assetId],
                             {
                                 outFormat: oracledb.Object
                             }).then(res => {
@@ -302,27 +303,22 @@ module.exports = class Asset {
                     }
                     , function secondAction() {
                         if (oj.length > 0) {
-                            console.log(JSON.stringify(oj));
+                            //console.log("statement:", oj)
                             return connection.execute(`delete from ASSET_LINKS  WHERE ASSET_ID=:ASSET_ID`, [self.assetId]
                                 , {
                                     autoCommit: true
                                 }
                             ).then(res => {
-                                console.log("Old linked clear");
-                                connection.executeMany(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID,LINK_ACTIVE) values(
-                                    :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:ASSET_ID,'true')`,
+                                //console.log('2nd update done(Asset links updated)' + res)
+                                connection.executeMany(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID) values(
+                                    :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:ASSET_ID)`,
                                     oj, {
                                     autoCommit: true
-                                }).then(linkres => {
-                                    console.log("2nd update Links batch succesfully executed : " + JSON.stringify(linkres));
-                                }).catch(err => {
-                                    console.log("Links batch insert failed");
                                 })
                             })
                         }
                         else {
                             return connection.query(`SELECT * from asset_links  where link_active='true'`, {})
-
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
@@ -337,7 +333,7 @@ module.exports = class Asset {
                                     {
                                         outFormat: oracledb.Object
                                     }).then(res => {
-                                        console.log("3rd update filters inserted successfully")
+                                        console.log("filters inserted successfully")
                                     })
                             })
                         }
@@ -389,16 +385,15 @@ module.exports = class Asset {
                         link.ASSET_ID = assetid;
                     })
                 }
-                console.log("Option SQL : " + JSON.stringify(self));
                 connection.transaction([
                     function firstAction() {
                         return connection.insert(`INSERT into ASSET_DETAILS(ASSET_ID,ASSET_TITLE,ASSET_DESCRIPTION,
                 ASSET_USERCASE,ASSET_CUSTOMER,ASSET_CREATEDBY,ASSET_CREATED_DATE,ASSET_SCRM_ID,ASSET_OPP_ID,
-                ASSET_THUMBNAIL,ASSET_MODIFIED_DATE,ASSET_MODIFIED_BY,ASSET_VIDEO_URL,ASSET_EXPIRY_DATE,ASSET_VIDEO_LINK,ASSET_LOCATION,ASSET_OWNER,ASSET_STATUS,ASSET_ARCHITECTURE_DESCRIPTION) values(:ASSET_ID,:ASSET_TITLE,:ASSET_DESCRIPTION,
+                ASSET_THUMBNAIL,ASSET_MODIFIED_DATE,ASSET_MODIFIED_BY,ASSET_VIDEO_URL,ASSET_EXPIRY_DATE,ASSET_VIDEO_LINK,ASSET_LOCATION,ASSET_OWNER,ASSET_STATUS,ASSET_ARCHITECTURE_DESCRIPTION,ASSET_TYPE) values(:ASSET_ID,:ASSET_TITLE,:ASSET_DESCRIPTION,
                 :ASSET_USERCASE,:ASSET_CUSTOMER,:ASSET_CREATEDBY,:CREATED_DATE,:ASSET_SCRM_ID,:ASSET_OPP_ID,
-                :ASSET_THUMBNAIL,:ASSET_MODIFIED_DATE,:ASSET_MODIFIED_BY,:ASSET_VIDEO_URL,:ASSET_EXPIRY_DATE,:ASSET_VIDEO_LINK,:ASSET_LOCATION,:ASSET_OWNER,:ASSET_STATUS,:ASSET_ARCHITECTURE_DESCRIPTION)`,
+                :ASSET_THUMBNAIL,:ASSET_MODIFIED_DATE,:ASSET_MODIFIED_BY,:ASSET_VIDEO_URL,:ASSET_EXPIRY_DATE,:ASSET_VIDEO_LINK,:ASSET_LOCATION,:ASSET_OWNER,:ASSET_STATUS,:ASSET_ARCHITECTURE_DESCRIPTION,ASSET_TYPE)`,
                             [assetid, self.title, self.description, self.usercase, self.customer, self.createdBy.toLowerCase(),
-                                self.createdDate, self.scrmId, self.oppId, self.thumbnail, self.modifiedDate, self.modifiedBy, self.ASSET_VIDEO_URL, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), 'Pending Review', self.asset_architecture_description],
+                                self.createdDate, self.scrmId, self.oppId, self.thumbnail, self.modifiedDate, self.modifiedBy, self.ASSET_VIDEO_URL, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), 'Pending Review', self.asset_architecture_description, self.asset_type],
                             {
                                 outFormat: oracledb.Object
                             }).then(res => {
@@ -410,22 +405,14 @@ module.exports = class Asset {
                     }
                     , function secondAction() {
                         if (oj.length > 0) {
-                            console.log(JSON.stringify(oj));
-                            return connection.execute(`delete from ASSET_LINKS  WHERE ASSET_ID=:ASSET_ID`, [self.assetId]
-                                , {
-                                    autoCommit: true
-                                }
-                            ).then(res => {
-                                console.log("Old linked clear");
-                                connection.executeMany(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID,LINK_ACTIVE) values(
-                                    :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:ASSET_ID,'true')`,
-                                    oj, {
-                                    autoCommit: true
-                                }).then(linkres => {
-                                    console.log("2nd update Links batch succesfully executed : " + JSON.stringify(linkres));
-                                }).catch(err => {
-                                    console.log("Links batch insert failed");
-                                })
+                            return connection.batchInsert(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID) values(
+                :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:ASSET_ID)`,
+                                oj, {
+                                autocommit: true
+                            }
+                            ).catch(err => {
+                                console.log("Second action error " + err);
+                                reject({ msg: "Asset creation failed on second step" });
                             })
                         }
                         else {
@@ -687,7 +674,7 @@ module.exports = class Asset {
     }
 
 
-    static uploadImages(assetId, images, imageDescription) {
+    static uploadImages(host, assetId, images, imageDescription) {
         return new Promise((resolve, reject) => {
             let filesArray = [];
             const connection = getDb();
@@ -720,45 +707,40 @@ module.exports = class Asset {
 
 
 
-    static uploadThumbnail(assetId, thumbnail) {
+    static uploadThumbnail(host, assetId, thumbnail) {
         return new Promise((resolve, reject) => {
-            console.log("inside thumnnail function")
-            try {
+            //console.log("inside thumnnail function")
+            const connection = getDb();
+            let fname = thumbnail.name.split('.')[0];
+            fname = fname.replace(/ /g, '');
 
-                const connection = getDb();
-                let fname = thumbnail.name.split('.')[0];
-                fname = fname.replace(/ /g, '');
-
-                const ftype = thumbnail.name.split('.')[1];
-                const uniqueId = uniqid();
-                const finalFname = fname + uniqueId.concat('.', ftype);
-                //console.log(finalFname)
-                const uploadPath = path.join(__dirname, '../../../..', 'mnt/ahfs/', finalFname);
-                var content = `${finalFname}`
-                //console.log(content)
-                thumbnail.mv(uploadPath, function (err) {
-                    if (err) {
-                        return res.status(500).send(err);
-                    }
-                })
-                connection.update(`UPDATE ASSET_DETAILS set 
+            const ftype = thumbnail.name.split('.')[1];
+            const uniqueId = uniqid();
+            const finalFname = fname + uniqueId.concat('.', ftype);
+            //console.log(finalFname)
+            const uploadPath = path.join(__dirname, '../../../..', 'mnt/ahfs/', finalFname);
+            var content = `${finalFname}`
+            //console.log(content)
+            thumbnail.mv(uploadPath, function (err) {
+                if (err) {
+                    return res.status(500).send(err);
+                }
+            })
+            connection.update(`UPDATE ASSET_DETAILS set 
             ASSET_THUMBNAIL=:ASSET_THUMBNAIL
              WHERE ASSET_ID=:ASSET_ID`, [content, assetId],
-                    {
-                        autoCommit: true
-                    }
-                ).then(res => {
-                    //console.log("thumbnail inserted Successfully")
-                    //console.log(res)
-                    resolve("working");
-                })
-            } catch (error) {
-                reject({ msg: "Thumnail saving error" });
-            }
+                {
+                    autoCommit: true
+                }
+            ).then(res => {
+                //console.log("thumbnail inserted Successfully")
+                //console.log(res)
+                resolve("working")
+            })
         })
     }
 
-    static uploadVideo(assetId, video) {
+    static uploadVideo(host, assetId, video) {
         return new Promise((resolve, reject) => {
             //console.log("inside video function")
             const connection = getDb();
@@ -2072,18 +2054,14 @@ module.exports = class Asset {
                         .then(result => {
                             let traceunique = "";
                             sugestionsarr = result.filter(suggest => {
-                                // console.log(traceunique);
-                                // console.log(suggest.ACTIVITY_FILTER + " - " + suggest.FILTER_NAME);
-                                // console.log(traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.trim().toLowerCase()) + " - " + traceunique.toLowerCase().indexOf(suggest.FILTER_NAME.toLowerCase()))
-                                if (traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.trim().toLowerCase()) == -1 && traceunique.toLowerCase().indexOf(suggest.FILTER_NAME.toLowerCase()) == -1) {
-                                    // console.log("IN");
+                                console.log(traceunique);
+                                console.log(suggest.ACTIVITY_FILTER + " - " + suggest.FILTER_NAME + " - " + traceunique.toLowerCase().indexOf(suggest.FILTER_NAME.toLowerCase()));
+                                if (traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.trim().toLowerCase()) == -1 && traceunique.toLowerCase().indexOf(suggest.ACTIVITY_FILTER.trim().toLowerCase()) == -1) {
                                     traceunique += suggest.FILTER_NAME.trim() + suggest.ACTIVITY_FILTER.trim();
-                                    traceunique = traceunique.replace(/ /g, "");
                                     return suggest;
                                 }
-
                             })
-                            // console.log(traceunique);
+                            console.log(traceunique);
 
 
 
@@ -2119,37 +2097,33 @@ module.exports = class Asset {
                                                         return 0; //default return value (no sorting)
                                                     });
                                                     typeArr.forEach(type => {
-                                                        console.log(JSON.stringify(type));
-                                                        console.log(JSON.stringify(filteredArr));
-                                                        if (filterObj != undefined) {
-                                                            filteredArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && !f.FILTER_NAME.toLowerCase().includes('other'));
+                                                        filteredArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && !f.FILTER_NAME.toLowerCase().includes('other'));
 
-                                                            filterObj.Type = type;
-                                                            filterObj.FILTER_TYPE_IMAGE = 'http://' + host + '/' + filteredArr[0].FILTER_TYPE_IMAGE;
-                                                            filteredArr.sort((a, b) => (a.FILTER_NAME > b.FILTER_NAME) ? 1 : -1)
-                                                            const otherArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && f.FILTER_NAME.toLowerCase().includes('other'))
-                                                            if (otherArr.length === 1) {
-                                                                filteredArr.push(otherArr[0]);
-                                                            }
-                                                            else {
-                                                                otherArr.forEach(o => {
-                                                                    filteredArr.push(o)
-                                                                })
-                                                            }
-                                                            filteredArr.forEach(f => {
-                                                                typeCountArr = countArr.filter(r => r.FILTER_ID === f.FILTER_ID)
-                                                                winstorytypeCountArr = winstorycountArr.filter(r => r.FILTER_ID === f.FILTER_ID)
-                                                                f.ASSET_COUNT = typeCountArr[0].CNT
-                                                                f.WINSTORY_COUNT = winstorytypeCountArr[0].CNT
-                                                                // console.log("f.FILTER_IMAGE" + ': ' + f.FILTER_IMAGE);
-                                                                f.FILTER_TYPE_IMAGE = 'http://' + host + '/' + f.FILTER_TYPE_IMAGE;
-                                                                f.FILTER_IMAGE = 'http://' + host + '/' + f.FILTER_IMAGE;
-                                                            })
-                                                            filterObj.filters = filteredArr;
-
-                                                            allFilters.push(filterObj);
-                                                            filterObj = {};
+                                                        filterObj.Type = type;
+                                                        filterObj.FILTER_TYPE_IMAGE = 'http://' + host + '/' + filteredArr[0].FILTER_TYPE_IMAGE;
+                                                        filteredArr.sort((a, b) => (a.FILTER_NAME > b.FILTER_NAME) ? 1 : -1)
+                                                        const otherArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && f.FILTER_NAME.toLowerCase().includes('other'))
+                                                        if (otherArr.length === 1) {
+                                                            filteredArr.push(otherArr[0]);
                                                         }
+                                                        else {
+                                                            otherArr.forEach(o => {
+                                                                filteredArr.push(o)
+                                                            })
+                                                        }
+                                                        filteredArr.forEach(f => {
+                                                            typeCountArr = countArr.filter(r => r.FILTER_ID === f.FILTER_ID)
+                                                            winstorytypeCountArr = winstorycountArr.filter(r => r.FILTER_ID === f.FILTER_ID)
+                                                            f.ASSET_COUNT = typeCountArr[0].CNT
+                                                            f.WINSTORY_COUNT = winstorytypeCountArr[0].CNT
+                                                            // console.log("f.FILTER_IMAGE" + ': ' + f.FILTER_IMAGE);
+                                                            f.FILTER_TYPE_IMAGE = 'http://' + host + '/' + f.FILTER_TYPE_IMAGE;
+                                                            f.FILTER_IMAGE = 'http://' + host + '/' + f.FILTER_IMAGE;
+                                                        })
+                                                        filterObj.filters = filteredArr;
+
+                                                        allFilters.push(filterObj);
+                                                        filterObj = {};
                                                     })
                                                     finalFilterObj.allFilters = allFilters;
                                                     finalFilterObj.userPreferences = userPreferencesArr;
@@ -2854,6 +2828,54 @@ module.exports = class Asset {
         }).catch(err => {
             //console.log("Error occurred while saving feedback : " + JSON.stringify(err));
             res.status(500).json({ status: "feedback captured failed", msg: JSON.stringify(err) })
+        })
+    }
+    static getHelpAndSupportModal() {
+        const connection = getDb();
+        return new Promise((resolve, reject) => {
+            connection.query(`select * from ASSET_HELP_SUPPORT`, {},
+                {
+                    outFormat: oracledb.OBJECT
+                })
+                .then(result => {
+                    //console.log(result)
+                    resolve(result)
+                }).catch(err => {
+                    console.log(err)
+                })
+        })
+    }
+    static SaveHelpAndSupportModal(data, res) {
+        const connection = getDb();
+        return new Promise((resolve, reject) => {
+            var sql = `UPDATE ASSET_HELP_SUPPORT 
+        SET PROMO_VIDEO_URL=:PROMO_VIDEO_URL, PROMO_CONTENT=:PROMO_CONTENT,USER_GUIDE=:USER_GUIDE,USER_GUIDE_URL=:USER_GUIDE_URL
+         WHERE  ITEM_ID=:ITEM_ID`;
+            var options = [data.promo_video_url, data.promo_content, data.user_guide, data.user_guide_url, 1];
+            connection.update(sql, options,
+                {
+                    outFormat: oracledb.Object,
+                    autoCommit: true
+                })
+                .then(result => {
+                    if (result.rowsAffected === 0) {
+                        //console.log("Could not capture feedback. . .");
+                        resolve({ status: "FAILED", msg: "Could not capture promo content " });
+                    } else {
+                        //console.log("feedback is captured. . .");
+                        resolve({ status: "Promo content updated successfully" });
+                    }
+
+                })
+                .catch(err => {
+                    //console.log(err)
+                    resolve({ status: "promo content captured failed", msg: JSON.stringify(err) })
+                })
+        })
+    }
+
+}
+JSON.stringify(err) })
         })
     }
     static getHelpAndSupportModal() {

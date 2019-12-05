@@ -1443,7 +1443,8 @@ module.exports = class Asset {
                 // GET THE MAPPED ASSES FOR THE FILTERS
                 let fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
                 where a.filter_id in('`+ filterids + `') 
-                and a.WINSTORY_ID=b.WINSTORY_ID`;
+                and a.WINSTORY_ID=b.WINSTORY_ID 
+                and b.winstory_status='Live'`;
                 console.log("> " + fetchAssetsSql);
                 connection.query(fetchAssetsSql, {},
                     {
