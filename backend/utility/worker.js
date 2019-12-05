@@ -256,54 +256,54 @@ exports.captureSearch = (activity) => {
 
 }
 
-exports.captureSearch2 = (activity) => {
+// exports.captureSearch2 = (activity) => {
 
-    if (activity.filters == undefined) {
-        return;
-    } else {
-        activity.activity_id = uniqid.process('a-');
-        activity.activitygroupid = uniqid.process('ag-');
-        activity.filters = activity.filters.split(',');
+//     if (activity.filters == undefined) {
+//         return;
+//     } else {
+//         activity.activity_id = uniqid.process('a-');
+//         activity.activitygroupid = uniqid.process('ag-');
+//         activity.filters = activity.filters.split(',');
 
-        activity.filters.map(filter => {
-            try {
-                const connection = getDb();
-                let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
-                let captureSearchActivityOptions = [activity.activity_id, activity.email, filter, activity.activitygroupid, "FILTER"];
-                connection.execute(captureSearchActivitySql, captureSearchActivityOptions, {
-                    autoCommit: true
-                });
-            } catch (err) {
-                console.log(JSON.stringify(err));
-            };
+//         activity.filters.map(filter => {
+//             try {
+//                 const connection = getDb();
+//                 let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
+//                 let captureSearchActivityOptions = [activity.activity_id, activity.email, filter, activity.activitygroupid, "FILTER"];
+//                 connection.execute(captureSearchActivitySql, captureSearchActivityOptions, {
+//                     autoCommit: true
+//                 });
+//             } catch (err) {
+//                 console.log(JSON.stringify(err));
+//             };
 
-        })
+//         })
 
 
-        if (activity.searchtext.length > 0) {
-            let searchwords = activity.searchtext.trim().split(" ");
-            // activity.searchtext.trim().split(" ").fil
-            try {
-                const connection = getDb();
-                let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
-                let captureSearchActivityOptions = [activity.activity_id, activity.email, activity.searchtext, activity.activitygroupid, "FREETEXT"];
-                let options = {
-                    autoCommit: true,   // autocommit if there are no batch errors
-                    batchErrors: true,  // identify invalid records; start a transaction for valid ones
-                    bindDefs: [         // describes the data in 'binds'
-                        { type: oracledb.STRING, maxSize: 20 },
-                        { type: oracledb.STRING, maxSize: 20 }
-                    ]
-                };
-                connection.execute(captureSearchActivitySql, captureSearchActivityOptions, {
-                    autoCommit: true
-                });
-            } catch (err) {
-                console.log(JSON.stringify(err));
-            };
-        }
-    }
-}
+//         if (activity.searchtext.length > 0) {
+//             let searchwords = activity.searchtext.trim().split(" ");
+//             // activity.searchtext.trim().split(" ").fil
+//             try {
+//                 const connection = getDb();
+//                 let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
+//                 let captureSearchActivityOptions = [activity.activity_id, activity.email, activity.searchtext, activity.activitygroupid, "FREETEXT"];
+//                 let options = {
+//                     autoCommit: true,   // autocommit if there are no batch errors
+//                     batchErrors: true,  // identify invalid records; start a transaction for valid ones
+//                     bindDefs: [         // describes the data in 'binds'
+//                         { type: oracledb.STRING, maxSize: 20 },
+//                         { type: oracledb.STRING, maxSize: 20 }
+//                     ]
+//                 };
+//                 connection.execute(captureSearchActivitySql, captureSearchActivityOptions, {
+//                     autoCommit: true
+//                 });
+//             } catch (err) {
+//                 console.log(JSON.stringify(err));
+//             };
+//         }
+//     }
+// }
 
 exports.updateUserLob = (req, res) => {
 
