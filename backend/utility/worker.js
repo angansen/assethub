@@ -205,9 +205,9 @@ exports.updateWorkerResult = () => {
 exports.captureSearch = (activity) => {
 
 
-    console.log("============= FILTER ==============")
-    console.log(JSON.stringify(activity));
-    console.log("============= FILTER ==============")
+    // console.log("============= FILTER ==============")
+    // console.log(JSON.stringify(activity));
+    // console.log("============= FILTER ==============")
     activity.activity_id = uniqid.process('a-');
     activity.activitygroupid = uniqid.process('ag-');
 
@@ -218,7 +218,6 @@ exports.captureSearch = (activity) => {
         activity.filters = activity.filters.split(',');
 
         activity.filters.map(filter => {
-            console.log("===========>>> " + filter)
             if (filter.trim().length > 0 && filter.trim().indexOf("14983ddhswcdol") == -1 && filter.trim().indexOf("Gdjfdskyuetr472V") == -1) {
                 try {
                     const connection = getDb();
