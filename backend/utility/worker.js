@@ -208,12 +208,13 @@ exports.captureSearch = (activity) => {
     console.log("============= FILTER ==============")
     console.log(JSON.stringify(activity));
     console.log("============= FILTER ==============")
+    activity.activity_id = uniqid.process('a-');
+    activity.activitygroupid = uniqid.process('ag-');
 
     if (activity.filters != undefined) {
 
         console.log(JSON.stringify(activity));
-        activity.activity_id = uniqid.process('a-');
-        activity.activitygroupid = uniqid.process('ag-');
+
         activity.filters = activity.filters.split(',');
 
         activity.filters.map(filter => {
