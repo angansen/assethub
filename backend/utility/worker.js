@@ -218,8 +218,8 @@ exports.captureSearch = (activity) => {
         activity.filters = activity.filters.split(',');
 
         activity.filters.map(filter => {
-            console.log("===========>>> "+filter)
-            if (filter.trim().indexOf("14983ddhswcdol") == -1 && filter.trim().indexOf("Gdjfdskyuetr472V") == -1) {
+            console.log("===========>>> " + filter)
+            if (filter.trim().length > 0 && filter.trim().indexOf("14983ddhswcdol") == -1 && filter.trim().indexOf("Gdjfdskyuetr472V") == -1) {
                 try {
                     const connection = getDb();
                     let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
