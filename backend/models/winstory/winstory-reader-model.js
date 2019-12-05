@@ -1431,7 +1431,7 @@ module.exports = class Asset {
         return new Promise((resolve, reject) => {
 
             // GET THE PREFERED FILTERS
-            let fetchPreferedFilterSql = "select ASSET_FILTER_ID from ASSET_WINSTORY_PREFERENCES where USER_EMAIL='" + userEmail + "'";
+            let fetchPreferedFilterSql = "select ASSET_FILTER_ID from asset_preferences where USER_EMAIL='" + userEmail + "'";
             connection.query(fetchPreferedFilterSql, {},
                 {
                     outFormat: oracledb.OBJECT
