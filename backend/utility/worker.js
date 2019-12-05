@@ -240,7 +240,7 @@ exports.captureSearch = (activity) => {
             console.log(word);
             try {
                 const connection = getDb();
-                let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER,filter_name, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
+                let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER,filter_name, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4,:5)`;
                 let captureSearchActivityOptions = [activity.activity_id, activity.email, word, word, activity.activitygroupid, "FREETEXT"];
                 connection.execute(captureSearchActivitySql, captureSearchActivityOptions, {
                     autoCommit: true
