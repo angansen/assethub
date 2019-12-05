@@ -1501,7 +1501,7 @@ module.exports = class Asset {
                 // GET THE MAPPED ASSES FOR THE FILTERS
                 let fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
                 where a.filter_id in('`+ filterids + `') 
-                and a.asset_id=b.asset_id`;
+                and a.asset_id=b.asset_id and b.asset_status='Live'`;
                 console.log("> " + fetchAssetsSql);
                 connection.query(fetchAssetsSql, {},
                     {
