@@ -1027,8 +1027,8 @@ module.exports = class Asset {
 
                 searchString = searchString.replace(/ /g, "");
                 let wordlist = searchString.split(/,/);
-                console.log("----- WIN  WORD SPLIT ------")
-                console.log(JSON.stringify(wordlist));
+                // console.log("----- WIN  WORD SPLIT ------")
+                // console.log(JSON.stringify(wordlist));
 
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
