@@ -218,16 +218,18 @@ exports.captureSearch = (activity) => {
         activity.filters = activity.filters.split(',');
 
         activity.filters.map(filter => {
-            try {
-                const connection = getDb();
-                let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
-                let captureSearchActivityOptions = [activity.activity_id, activity.email, filter, activity.activitygroupid, "FILTER"];
-                connection.execute(captureSearchActivitySql, captureSearchActivityOptions, {
-                    autoCommit: true
-                });
-            } catch (err) {
-                console.log(JSON.stringify(err));
-            };
+            if (filter.trim().indexOf("14983ddhswcdol") == -1 && filter.trim().indexOf("Gdjfdskyuetr472V") == -1) {
+                try {
+                    const connection = getDb();
+                    let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
+                    let captureSearchActivityOptions = [activity.activity_id, activity.email, filter, activity.activitygroupid, "FILTER"];
+                    connection.execute(captureSearchActivitySql, captureSearchActivityOptions, {
+                        autoCommit: true
+                    });
+                } catch (err) {
+                    console.log(JSON.stringify(err));
+                };
+            }
 
         })
     }
