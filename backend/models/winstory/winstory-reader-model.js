@@ -1025,13 +1025,12 @@ module.exports = class Asset {
                         combineContentToMatch += filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
 
-                searchString = searchString.replace(/ /g, "");
-                let wordlist = searchString.split(/,/);
+                // searchString = searchString.replace(/ /g, "");
+                let wordlist = searchString.split(/ |,/);
                 // console.log("----- WIN  WORD SPLIT ------")
-                // console.log(JSON.stringify(wordlist));
+                console.log(JSON.stringify("Captured Words ==== > " +wordlist));
 
 
-                combineContentToMatch = combineContentToMatch.toLowerCase();
                 combineContentToMatch = combineContentToMatch.toLowerCase();
                 wordlist.forEach(word => {
                     if (word.includes("+")) {
