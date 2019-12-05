@@ -234,8 +234,9 @@ exports.captureSearch = (activity) => {
 
     if (activity.searchtext != undefined && activity.searchtext.length > 0) {
         let words = activity.searchtext.trim().split(" ");
-
+        console.log(words);
         words.filter(word => {
+            console.log(word);
             try {
                 const connection = getDb();
                 let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER,filter_name, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
