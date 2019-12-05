@@ -218,6 +218,7 @@ exports.captureSearch = (activity) => {
         activity.filters = activity.filters.split(',');
 
         activity.filters.map(filter => {
+            console.log("===========>>> "+filter)
             if (filter.trim().indexOf("14983ddhswcdol") == -1 && filter.trim().indexOf("Gdjfdskyuetr472V") == -1) {
                 try {
                     const connection = getDb();
