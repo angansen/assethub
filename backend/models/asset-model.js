@@ -1418,7 +1418,7 @@ module.exports = class Asset {
             if (filter.FILTER_ID.indexOf("14983ddhswcdol") != -1 && filter.FILTER_ID.indexOf("Gdjfdskyuetr472V") != -1) {
                 return filter;
             }
-        }
+        })
 
         data = reducedFilter;
         console.log(JSON.stringify(data));
