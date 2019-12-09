@@ -47,7 +47,7 @@ webworker = () => {
 exports.triggerWorkeronce = (req, res) => {
     webworker();
     if (res != undefined) {
-        res.send({ "status": "worker triggered" });
+        res.send({ "status": "worker triggered once" });
     }
 }
 
