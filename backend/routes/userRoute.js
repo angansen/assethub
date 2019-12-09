@@ -17,7 +17,7 @@ router.delete('/:email',userController.deleteUser);
 router.get('/getprofileimage/:platform/:email',userController.getProfileImage);
 router.get('/ldap',userController.getLdapUsers);
 router.get('/ldapcompletelist',worker.triggerWorkers);
-router.get('/lobupdate',worker.updateUserLob);
+router.get('/ldapupdate',worker.triggerWorkeronce);
 router.get('/getactivitybyuser',userController.fetchActivityByemail);
 
 

@@ -21,37 +21,47 @@ webworker = () => {
         // minute: 10,
         // dayOfWeek: 1
     }
-    schedule.scheduleJob(timeToTick, () => {
-        assetlinkCount = 0;
-        winlinkcount = 0;
+    // schedule.scheduleJob(timeToTick, () => {
+    assetlinkCount = 0;
+    winlinkcount = 0;
 
-        // LDAP SYNC WORKER
-        console.log("Starting LDAP worker");
-        user.getLdapInfoComplete().then(data => {
-            if (data != undefined) {
-                console.log("Ldap synced . . . ");
-                this.updateUserLob(undefined, undefined);
-            }
-        });
-
-
-        // LINK VERIFY WORKER
-        console.log("Starting link verifier");
-        // linkvalidator(getAllWinstoryLinks(), "WINSTORY");
-        // linkvalidator(getAllAssetLinks(), "ASSET");
-
-
-        // EXPIERY VERIFY WORKER
-
+    // LDAP SYNC WORKER
+    console.log("Starting LDAP worker");
+    user.getLdapInfoComplete().then(data => {
+        if (data != undefined) {
+            console.log("Ldap synced . . . ");
+            this.updateUserLob(undefined, undefined);
+        }
     });
+
+
+    // LINK VERIFY WORKER
+    console.log("Starting link verifier");
+    // linkvalidator(getAllWinstoryLinks(), "WINSTORY");
+    // linkvalidator(getAllAssetLinks(), "ASSET");
+    // EXPIERY VERIFY WORKER
+    // });
 
 }
 
+exports.triggerWorkeronce = (req, res) => {
+    webworker();
+    if (res != undefined) {
+        res.send({ "status": "worker triggered" });
+    }
+}
 
 exports.triggerWorkers = (req, res) => {
 
-    webworker();
-
+    let timeToTick = {
+        // second: 10
+        hour: 12
+        // minute: 10,
+        // dayOfWeek: 1
+    }
+    schedule.scheduleJob(timeToTick, () => {
+        webworker();
+    });
     if (res != undefined) {
         res.send({ "status": "worker triggered" });
     }
