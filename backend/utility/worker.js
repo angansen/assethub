@@ -16,17 +16,41 @@ webworker = () => {
     // console.log("Link validator working. . . ");
 
     let timeToTick = {
-        // second: 10
-        hour: 12
+        second: 10
+        // hour: 12
         // minute: 10,
         // dayOfWeek: 1
     }
-    // schedule.scheduleJob(timeToTick, () => {
+    schedule.scheduleJob(timeToTick, () => {
+        assetlinkCount = 0;
+        winlinkcount = 0;
+
+        // LDAP SYNC WORKER
+        console.log("Starting LDAP worker");
+        user.getLdapInfoComplete().then(data => {
+            if (data != undefined) {
+                console.log("Ldap synced . . . ");
+                this.updateUserLob(undefined, undefined);
+            }
+        });
+
+
+        // LINK VERIFY WORKER
+        console.log("Starting link verifier");
+        // linkvalidator(getAllWinstoryLinks(), "WINSTORY");
+        // linkvalidator(getAllAssetLinks(), "ASSET");
+        // EXPIERY VERIFY WORKER
+    });
+
+}
+
+webworkertrigger = () => {
+    // console.log("Link validator working. . . ");
     assetlinkCount = 0;
     winlinkcount = 0;
 
     // LDAP SYNC WORKER
-    console.log("Starting LDAP worker");
+    console.log("Starting Once LDAP worker");
     user.getLdapInfoComplete().then(data => {
         if (data != undefined) {
             console.log("Ldap synced . . . ");
@@ -36,11 +60,10 @@ webworker = () => {
 
 
     // LINK VERIFY WORKER
-    console.log("Starting link verifier");
+    // console.log("Starting link verifier");
     // linkvalidator(getAllWinstoryLinks(), "WINSTORY");
     // linkvalidator(getAllAssetLinks(), "ASSET");
     // EXPIERY VERIFY WORKER
-    // });
 
 }
 
@@ -52,16 +75,7 @@ exports.triggerWorkeronce = (req, res) => {
 }
 
 exports.triggerWorkers = (req, res) => {
-
-    let timeToTick = {
-        second: 10
-        // hour: 12
-        // minute: 10,
-        // dayOfWeek: 1
-    }
-    schedule.scheduleJob(timeToTick, () => {
-        webworker();
-    });
+    webworker();
     if (res != undefined) {
         res.send({ "status": "worker triggered" });
     }
