@@ -1021,6 +1021,8 @@ module.exports = class Asset {
     static filterAssetBySearchString(data, filterdata, searchString, filtersasset) {
         searchString = searchString.trim().toLowerCase();
         console.log(JSON.stringify("Captured Words ==== > " + searchString));
+        // console.log(JSON.stringify("Captured filters ==== > " + JSON.stringify(filterdata)));
+
         let assetFilters = [];
         return new Promise((resolve) => {
             for (let i = 0; i < data.length; i++) {
@@ -1635,8 +1637,7 @@ module.exports = class Asset {
                     // console.log(JSON.stringify(assetlist));
 
                     let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
-                    where activity_type='FREETEXT' 
-                    and activity_performed_by='` + userEmail + `' 
+                    where activity_performed_by='` + userEmail + `' 
                     group by activity_filter 
                     order by frequency desc 
                     FETCH NEXT 3 ROWS ONLY`
