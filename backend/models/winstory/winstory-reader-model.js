@@ -1507,7 +1507,7 @@ module.exports = class Asset {
                                 combineContentToMatch = combineContentToMatch.toLowerCase();
                                 wordlist.forEach(word => {
                                     // console.log(" >>> " + combineContentToMatch.indexOf(word));
-                                    if (combineContentToMatch.indexOf(word) != -1) {// MATCH FOUND
+                                    if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
                                         finalList.push(allwins[i]);
                                     }
                                 })
