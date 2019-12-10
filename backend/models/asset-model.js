@@ -1228,7 +1228,7 @@ module.exports = class Asset {
                                                                     .then(res => {
                                                                         industryArray = res.rows;
                                                                         //console.log(solutionAreasArray)
-                                                                        connection.execute(`select USER_LOB from asset_user where USER_EMAIL='` + email + `')`, [],
+                                                                        connection.execute(`select USER_LOB from asset_user where USER_EMAIL=` + email, [],
                                                                             {
                                                                                 outFormat: oracledb.OBJECT
                                                                             })
