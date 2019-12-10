@@ -1000,6 +1000,7 @@ module.exports = class Asset {
     static filterAssetBySearchString(data, filterdata, searchString, filtersasset) {
         searchString = searchString.trim().toLowerCase();
         console.log(JSON.stringify("Captured Words ==== > " + searchString));
+        console.log(JSON.stringify("Captured filters ==== > " + JSON.stringify(filterdata)));
         let assetFilters = [];
         return new Promise((resolve) => {
             for (let i = 0; i < data.length; i++) {
