@@ -1039,7 +1039,7 @@ module.exports = class Asset {
                     });
 
                 let wordlist = searchString.split(/ |,/);
-                // console.log("----- Asset  WORD SPLIT ------")
+                console.log("----- Asset  WORD SPLIT ------")
                 // console.log(JSON.stringify(wordlist));
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
