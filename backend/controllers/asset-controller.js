@@ -570,14 +570,14 @@ exports.getAllAssetsByFilters = (req, res) => {
             },
         ).then(result => {
             limit = result.rows[0].TOTAL;
-            Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order).then(result => {
+            Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order, email).then(result => {
                 res.json(result);
             })
         })
 
     }
     else {
-        Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order).then(result => {
+        Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order, email).then(result => {
             res.json(result);
         })
     }

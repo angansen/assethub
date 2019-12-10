@@ -393,7 +393,7 @@ const createOrUpdateUser2 = (userdataArr) => {
     userdataArr.forEach((userdata, i) => {
         updateCount = i;
         count2++
-        // console.log("USER : " + i)
+        console.log("USER : " + i)
         try {
             if (userdata.telephonenumber === null) {
                 userdata.telephonenumber = userdata.orclbeehivephonenumber
@@ -415,7 +415,7 @@ const createOrUpdateUser2 = (userdataArr) => {
                     console.log("User record creation failed . .");
                 } else {
                     createduser++;
-                    //console.log("User creation successful. . . " + createduser + "/ User found . . ." + count + "/ Connection reset . . ." + connectionresetCount + "/" + connectionresetHierCount);
+                    console.log("User creation successful. . . " + createduser + "/ User found . . ." + count + "/ Connection reset . . ." + connectionresetCount + "/" + connectionresetHierCount);
 
                 }
 

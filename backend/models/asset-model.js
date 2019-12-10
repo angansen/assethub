@@ -1228,7 +1228,7 @@ module.exports = class Asset {
                                                                     .then(res => {
                                                                         industryArray = res.rows;
                                                                         //console.log(solutionAreasArray)
-                                                                        connection.execute(`SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1`, [],
+                                                                        connection.execute(`SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB=(select user_lob from asset_user where user_email='` + email + `')`, [],
                                                                             {
                                                                                 outFormat: oracledb.OBJECT
                                                                             })
@@ -1342,7 +1342,7 @@ module.exports = class Asset {
         })
     }
 
-    static fetchAssets3(host, offset, limit, filters, searchString, sortBy, order, action) {
+    static fetchAssets3(host, offset, limit, filters, searchString, sortBy, order, action, email) {
 
         return new Promise((resolve, reject) => {
             if (filters.length > 0 && filters != "") {
@@ -1372,7 +1372,7 @@ module.exports = class Asset {
                                         }).then(filterdata => {
                                             let filtersasset = [];
                                             this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
-                                                this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action).then(assets => {
+                                                this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action, email).then(assets => {
                                                     resolve(assets);
                                                 })
                                             })
@@ -1400,7 +1400,7 @@ module.exports = class Asset {
                                 let filtersasset = [];
                                 this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
                                     // console.log("Content filter ended : " + filtersasset.length);
-                                    this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action).then(assets => {
+                                    this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action, email).then(assets => {
                                         resolve(assets);
                                     })
                                 })
@@ -1570,7 +1570,7 @@ module.exports = class Asset {
                             }
 
                             console.log("Suggested assets : " + finalList.length);
-                            this.refineAssets(host, offset, limit, finalList, sortBy, order, "").then(assets => {
+                            this.refineAssets(host, offset, limit, finalList, sortBy, order, "", email).then(assets => {
                                 resolve(assets);
                             })
 
