@@ -54,8 +54,8 @@ exports.triggerWorkeronce = (req, res) => {
 exports.triggerWorkers = (req, res) => {
 
     let timeToTick = {
-        // second: 10
-        hour: 12
+        second: 10
+        // hour: 12
         // minute: 10,
         // dayOfWeek: 1
     }
