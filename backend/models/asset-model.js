@@ -1228,105 +1228,117 @@ module.exports = class Asset {
                                                                     .then(res => {
                                                                         industryArray = res.rows;
                                                                         //console.log(solutionAreasArray)
-                                                                        connection.execute(`SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in ((select USER_LOB from asset_user where USER_EMAIL='` + email + `'), 'Others')`, [],
+                                                                        connection.execute(`select USER_LOB from asset_user where USER_EMAIL='` + email + `')`, [],
                                                                             {
                                                                                 outFormat: oracledb.OBJECT
                                                                             })
-                                                                            .then(res => {
-                                                                                promotedArray = res.rows;
-                                                                                connection.execute(`SELECT count(*) like_count,asset_id from ASSET_LIKES group by asset_id`, [],
+                                                                            .then(lob => {
+                                                                                let sqlquery = ``
+                                                                                if (lob == 'Others') {
+                                                                                    sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
+                                                                                } else {
+                                                                                    sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in ('` + lob + `', 'Others')`
+                                                                                }
+                                                                                connection.execute(sqlquery, [],
                                                                                     {
                                                                                         outFormat: oracledb.OBJECT
                                                                                     })
                                                                                     .then(res => {
-                                                                                        //console.log("LIKES",res)
-                                                                                        likesArray = res.rows;
-                                                                                        connection.execute(`SELECT count(*) view_count,asset_id from ASSET_VIEWS group by asset_id`, [],
+                                                                                        promotedArray = res.rows;
+                                                                                        connection.execute(`SELECT count(*) like_count,asset_id from ASSET_LIKES group by asset_id`, [],
                                                                                             {
                                                                                                 outFormat: oracledb.OBJECT
                                                                                             })
                                                                                             .then(res => {
-                                                                                                viewsArray = res.rows;
-                                                                                                assetsArray.forEach(asset => {
-                                                                                                    const id = asset.ASSET_ID;
-                                                                                                    allAssetsObj = asset
-                                                                                                    allAssetsObj.LINKS = [];
-                                                                                                    var links = linksArray.filter(link => link.ASSET_ID === id)
-                                                                                                    ////console.log('links:',links)
-                                                                                                    solutionAreas = solutionAreasArray.filter(s => s.ASSET_ID === id)
-                                                                                                    assetTypes = assetTypesArray.filter(s => s.ASSET_ID === id)
-                                                                                                    salesPlays = salesPlaysArray.filter(s => s.ASSET_ID === id)
-                                                                                                    industry = industryArray.filter(s => s.ASSET_ID === id);
-                                                                                                    let promote = promotedArray.filter(s => s.ASSET_ID === id);
-                                                                                                    allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
-                                                                                                    allAssetsObj.SOLUTION_AREAS = solutionAreas;
-                                                                                                    allAssetsObj.ASSET_TYPE = assetTypes;
-                                                                                                    allAssetsObj.SALES_PLAY = salesPlays;
-                                                                                                    allAssetsObj.INDUSTRY = industry;
-
-                                                                                                    linkType = links.map(a => a.LINK_REPOS_TYPE)
-                                                                                                    linkType = [...new Set(linkType)]
-                                                                                                    ////console.log(linkType)
-                                                                                                    linkType.forEach(type => {
-                                                                                                        var links2 = linksArray.filter(link => link.LINK_REPOS_TYPE === type && link.ASSET_ID === id)
-                                                                                                        lobj.TYPE = type;
-                                                                                                        lobj.arr = links2;
-                                                                                                        lobj2 = lobj
-                                                                                                        linkObjArr.push(lobj2);
-                                                                                                        lobj = {}
+                                                                                                //console.log("LIKES",res)
+                                                                                                likesArray = res.rows;
+                                                                                                connection.execute(`SELECT count(*) view_count,asset_id from ASSET_VIEWS group by asset_id`, [],
+                                                                                                    {
+                                                                                                        outFormat: oracledb.OBJECT
                                                                                                     })
-                                                                                                    allAssetsObj.LINKS = linkObjArr;
+                                                                                                    .then(res => {
+                                                                                                        viewsArray = res.rows;
+                                                                                                        assetsArray.forEach(asset => {
+                                                                                                            const id = asset.ASSET_ID;
+                                                                                                            allAssetsObj = asset
+                                                                                                            allAssetsObj.LINKS = [];
+                                                                                                            var links = linksArray.filter(link => link.ASSET_ID === id)
+                                                                                                            ////console.log('links:',links)
+                                                                                                            solutionAreas = solutionAreasArray.filter(s => s.ASSET_ID === id)
+                                                                                                            assetTypes = assetTypesArray.filter(s => s.ASSET_ID === id)
+                                                                                                            salesPlays = salesPlaysArray.filter(s => s.ASSET_ID === id)
+                                                                                                            industry = industryArray.filter(s => s.ASSET_ID === id);
+                                                                                                            let promote = promotedArray.filter(s => s.ASSET_ID === id);
+                                                                                                            allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
+                                                                                                            allAssetsObj.SOLUTION_AREAS = solutionAreas;
+                                                                                                            allAssetsObj.ASSET_TYPE = assetTypes;
+                                                                                                            allAssetsObj.SALES_PLAY = salesPlays;
+                                                                                                            allAssetsObj.INDUSTRY = industry;
 
-                                                                                                    linkObjArr = [];
-                                                                                                    ////console.log(lobj2,"obj2")
-                                                                                                    var images = imagesArray.filter(image => image.ASSET_ID === id);
-                                                                                                    images.forEach(image => {
-                                                                                                        image.IMAGEURL = 'http://' + host + '/' + image.IMAGEURL;
-                                                                                                    });
-                                                                                                    allAssetsObj.IMAGES = images;
-                                                                                                    var comments = commentsArray.filter(c => c.ASSET_ID === id);
+                                                                                                            linkType = links.map(a => a.LINK_REPOS_TYPE)
+                                                                                                            linkType = [...new Set(linkType)]
+                                                                                                            ////console.log(linkType)
+                                                                                                            linkType.forEach(type => {
+                                                                                                                var links2 = linksArray.filter(link => link.LINK_REPOS_TYPE === type && link.ASSET_ID === id)
+                                                                                                                lobj.TYPE = type;
+                                                                                                                lobj.arr = links2;
+                                                                                                                lobj2 = lobj
+                                                                                                                linkObjArr.push(lobj2);
+                                                                                                                lobj = {}
+                                                                                                            })
+                                                                                                            allAssetsObj.LINKS = linkObjArr;
 
-                                                                                                    var ratings = ratingsArray.filter(r => r.ASSET_ID === id)
-                                                                                                    var likes = likesArray.filter(l => l.ASSET_ID === id)
-                                                                                                    var views = viewsArray.filter(v => v.ASSET_ID === id)
-                                                                                                    //console.log(...views);
-                                                                                                    if (comments[0]) {
-                                                                                                        delete comments[0].ASSET_ID;
+                                                                                                            linkObjArr = [];
+                                                                                                            ////console.log(lobj2,"obj2")
+                                                                                                            var images = imagesArray.filter(image => image.ASSET_ID === id);
+                                                                                                            images.forEach(image => {
+                                                                                                                image.IMAGEURL = 'http://' + host + '/' + image.IMAGEURL;
+                                                                                                            });
+                                                                                                            allAssetsObj.IMAGES = images;
+                                                                                                            var comments = commentsArray.filter(c => c.ASSET_ID === id);
 
-                                                                                                    }
-                                                                                                    if (!comments.length) {
-                                                                                                        comments.push({ COMMENT_COUNT: 0 });
-                                                                                                    }
-                                                                                                    if (!ratings.length) {
-                                                                                                        ratings.push({ AVG_RATING: 0, ASSET_ID: id })
-                                                                                                    }
-                                                                                                    if (!likes.length) {
-                                                                                                        likes.push({ LIKE_COUNT: 0, ASSET_ID: id })
-                                                                                                    }
-                                                                                                    if (!views.length) {
-                                                                                                        views.push({ VIEW_COUNT: 0, ASSET_ID: id })
-                                                                                                    }
+                                                                                                            var ratings = ratingsArray.filter(r => r.ASSET_ID === id)
+                                                                                                            var likes = likesArray.filter(l => l.ASSET_ID === id)
+                                                                                                            var views = viewsArray.filter(v => v.ASSET_ID === id)
+                                                                                                            //console.log(...views);
+                                                                                                            if (comments[0]) {
+                                                                                                                delete comments[0].ASSET_ID;
 
-                                                                                                    allAssetsObj.COMMENTS = comments[0];
-                                                                                                    allAssetsObj.RATINGS = ratings[0];
-                                                                                                    allAssetsObj.LIKES = likes[0];
-                                                                                                    allAssetsObj.VIEWS = views[0];
+                                                                                                            }
+                                                                                                            if (!comments.length) {
+                                                                                                                comments.push({ COMMENT_COUNT: 0 });
+                                                                                                            }
+                                                                                                            if (!ratings.length) {
+                                                                                                                ratings.push({ AVG_RATING: 0, ASSET_ID: id })
+                                                                                                            }
+                                                                                                            if (!likes.length) {
+                                                                                                                likes.push({ LIKE_COUNT: 0, ASSET_ID: id })
+                                                                                                            }
+                                                                                                            if (!views.length) {
+                                                                                                                views.push({ VIEW_COUNT: 0, ASSET_ID: id })
+                                                                                                            }
 
-                                                                                                    if (!(sortBy == 'views' && allAssetsObj.VIEWS.VIEW_COUNT == 0)) {
-                                                                                                        allAssets.push(allAssetsObj)
-                                                                                                    }
-                                                                                                })
+                                                                                                            allAssetsObj.COMMENTS = comments[0];
+                                                                                                            allAssetsObj.RATINGS = ratings[0];
+                                                                                                            allAssetsObj.LIKES = likes[0];
+                                                                                                            allAssetsObj.VIEWS = views[0];
 
-                                                                                                let allObj = {};
-                                                                                                allObj.TOTALCOUNT = allAssets.length;
-                                                                                                tAssets = allAssets.slice(offset, limit);
-                                                                                                dynamicSort(tAssets, sortBy, order)
+                                                                                                            if (!(sortBy == 'views' && allAssetsObj.VIEWS.VIEW_COUNT == 0)) {
+                                                                                                                allAssets.push(allAssetsObj)
+                                                                                                            }
+                                                                                                        })
 
-                                                                                                allObj.ASSETS = tAssets;
-                                                                                                console.log("Asset Count :::: " + tAssets.length);
-                                                                                                resolve(allObj);
-                                                                                                //}
+                                                                                                        let allObj = {};
+                                                                                                        allObj.TOTALCOUNT = allAssets.length;
+                                                                                                        tAssets = allAssets.slice(offset, limit);
+                                                                                                        dynamicSort(tAssets, sortBy, order)
 
+                                                                                                        allObj.ASSETS = tAssets;
+                                                                                                        console.log("Asset Count :::: " + tAssets.length);
+                                                                                                        resolve(allObj);
+                                                                                                        //}
+
+                                                                                                    })
                                                                                             })
                                                                                     })
                                                                             })
