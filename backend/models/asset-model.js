@@ -1657,32 +1657,25 @@ module.exports = class Asset {
                             },
                         ).then(allassets => {
                             console.log(JSON.stringify(words));
-                            let wordlist = words.map(word => word.ACTIVITY_FILTER);
-                            let filteredbyword = []
+                            let wordlist = "";
+                            words.map(word => {
+                                wordlist = wordlist + " " + word.ACTIVITY_FILTER
+                            });
 
-                            for (let i = 0; i < allassets.length; i++) {
+                            let fetchAllFilterSQL = `select a.filter_id,a.filter_name,a.filter_type,b.asset_id from asset_filter a, asset_filter_asset_map b where a.filter_id=b.filter_id and a.filter_status=1`;
 
-                                let combineContentToMatch = allassets[i].ASSET_ID +
-                                    allassets[i].ASSET_TITLE +
-                                    allassets[i].ASSET_DESCRIPTION +
-                                    allassets[i].ASSET_USERCASE +
-                                    allassets[i].ASSET_CUSTOMER +
-                                    allassets[i].ASSET_ARCHITECTURE_DESCRIPTION
-
-                                combineContentToMatch = combineContentToMatch.toLowerCase();
-                                wordlist.forEach(word => {
-                                    // console.log(" >>> " + combineContentToMatch.indexOf(word));
-                                    console.log("------------------ ASSET MATCH ---------------- " + combineContentToMatch.indexOf(word.toLowerCase()));
-                                    if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
-                                        finalList.push(allassets[i]);
-                                    }
+                            connection.query(fetchAllFilterSQL, {},
+                                {
+                                    outFormat: oracledb.OBJECT
+                                }).then(filterdata => {
+                                    let filtersasset = [];
+                                    
+                                    this.filterAssetBySearchString(allassets, filterdata, wordlist, filtersasset).then(res => {
+                                        this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "").then(assets => {
+                                            resolve(assets);
+                                        })
+                                    })
                                 })
-                            }
-                            console.log("Suggested assets : " + finalList.length);
-                            this.refineAssets(host, offset, limit, finalList, sortBy, order, "", userEmail).then(assets => {
-                                resolve(assets);
-                            })
-
                         })
 
                     })
