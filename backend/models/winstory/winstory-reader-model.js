@@ -1480,11 +1480,7 @@ module.exports = class Asset {
                 ).then(winList => {
                     // console.log(JSON.stringify(assetlist));
 
-                    if (filterids.trim().length > 0) {
-                        finalList = [...winList];
-                    } else {
-                        finalList = [];
-                    }
+
 
 
                     let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
@@ -1505,6 +1501,11 @@ module.exports = class Asset {
                             },
                         ).then(allwins => {
                             console.log(JSON.stringify(words));
+                            if (filterids.trim().length > 0 || words.length > 0) {
+                                finalList = [...winList];
+                            } else {
+                                finalList = [];
+                            }
                             let wordlist = "";
                             words.map(word => {
                                 wordlist = wordlist + " " + word.ACTIVITY_FILTER
