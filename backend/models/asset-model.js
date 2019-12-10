@@ -1144,7 +1144,7 @@ module.exports = class Asset {
                 return asset;
             }
         })
-        console.log("Limit : " + limit);
+        console.log(email+" Limit : " + limit);
         assetsArray = uniqueassetarray;
         let allAssetsObj = {};
         let tAssets = [];
@@ -1228,7 +1228,7 @@ module.exports = class Asset {
                                                                     .then(res => {
                                                                         industryArray = res.rows;
                                                                         //console.log(solutionAreasArray)
-                                                                        connection.execute(`select USER_LOB from asset_user where USER_EMAIL='angan.sen@oracle.com'`, [],
+                                                                        connection.execute(`select USER_LOB from asset_user where USER_EMAIL='`+email+`'`, [],
                                                                             {
                                                                                 outFormat: oracledb.OBJECT
                                                                             })
