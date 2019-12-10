@@ -1515,36 +1515,6 @@ module.exports = class Asset {
                                         })
                                     })
                                 })
-
-
-                            // for (let i = 0; i < allwins.length; i++) {
-                            //     let combineContentToMatch = allwins[i].WINSTORY_ID +
-                            //         allwins[i].WINSTORY_NAME +
-                            //         allwins[i].WINSTORY_PARTNER +
-                            //         allwins[i].WINSTORY_CUSTOMER_NAME +
-                            //         allwins[i].WINSTORY_IMPERATIVE +
-                            //         allwins[i].WINSTORY_CUSTOMER_IMPACT +
-                            //         allwins[i].WINSTORY_BUSSINESS_DRIVER +
-                            //         allwins[i].WINSTORY_SALES_PROCESS +
-                            //         allwins[i].WINSTORY_USECASE +
-                            //         allwins[i].WINSTORY_LESSON_LEARNT +
-                            //         allwins[i].WINSTORY_SOLUTION_USECASE +
-                            //         allwins[i].WINSTORY_COMPETIION +
-                            //         allwins[i].WINSTORY_MAPPED_L2_FILTERS;
-
-                            //     combineContentToMatch = combineContentToMatch.toLowerCase();
-                            //     wordlist.forEach(word => {
-                            //         console.log("------------------ WIN MATCH ---------------- " + combineContentToMatch.indexOf(word.toLowerCase()));
-
-                            //         if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
-                            //             finalList.push(allwins[i]);
-                            //         }
-                            //     })
-                            // }
-                            // console.log("Suggested wins : " + finalList.length);
-                            // this.refineAssets(host, offset, limit, finalList, sortBy, order, "").then(assets => {
-                            //     resolve(assets);
-                            // })
                         })
 
                     })
@@ -1556,116 +1526,116 @@ module.exports = class Asset {
 
     }
 
-    static fetchPreferedWins2(host, userEmail) {
-        let finalList = [];
-        const offset = 0
-        let limit;
-        let order;
-        let sortBy;
+    // static fetchPreferedWins2(host, userEmail) {
+    //     let finalList = [];
+    //     const offset = 0
+    //     let limit;
+    //     let order;
+    //     let sortBy;
 
-        const connection = getDb();
-        return new Promise((resolve, reject) => {
+    //     const connection = getDb();
+    //     return new Promise((resolve, reject) => {
 
-            // GET THE PREFERED FILTERS
-            let fetchPreferedFilterSql = "select ASSET_FILTER_ID from asset_preferences where USER_EMAIL='" + userEmail + "'";
-            connection.query(fetchPreferedFilterSql, {},
-                {
-                    outFormat: oracledb.OBJECT
-                },
-            ).then(filterList => {
-                let filterids = filterList.map(filter => filter.ASSET_FILTER_ID).join().replace(/,/g, "','");
-                console.log(JSON.stringify(filterids));
-                let fetchAssetsSql = "";
-                if (filterids.trim().length > 0) {
-                    fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
-                where a.filter_id in('`+ filterids + `') 
-                and a.WINSTORY_ID=b.WINSTORY_ID 
-                and b.winstory_status='Live'`;
-                } else {
-                    fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
-                    where a.WINSTORY_ID=b.WINSTORY_ID 
-                    and b.winstory_status='Live'`;
-                }
+    //         // GET THE PREFERED FILTERS
+    //         let fetchPreferedFilterSql = "select ASSET_FILTER_ID from asset_preferences where USER_EMAIL='" + userEmail + "'";
+    //         connection.query(fetchPreferedFilterSql, {},
+    //             {
+    //                 outFormat: oracledb.OBJECT
+    //             },
+    //         ).then(filterList => {
+    //             let filterids = filterList.map(filter => filter.ASSET_FILTER_ID).join().replace(/,/g, "','");
+    //             console.log(JSON.stringify(filterids));
+    //             let fetchAssetsSql = "";
+    //             if (filterids.trim().length > 0) {
+    //                 fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
+    //             where a.filter_id in('`+ filterids + `') 
+    //             and a.WINSTORY_ID=b.WINSTORY_ID 
+    //             and b.winstory_status='Live'`;
+    //             } else {
+    //                 fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
+    //                 where a.WINSTORY_ID=b.WINSTORY_ID 
+    //                 and b.winstory_status='Live'`;
+    //             }
 
-                // GET THE MAPPED ASSES FOR THE FILTERS
-                // let fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
-                // where a.filter_id in('`+ filterids + `') 
-                // and a.WINSTORY_ID=b.WINSTORY_ID 
-                // and b.winstory_status='Live'`;
-                console.log("> " + fetchAssetsSql);
-                connection.query(fetchAssetsSql, {},
-                    {
-                        outFormat: oracledb.OBJECT
-                    },
-                ).then(winList => {
-                    // console.log(JSON.stringify(assetlist));
+    //             // GET THE MAPPED ASSES FOR THE FILTERS
+    //             // let fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
+    //             // where a.filter_id in('`+ filterids + `') 
+    //             // and a.WINSTORY_ID=b.WINSTORY_ID 
+    //             // and b.winstory_status='Live'`;
+    //             console.log("> " + fetchAssetsSql);
+    //             connection.query(fetchAssetsSql, {},
+    //                 {
+    //                     outFormat: oracledb.OBJECT
+    //                 },
+    //             ).then(winList => {
+    //                 // console.log(JSON.stringify(assetlist));
 
-                    if (filterids.trim().length > 0) {
-                        finalList = [...winList];
-                    } else {
-                        finalList = [];
-                    }
-
-
-                    let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
-                    where activity_type='FREETEXT' 
-                    and activity_performed_by='` + userEmail + `' 
-                    group by activity_filter 
-                    order by frequency desc 
-                    FETCH NEXT 3 ROWS ONLY`
-                    connection.query(fetchtopwordssql, {},
-                        {
-                            outFormat: oracledb.OBJECT
-                        },
-                    ).then(words => {
-                        let fetchtopwordssql = `select * from asset_winstory_details where winstory_status='Live'`;
-                        connection.query(fetchtopwordssql, {},
-                            {
-                                outFormat: oracledb.OBJECT
-                            },
-                        ).then(allwins => {
-                            console.log(JSON.stringify(words));
-                            let wordlist = words.map(word => word.ACTIVITY_FILTER);
+    //                 if (filterids.trim().length > 0) {
+    //                     finalList = [...winList];
+    //                 } else {
+    //                     finalList = [];
+    //                 }
 
 
-                            for (let i = 0; i < allwins.length; i++) {
-                                let combineContentToMatch = allwins[i].WINSTORY_ID +
-                                    allwins[i].WINSTORY_NAME +
-                                    allwins[i].WINSTORY_PARTNER +
-                                    allwins[i].WINSTORY_CUSTOMER_NAME +
-                                    allwins[i].WINSTORY_IMPERATIVE +
-                                    allwins[i].WINSTORY_CUSTOMER_IMPACT +
-                                    allwins[i].WINSTORY_BUSSINESS_DRIVER +
-                                    allwins[i].WINSTORY_SALES_PROCESS +
-                                    allwins[i].WINSTORY_USECASE +
-                                    allwins[i].WINSTORY_LESSON_LEARNT +
-                                    allwins[i].WINSTORY_SOLUTION_USECASE +
-                                    allwins[i].WINSTORY_COMPETIION +
-                                    allwins[i].WINSTORY_MAPPED_L2_FILTERS;
+    //                 let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
+    //                 where activity_type='FREETEXT' 
+    //                 and activity_performed_by='` + userEmail + `' 
+    //                 group by activity_filter 
+    //                 order by frequency desc 
+    //                 FETCH NEXT 3 ROWS ONLY`
+    //                 connection.query(fetchtopwordssql, {},
+    //                     {
+    //                         outFormat: oracledb.OBJECT
+    //                     },
+    //                 ).then(words => {
+    //                     let fetchtopwordssql = `select * from asset_winstory_details where winstory_status='Live'`;
+    //                     connection.query(fetchtopwordssql, {},
+    //                         {
+    //                             outFormat: oracledb.OBJECT
+    //                         },
+    //                     ).then(allwins => {
+    //                         console.log(JSON.stringify(words));
+    //                         let wordlist = words.map(word => word.ACTIVITY_FILTER);
 
-                                combineContentToMatch = combineContentToMatch.toLowerCase();
-                                wordlist.forEach(word => {
-                                    console.log("------------------ WIN MATCH ---------------- " + combineContentToMatch.indexOf(word.toLowerCase()));
 
-                                    if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
-                                        finalList.push(allwins[i]);
-                                    }
-                                })
-                            }
-                            console.log("Suggested wins : " + finalList.length);
-                            this.refineAssets(host, offset, limit, finalList, sortBy, order, "").then(assets => {
-                                resolve(assets);
-                            })
-                        })
+    //                         for (let i = 0; i < allwins.length; i++) {
+    //                             let combineContentToMatch = allwins[i].WINSTORY_ID +
+    //                                 allwins[i].WINSTORY_NAME +
+    //                                 allwins[i].WINSTORY_PARTNER +
+    //                                 allwins[i].WINSTORY_CUSTOMER_NAME +
+    //                                 allwins[i].WINSTORY_IMPERATIVE +
+    //                                 allwins[i].WINSTORY_CUSTOMER_IMPACT +
+    //                                 allwins[i].WINSTORY_BUSSINESS_DRIVER +
+    //                                 allwins[i].WINSTORY_SALES_PROCESS +
+    //                                 allwins[i].WINSTORY_USECASE +
+    //                                 allwins[i].WINSTORY_LESSON_LEARNT +
+    //                                 allwins[i].WINSTORY_SOLUTION_USECASE +
+    //                                 allwins[i].WINSTORY_COMPETIION +
+    //                                 allwins[i].WINSTORY_MAPPED_L2_FILTERS;
 
-                    })
-                })
+    //                             combineContentToMatch = combineContentToMatch.toLowerCase();
+    //                             wordlist.forEach(word => {
+    //                                 console.log("------------------ WIN MATCH ---------------- " + combineContentToMatch.indexOf(word.toLowerCase()));
 
-            })
+    //                                 if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
+    //                                     finalList.push(allwins[i]);
+    //                                 }
+    //                             })
+    //                         }
+    //                         console.log("Suggested wins : " + finalList.length);
+    //                         this.refineAssets(host, offset, limit, finalList, sortBy, order, "").then(assets => {
+    //                             resolve(assets);
+    //                         })
+    //                     })
 
-        })
+    //                 })
+    //             })
 
-    }
+    //         })
+
+    //     })
+
+    // }
 
 
     //Fetch asset model function
