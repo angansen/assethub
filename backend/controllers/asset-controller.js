@@ -52,7 +52,7 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
                     asset_reviewer_email = result.map(o => o.USER_EMAIL)
                     asset_reviewer_email = asset_reviewer_email.join(';')
                 }
-                else if (result[0]!=undefined) {
+                else if (result[0] != undefined) {
                     console.log("single reviewer")
                     console.log(JSON.stringify(result[0]));
                     asset_reviewer_name = result[0].USER_NAME;
@@ -514,14 +514,14 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         ).then(result => {
             limit = result.rows[0].TOTAL;
             console.log("new Limit" + limit)
-            Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order).then(result => {
+            Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, email).then(result => {
                 res.json(result);
             })
         })
 
     }
     else {
-        Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order).then(result => {
+        Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, email).then(result => {
             res.json(result);
         })
     }

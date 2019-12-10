@@ -1067,7 +1067,7 @@ module.exports = class Asset {
     }
 
 
-    static fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, action) {
+    static fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, action, email) {
 
         return new Promise((resolve, reject) => {
             if (filters.length > 0 && filters != "") {
@@ -1095,7 +1095,7 @@ module.exports = class Asset {
                                         }).then(filterdata => {
                                             let filtersasset = [];
                                             this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
-                                                this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action).then(assets => {
+                                                this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action, email).then(assets => {
                                                     resolve(assets);
                                                 })
                                             })
@@ -1134,7 +1134,7 @@ module.exports = class Asset {
         });
     }
 
-    static refineAssets(host, offset, limit, assetsArray, sortBy, order, action) {
+    static refineAssets(host, offset, limit, assetsArray, sortBy, order, action, email) {
 
         // REMOVE DUPLICATE ENTRIES
         let assetidtracker = {};
@@ -1526,8 +1526,8 @@ module.exports = class Asset {
                     // console.log(JSON.stringify(assetlist));
                     if (filterids.trim().length > 0) {
                         finalList = [...winList];
-                    }else{
-                        finalList=[];
+                    } else {
+                        finalList = [];
                     }
                     let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
                     where activity_type='FREETEXT' 
@@ -1562,7 +1562,7 @@ module.exports = class Asset {
                                 combineContentToMatch = combineContentToMatch.toLowerCase();
                                 wordlist.forEach(word => {
                                     // console.log(" >>> " + combineContentToMatch.indexOf(word));
-                                    console.log("------------------ ASSET MATCH ---------------- "+combineContentToMatch.indexOf(word.toLowerCase()));
+                                    console.log("------------------ ASSET MATCH ---------------- " + combineContentToMatch.indexOf(word.toLowerCase()));
                                     if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
                                         finalList.push(allassets[i]);
                                     }
