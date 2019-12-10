@@ -1655,7 +1655,8 @@ module.exports = class Asset {
                                 outFormat: oracledb.OBJECT
                             },
                         ).then(allassets => {
-                            console.log(JSON.stringify(words));
+                            console.log("------------------- Prefered asset --------------");
+                            console.log("Prefered words"+JSON.stringify(words));
                             let wordlist = "";
                             words.map(word => {
                                 wordlist = wordlist + " " + word.ACTIVITY_FILTER

@@ -1029,6 +1029,7 @@ module.exports = class Asset {
 
                 // searchString = searchString.replace(/ /g, "");
                 let wordlist = searchString.split(/ |,/);
+                console.log("----- WIN  WORD SPLIT ------")
 
 
 
@@ -1057,7 +1058,7 @@ module.exports = class Asset {
     }
 
 
-    static fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, action) {
+    static fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, action, email) {
         //console.log(JSON.stringify(filters));
         return new Promise((resolve, reject) => {
             if (filters.length > 0 && filters != "") {
@@ -1088,7 +1089,7 @@ module.exports = class Asset {
                                             let filtersasset = [];
                                             this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
                                                 //console.log("Content filter ended : " + filtersasset.length);
-                                                this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action).then(assets => {
+                                                this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action, email).then(assets => {
                                                     resolve(assets);
                                                 })
                                             })
@@ -1126,7 +1127,7 @@ module.exports = class Asset {
             }
         });
     }
-    static refineAssets(host, offset, limit, assetsArray, sortBy, order, action) {
+    static refineAssets(host, offset, limit, assetsArray, sortBy, order, action, email) {
 
         // REMOVE DUPLICATE ENTRIES
         let assetidtracker = {};
@@ -1225,108 +1226,123 @@ module.exports = class Asset {
                                                                                     })
                                                                                     .then(res => {
                                                                                         viewsArray = res.rows;
-                                                                                        connection.execute(`SELECT WINSTORY_ID from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1`, [],
+                                                                                        connection.execute(`select USER_LOB from asset_user where USER_EMAIL='` + email + `'`, [],
                                                                                             {
                                                                                                 outFormat: oracledb.OBJECT
                                                                                             })
-                                                                                            .then(res => {
-                                                                                                promotedArray = res.rows;
-                                                                                                connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Win Status'`, {},
+                                                                                            .then(lob => {
+                                                                                                console.log('=================lob============================')
+                                                                                                console.log(lob)
+                                                                                                let sqlquery = ``
+                                                                                                if (lob === 'Others') {
+                                                                                                    sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
+                                                                                                } else {
+                                                                                                    sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in ('` + lob + `', 'Others')`
+                                                                                                }
+                                                                                                connection.execute(sqlquery, [],
+                                                                                                    //connection.execute(`SELECT WINSTORY_ID from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1`, [],
                                                                                                     {
                                                                                                         outFormat: oracledb.OBJECT
                                                                                                     })
                                                                                                     .then(res => {
-                                                                                                        let winStatusArray = res.rows;
-                                                                                                        //console.log(viewsArray);
-                                                                                                        assetsArray.forEach(asset => {
-                                                                                                            const id = asset.WINSTORY_ID;
-
-                                                                                                            allAssetsObj = asset;
-                                                                                                            allAssetsObj.createdDate = allAssetsObj.WINSTORY_CREATED_ON;
-                                                                                                            let path = allAssetsObj.WINSTORY_THUMBNAIL;
-                                                                                                            if (path == null) {
-                                                                                                                allAssetsObj.WINSTORY_THUMBNAIL = `http://${host}/winstorylogo/Logo_Thumbnail.png`
-                                                                                                            } else
-                                                                                                                allAssetsObj.WINSTORY_THUMBNAIL = `http://${host}/${path}`;
-
-                                                                                                            let logopath = allAssetsObj.WINSTORY_LOGO;
-                                                                                                            if (logopath == null) {
-                                                                                                                allAssetsObj.WINSTORY_LOGO = `http://${host}/winstorylogo/Logo_Thumbnail.png`
-                                                                                                            } else
-                                                                                                                allAssetsObj.WINSTORY_LOGO = `http://${host}/${logopath}`;
-
-                                                                                                            allAssetsObj.LINKS = [];
-                                                                                                            var links = linksArray.filter(link => link.WINSTORY_ID == id)
-
-                                                                                                            solutionAreas = solutionAreasArray.filter(s => s.WINSTORY_ID == id);
-                                                                                                            assetTypes = assetTypesArray.filter(s => s.WINSTORY_ID == id);
-                                                                                                            salesPlays = salesPlaysArray.filter(s => s.WINSTORY_ID == id);
-                                                                                                            industry = industryArray.filter(s => s.WINSTORY_ID == id);
-                                                                                                            let winStatus = winStatusArray.filter(s => s.WINSTORY_ID == id);
-                                                                                                            //console.log(solutionAreas);
-                                                                                                            allAssetsObj.WIN_STATUS = winStatus
-                                                                                                            allAssetsObj.SOLUTION_AREAS = solutionAreas
-                                                                                                            allAssetsObj.ASSET_TYPE = assetTypes;
-                                                                                                            allAssetsObj.SALES_PLAY = salesPlays;
-                                                                                                            allAssetsObj.INDUSTRY = industry;
-                                                                                                            linkType = links.map(a => a.LINK_REPOS_TYPE)
-                                                                                                            linkType = [...new Set(linkType)]
-                                                                                                            let promote = promotedArray.filter(s => s.WINSTORY_ID === id);
-                                                                                                            allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
-                                                                                                            linkType.forEach(type => {
-                                                                                                                var links2 = linksArray.filter(link => link.LINK_REPOS_TYPE === type && link.WINSTORY_ID === id)
-                                                                                                                lobj.TYPE = type;
-                                                                                                                lobj.arr = links2;
-                                                                                                                lobj2 = lobj
-                                                                                                                linkObjArr.push(lobj2);
-                                                                                                                lobj = {}
+                                                                                                        promotedArray = res.rows;
+                                                                                                        connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Win Status'`, {},
+                                                                                                            {
+                                                                                                                outFormat: oracledb.OBJECT
                                                                                                             })
-                                                                                                            allAssetsObj.LINKS = linkObjArr;
+                                                                                                            .then(res => {
+                                                                                                                let winStatusArray = res.rows;
+                                                                                                                //console.log(viewsArray);
+                                                                                                                assetsArray.forEach(asset => {
+                                                                                                                    const id = asset.WINSTORY_ID;
 
-                                                                                                            linkObjArr = [];
-                                                                                                            ////console.log(lobj2,"obj2")
-                                                                                                            var images = imagesArray.filter(image => image.WINSTORY_ID === id);
-                                                                                                            allAssetsObj.IMAGES = images;
-                                                                                                            var comments = commentsArray.filter(c => c.WINSTORY_ID === id);
+                                                                                                                    allAssetsObj = asset;
+                                                                                                                    allAssetsObj.createdDate = allAssetsObj.WINSTORY_CREATED_ON;
+                                                                                                                    let path = allAssetsObj.WINSTORY_THUMBNAIL;
+                                                                                                                    if (path == null) {
+                                                                                                                        allAssetsObj.WINSTORY_THUMBNAIL = `http://${host}/winstorylogo/Logo_Thumbnail.png`
+                                                                                                                    } else
+                                                                                                                        allAssetsObj.WINSTORY_THUMBNAIL = `http://${host}/${path}`;
 
-                                                                                                            var ratings = ratingsArray.filter(r => r.WINSTORY_ID === id)
-                                                                                                            var likes = likesArray.filter(l => l.WINSTORY_ID === id)
-                                                                                                            var views = viewsArray.filter(v => v.WINSTORY_ID === id)
-                                                                                                            if (comments[0]) {
-                                                                                                                delete comments[0].WINSTORY_ID;
+                                                                                                                    let logopath = allAssetsObj.WINSTORY_LOGO;
+                                                                                                                    if (logopath == null) {
+                                                                                                                        allAssetsObj.WINSTORY_LOGO = `http://${host}/winstorylogo/Logo_Thumbnail.png`
+                                                                                                                    } else
+                                                                                                                        allAssetsObj.WINSTORY_LOGO = `http://${host}/${logopath}`;
 
-                                                                                                            }
-                                                                                                            if (!comments.length) {
-                                                                                                                comments.push({ COMMENT_COUNT: 0 });
-                                                                                                            }
-                                                                                                            if (!ratings.length) {
-                                                                                                                ratings.push({ AVG_RATING: 0, WINSTORY_ID: id })
-                                                                                                            }
-                                                                                                            if (!likes.length) {
-                                                                                                                likes.push({ LIKE_COUNT: 0, WINSTORY_ID: id })
-                                                                                                            }
-                                                                                                            if (!views.length) {
-                                                                                                                views.push({ VIEW_COUNT: 0, WINSTORY_ID: id })
-                                                                                                            }
+                                                                                                                    allAssetsObj.LINKS = [];
+                                                                                                                    var links = linksArray.filter(link => link.WINSTORY_ID == id)
 
-                                                                                                            allAssetsObj.COMMENTS = comments[0];
-                                                                                                            allAssetsObj.RATINGS = ratings[0];
-                                                                                                            allAssetsObj.LIKES = likes[0];
-                                                                                                            allAssetsObj.VIEWS = views[0];
-                                                                                                            if (!(sortBy == 'views' && allAssetsObj.VIEWS.VIEW_COUNT == 0)) {
-                                                                                                                allAssets.push(allAssetsObj);
-                                                                                                            }
+                                                                                                                    solutionAreas = solutionAreasArray.filter(s => s.WINSTORY_ID == id);
+                                                                                                                    assetTypes = assetTypesArray.filter(s => s.WINSTORY_ID == id);
+                                                                                                                    salesPlays = salesPlaysArray.filter(s => s.WINSTORY_ID == id);
+                                                                                                                    industry = industryArray.filter(s => s.WINSTORY_ID == id);
+                                                                                                                    let winStatus = winStatusArray.filter(s => s.WINSTORY_ID == id);
+                                                                                                                    //console.log(solutionAreas);
+                                                                                                                    allAssetsObj.WIN_STATUS = winStatus
+                                                                                                                    allAssetsObj.SOLUTION_AREAS = solutionAreas
+                                                                                                                    allAssetsObj.ASSET_TYPE = assetTypes;
+                                                                                                                    allAssetsObj.SALES_PLAY = salesPlays;
+                                                                                                                    allAssetsObj.INDUSTRY = industry;
+                                                                                                                    linkType = links.map(a => a.LINK_REPOS_TYPE)
+                                                                                                                    linkType = [...new Set(linkType)]
+                                                                                                                    let promote = promotedArray.filter(s => s.WINSTORY_ID === id);
+                                                                                                                    allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
+                                                                                                                    linkType.forEach(type => {
+                                                                                                                        var links2 = linksArray.filter(link => link.LINK_REPOS_TYPE === type && link.WINSTORY_ID === id)
+                                                                                                                        lobj.TYPE = type;
+                                                                                                                        lobj.arr = links2;
+                                                                                                                        lobj2 = lobj
+                                                                                                                        linkObjArr.push(lobj2);
+                                                                                                                        lobj = {}
+                                                                                                                    })
+                                                                                                                    allAssetsObj.LINKS = linkObjArr;
 
-                                                                                                        })
+                                                                                                                    linkObjArr = [];
+                                                                                                                    ////console.log(lobj2,"obj2")
+                                                                                                                    var images = imagesArray.filter(image => image.WINSTORY_ID === id);
+                                                                                                                    allAssetsObj.IMAGES = images;
+                                                                                                                    var comments = commentsArray.filter(c => c.WINSTORY_ID === id);
 
-                                                                                                        let allObj = {};
-                                                                                                        allObj.TOTALCOUNT = allAssets.length;
-                                                                                                        tAssets = allAssets;
-                                                                                                        dynamicSort(tAssets, sortBy, order);
-                                                                                                        var tmp = tAssets.slice(offset, limit)
-                                                                                                        allObj.WINSTORIES = tmp;
-                                                                                                        resolve(allObj);
+                                                                                                                    var ratings = ratingsArray.filter(r => r.WINSTORY_ID === id)
+                                                                                                                    var likes = likesArray.filter(l => l.WINSTORY_ID === id)
+                                                                                                                    var views = viewsArray.filter(v => v.WINSTORY_ID === id)
+                                                                                                                    if (comments[0]) {
+                                                                                                                        delete comments[0].WINSTORY_ID;
 
+                                                                                                                    }
+                                                                                                                    if (!comments.length) {
+                                                                                                                        comments.push({ COMMENT_COUNT: 0 });
+                                                                                                                    }
+                                                                                                                    if (!ratings.length) {
+                                                                                                                        ratings.push({ AVG_RATING: 0, WINSTORY_ID: id })
+                                                                                                                    }
+                                                                                                                    if (!likes.length) {
+                                                                                                                        likes.push({ LIKE_COUNT: 0, WINSTORY_ID: id })
+                                                                                                                    }
+                                                                                                                    if (!views.length) {
+                                                                                                                        views.push({ VIEW_COUNT: 0, WINSTORY_ID: id })
+                                                                                                                    }
+
+                                                                                                                    allAssetsObj.COMMENTS = comments[0];
+                                                                                                                    allAssetsObj.RATINGS = ratings[0];
+                                                                                                                    allAssetsObj.LIKES = likes[0];
+                                                                                                                    allAssetsObj.VIEWS = views[0];
+                                                                                                                    if (!(sortBy == 'views' && allAssetsObj.VIEWS.VIEW_COUNT == 0)) {
+                                                                                                                        allAssets.push(allAssetsObj);
+                                                                                                                    }
+
+                                                                                                                })
+
+                                                                                                                let allObj = {};
+                                                                                                                allObj.TOTALCOUNT = allAssets.length;
+                                                                                                                tAssets = allAssets;
+                                                                                                                dynamicSort(tAssets, sortBy, order);
+                                                                                                                var tmp = tAssets.slice(offset, limit)
+                                                                                                                allObj.WINSTORIES = tmp;
+                                                                                                                resolve(allObj);
+
+                                                                                                            })
                                                                                                     })
                                                                                             })
                                                                                     })
@@ -1506,7 +1522,7 @@ module.exports = class Asset {
                                     outFormat: oracledb.OBJECT
                                 }).then(filterdata => {
                                     let filtersasset = [];
-                                    
+
                                     this.filterAssetBySearchString(allwins, filterdata, wordlist, filtersasset).then(res => {
                                         //console.log("Content filter ended : " + filtersasset.length);
                                         this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "").then(assets => {
