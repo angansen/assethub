@@ -1546,7 +1546,8 @@ module.exports = class Asset {
 
                             for (let i = 0; i < allassets.length; i++) {
 
-                                let combineContentToMatch = allassets[i].ASSET_TITLE +
+                                let combineContentToMatch = allassets[i].ASSET_ID +
+                                    allassets[i].ASSET_TITLE +
                                     allassets[i].ASSET_DESCRIPTION +
                                     allassets[i].ASSET_USERCASE +
                                     allassets[i].ASSET_CUSTOMER +

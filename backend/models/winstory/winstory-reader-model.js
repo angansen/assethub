@@ -1490,7 +1490,8 @@ module.exports = class Asset {
 
 
                             for (let i = 0; i < allwins.length; i++) {
-                                let combineContentToMatch = allwins[i].WINSTORY_NAME +
+                                let combineContentToMatch = allwins[i].WINSTORY_ID +
+                                    allwins[i].WINSTORY_NAME +
                                     allwins[i].WINSTORY_PARTNER +
                                     allwins[i].WINSTORY_CUSTOMER_NAME +
                                     allwins[i].WINSTORY_IMPERATIVE +
