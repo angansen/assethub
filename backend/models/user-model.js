@@ -393,7 +393,17 @@ const createOrUpdateUser2 = (userdataArr) => {
     userdataArr.forEach((userdata, i) => {
         updateCount = i;
         count2++
-        console.log("USER : " + i)
+      
+
+        try {
+            console.log("USER : " + i);
+            if(userdata.krbprincipalkey){
+                console.log("FIne");
+            }
+            
+        } catch (error) {
+            console.log("Rejected")
+        }
         try {
             if (userdata.telephonenumber === null) {
                 userdata.telephonenumber = userdata.orclbeehivephonenumber
