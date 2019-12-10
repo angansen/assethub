@@ -236,7 +236,7 @@ module.exports = class Asset {
             let filterObj = {};
             let filterArr = [];
             console.log("------------------ SAVEING ASSET -----------------");
-            console.log(JSON.stringify(self));
+            // console.log(JSON.stringify(self));
 
             if (this.assetId) {
 
@@ -273,7 +273,7 @@ module.exports = class Asset {
                     })
                 }
 
-                console.log("Option SQL : " + JSON.stringify(self));
+                // console.log("Option SQL : " + JSON.stringify(self));
                 connection.transaction([
                     function firstAction() {
                         return connection.update(`UPDATE ASSET_DETAILS set 
@@ -302,7 +302,7 @@ module.exports = class Asset {
                     }
                     , function secondAction() {
                         if (oj.length > 0) {
-                            console.log(JSON.stringify(oj));
+                            // console.log(JSON.stringify(oj));
                             return connection.execute(`delete from ASSET_LINKS  WHERE ASSET_ID=:ASSET_ID`, [self.assetId]
                                 , {
                                     autoCommit: true
@@ -389,7 +389,7 @@ module.exports = class Asset {
                         link.ASSET_ID = assetid;
                     })
                 }
-                console.log("Option SQL : " + JSON.stringify(self));
+                // console.log("Option SQL : " + JSON.stringify(self));
                 connection.transaction([
                     function firstAction() {
                         return connection.insert(`INSERT into ASSET_DETAILS(ASSET_ID,ASSET_TITLE,ASSET_DESCRIPTION,
@@ -410,7 +410,7 @@ module.exports = class Asset {
                     }
                     , function secondAction() {
                         if (oj.length > 0) {
-                            console.log(JSON.stringify(oj));
+                            // console.log(JSON.stringify(oj));
                             return connection.execute(`delete from ASSET_LINKS  WHERE ASSET_ID=:ASSET_ID`, [self.assetId]
                                 , {
                                     autoCommit: true
@@ -1039,7 +1039,7 @@ module.exports = class Asset {
                     });
 
                 let wordlist = searchString.split(/ |,/);
-                console.log("----- Asset  WORD SPLIT ------")
+                // console.log("----- Asset  WORD SPLIT ------")
                 // console.log(JSON.stringify(wordlist));
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
@@ -1144,7 +1144,7 @@ module.exports = class Asset {
                 return asset;
             }
         })
-        console.log(email+" Limit : " + limit);
+        // console.log(email+" Limit : " + limit);
         assetsArray = uniqueassetarray;
         let allAssetsObj = {};
         let tAssets = [];
@@ -1233,8 +1233,7 @@ module.exports = class Asset {
                                                                                 outFormat: oracledb.OBJECT
                                                                             })
                                                                             .then(lob => {
-                                                                                console.log('=================lob============================')
-                                                                                console.log(lob)
+
                                                                                 let sqlquery = ``
                                                                                 if (lob === 'Others') {
                                                                                     sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
@@ -1365,7 +1364,7 @@ module.exports = class Asset {
                 const connection = getDb();
                 let fetchfilterDetailssql = `select filter_name,filter_type,filter_id from asset_filter where filter_id in(` + filterString + `)`;
                 let fetchfilterDetailsOption = {};
-                console.log(fetchfilterDetailssql);
+                // console.log(fetchfilterDetailssql);
                 connection.query(fetchfilterDetailssql, fetchfilterDetailsOption,
                     {
                         outFormat: oracledb.OBJECT
@@ -1437,7 +1436,7 @@ module.exports = class Asset {
         })
 
         data = reducedFilter;
-        console.log(JSON.stringify(data));
+        // console.log(JSON.stringify(data));
 
         return new Promise((resolve, reject) => {
             // CREATE SQL queries   
@@ -1613,7 +1612,7 @@ module.exports = class Asset {
                 },
             ).then(filterList => {
                 let filterids = filterList.map(filter => filter.ASSET_FILTER_ID).join().replace(/,/g, "','");
-                console.log(JSON.stringify(filterids));
+                // console.log(JSON.stringify(filterids));
                 let fetchAssetsSql = "";
                 if (filterids.trim().length > 0) {
                     fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
@@ -2154,7 +2153,7 @@ module.exports = class Asset {
 
 
     static getFilters(user_email, host) {
-        console.log("fetching filters >" + user_email);
+        // console.log("fetching filters >" + user_email);
         let typeArr = [];
         let filteredArr = [];
         let allFilters = [];
@@ -2242,8 +2241,8 @@ module.exports = class Asset {
                                                         return 0; //default return value (no sorting)
                                                     });
                                                     typeArr.forEach(type => {
-                                                        console.log(JSON.stringify(type));
-                                                        console.log(JSON.stringify(filteredArr));
+                                                        // console.log(JSON.stringify(type));
+                                                        // console.log(JSON.stringify(filteredArr));
                                                         if (filterObj != undefined) {
                                                             filteredArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && !f.FILTER_NAME.toLowerCase().includes('other'));
 

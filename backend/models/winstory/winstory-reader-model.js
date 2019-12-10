@@ -1029,7 +1029,6 @@ module.exports = class Asset {
 
                 // searchString = searchString.replace(/ /g, "");
                 let wordlist = searchString.split(/ |,/);
-                console.log("----- WIN  WORD SPLIT ------")
 
 
 
