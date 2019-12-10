@@ -864,7 +864,7 @@ exports.promoteAsset = (data) => {
 
                 }
                 else {
-                    sql = `UPDATE ASSET_LOB_LEADER_PROMOTED_ASSETS SET STATUS=0, DEMOTE_DATE=:DEMOTE_DATE, DEMOTED_BY=:DEMOTED_BY  WHERE STATUS=1 and ASSET_ID=:ASSET_ID and LOB_LEADER_EMAIL=:lob_leader_email`;
+                    sql = `UPDATE ASSET_LOB_LEADER_PROMOTED_ASSETS SET STATUS=0, DEMOTE_DATE=:DEMOTE_DATE, DEMOTED_BY=:DEMOTED_BY  WHERE ASSET_ID=:ASSET_ID and LOB_LEADER_EMAIL=:lob_leader_email`;
                     options = [new Date(), data.lob_leader_email, data.assetId, data.lob_leader_email]
                     //sql = `delete from ASSET_LOB_LEADER_PROMOTED_ASSETS where asset_id=:ASSET_ID`;
                     //options = [data.assetId];
@@ -885,7 +885,7 @@ exports.promoteAsset = (data) => {
                             })
                             .then(res => {
                                 console.log(JSON.stringify(res));
-                                if (action === 'insert') {
+                                if (asset_promote_count === 0) {
                                     let query = `INSERT into asset_lob_asset_map(LOB_ID,ASSET_ID) values(:LOB_ID,:ASSET_ID)`
                                     let option = [lobId, data.assetId]
                                     console.log(JSON.stringify(option));
@@ -938,7 +938,7 @@ exports.promoteWins = (data) => {
             {
                 outFormat: oracledb.OBJECT
             }).then(result => {
-                promote_count = result.rows[0].promote_count;
+                let promote_count = result.rows[0].promote_count;
                 if (promote_count === 0) {
                     action = 'insert'
                     console.log("insert section")
@@ -947,7 +947,7 @@ exports.promoteWins = (data) => {
                 }
                 else {
                     //console.log("in like unlike section")
-                    sql = `UPDATE ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY SET STATUS=0, DEMOTE_DATE=:DEMOTE_DATE, DEMOTED_BY=:DEMOTED_BY  WHERE STATUS=1 AND WINSTORY_ID=:WINSTORY_ID and LOB_LEADER_EMAIL=:lob_leader_email`;
+                    sql = `UPDATE ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY SET STATUS=0, DEMOTE_DATE=:DEMOTE_DATE, DEMOTED_BY=:DEMOTED_BY  WHERE WINSTORY_ID=:WINSTORY_ID and LOB_LEADER_EMAIL=:lob_leader_email`;
                     options = [new Date(), data.lob_leader_email, data.winstoryId, data.lob_leader_email]
                 }
                 connection.execute(`select lob_id from asset_lobs where lob_name=:LOB_NAME`, [data.lob_leader_lob],

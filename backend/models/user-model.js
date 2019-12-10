@@ -388,7 +388,7 @@ exports.getAllLinks = () => {
 
 let count2 = 0;
 const createOrUpdateUser2 = (userdataArr) => {
-    console.log("user Count > "+userdataArr.length)
+    console.log("user Count > " + userdataArr.length)
     let updateCount = 0;
     userdataArr.forEach((userdata, i) => {
         updateCount = i;
@@ -399,11 +399,13 @@ const createOrUpdateUser2 = (userdataArr) => {
             if (userdata.telephonenumber === null) {
                 userdata.telephonenumber = userdata.orclbeehivephonenumber
             }
-            console.log("===============================================");
+            console.log("===============================================: "+userdata.manager);
             console.log(JSON.stringify(userdata));
-            userdata.lob = "Others"
-            let manager_email = userdata.manager.split(',')[0].split('=')[1].toLowerCase().replace(/_/g, ".") + "@oracle.com";
-            let name = userdata.displayname
+            userdata.lob = "Others";
+            let manager_email = " ";
+            if (userdata.manager != null) {
+                manager_email = userdata.manager.split(',')[0].split('=')[1].toLowerCase().replace(/_/g, ".") + "@oracle.com";
+            }
             // console.log(manager_email)
             const connection = getDb();
             let saveUserSql = `insert into asset_user (USER_ID,USER_NAME,USER_EMAIL,USER_ROLE,USER_LOCATION
