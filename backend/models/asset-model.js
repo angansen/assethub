@@ -1233,8 +1233,10 @@ module.exports = class Asset {
                                                                                 outFormat: oracledb.OBJECT
                                                                             })
                                                                             .then(lob => {
+                                                                                console.log('=================lob============================')
+                                                                                console.log(lob)
                                                                                 let sqlquery = ``
-                                                                                if (lob == 'Others') {
+                                                                                if (lob === 'Others') {
                                                                                     sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
                                                                                 } else {
                                                                                     sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in ('` + lob + `', 'Others')`
