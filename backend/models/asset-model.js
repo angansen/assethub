@@ -1502,11 +1502,19 @@ module.exports = class Asset {
             ).then(filterList => {
                 let filterids = filterList.map(filter => filter.ASSET_FILTER_ID).join().replace(/,/g, "','");
                 console.log(JSON.stringify(filterids));
-
-                // GET THE MAPPED ASSES FOR THE FILTERS
-                let fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
+                let fetchAssetsSql = "";
+                if (filterids.trim().length > 0) {
+                    fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
                 where a.filter_id in('`+ filterids + `') 
                 and a.asset_id=b.asset_id and b.asset_status='Live'`;
+                } else {
+                    fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
+                where d a.asset_id=b.asset_id and b.asset_status='Live'`;
+                }
+                // GET THE MAPPED ASSES FOR THE FILTERS
+                // let fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
+                // where a.filter_id in('`+ filterids + `') 
+                // and a.asset_id=b.asset_id and b.asset_status='Live'`;
                 console.log("> " + fetchAssetsSql);
                 connection.query(fetchAssetsSql, {},
                     {

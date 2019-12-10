@@ -947,8 +947,9 @@ exports.promoteWins = (data) => {
                 }
                 else {
                     //console.log("in like unlike section")
-                    sql = `UPDATE ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY SET STATUS=0, DEMOTE_DATE=:DEMOTE_DATE, DEMOTED_BY=:DEMOTED_BY  WHERE STATUS=1 AND WINSTORY_ID=:WINSTORY_ID`;
-                    options = [new Date(), data.lob_leader_email, data.winstoryId]
+                    //sql = `UPDATE ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY SET STATUS=0, DEMOTE_DATE=:DEMOTE_DATE, DEMOTED_BY=:DEMOTED_BY  WHERE STATUS=1 AND WINSTORY_ID=:WINSTORY_ID`;
+                    sql = `delete from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where WINSTORY_ID=:WINSTORY_ID`;
+                    options = [data.winstoryId]
                 }
                 connection.execute(`select lob_id from asset_lobs where lob_name=:LOB_NAME`, [data.lob_leader_lob],
                     {
