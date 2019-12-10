@@ -963,7 +963,7 @@ exports.promoteWins = (data) => {
                                 autoCommit: true
                             })
                             .then(res => {
-                                if (action === 'insert') {
+                                if (promote_count === 0) {
                                     let query = `INSERT into ASSET_WINSTORY_LOB_MAP(LOB_ID,WINSTORY_ID) values(:LOB_ID,:WINSTORY_ID)`
                                     let option = [lobId, data.winstoryId]
                                     console.log(JSON.stringify(option));

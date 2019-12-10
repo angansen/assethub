@@ -1020,6 +1020,7 @@ module.exports = class Asset {
 
     static filterAssetBySearchString(data, filterdata, searchString, filtersasset) {
         searchString = searchString.trim().toLowerCase();
+        console.log(JSON.stringify("Captured Words ==== > " + searchString));
         let assetFilters = [];
         return new Promise((resolve) => {
             for (let i = 0; i < data.length; i++) {
@@ -1036,8 +1037,8 @@ module.exports = class Asset {
                     .map((filter) => {
                         combineContentToMatch += filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
-                searchString = searchString.replace(/ /g, "");
-                let wordlist = searchString.split(/,/);
+
+                let wordlist = searchString.split(/ |,/);
                 // console.log("----- Asset  WORD SPLIT ------")
                 // console.log(JSON.stringify(wordlist));
 
