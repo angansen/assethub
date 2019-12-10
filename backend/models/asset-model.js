@@ -1044,7 +1044,7 @@ module.exports = class Asset {
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
                 wordlist.forEach(word => {
-                    console.log("Match Asset : "+combineContentToMatch.indexOf(word.toLowerCase()));
+                    console.log("Match Asset : " + combineContentToMatch.indexOf(word.toLowerCase()));
                     if (word.includes("+")) {
                         let isMatch = true;
                         let wordfrag = word.split("+");
@@ -1229,7 +1229,7 @@ module.exports = class Asset {
                                                                     .then(res => {
                                                                         industryArray = res.rows;
                                                                         //console.log(solutionAreasArray)
-                                                                        connection.execute(`select USER_LOB from asset_user where USER_EMAIL='`+email+`'`, [],
+                                                                        connection.execute(`select USER_LOB from asset_user where USER_EMAIL='` + email + `'`, [],
                                                                             {
                                                                                 outFormat: oracledb.OBJECT
                                                                             })
@@ -1634,11 +1634,7 @@ module.exports = class Asset {
                     },
                 ).then(assetlist => {
                     // console.log(JSON.stringify(assetlist));
-                    if (filterids.trim().length > 0) {
-                        finalList = [...assetlist];
-                    } else {
-                        finalList = [];
-                    }
+
                     let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
                     where activity_type='FREETEXT' 
                     and activity_performed_by='` + userEmail + `' 
@@ -1657,7 +1653,12 @@ module.exports = class Asset {
                             },
                         ).then(allassets => {
                             console.log("------------------- Prefered asset --------------");
-                            console.log("Prefered words"+JSON.stringify(words));
+                            console.log("Prefered words" + JSON.stringify(words));
+                            if (filterids.trim().length > 0 || words.length > 0) {
+                                finalList = [...assetlist];
+                            } else {
+                                finalList = [];
+                            }
                             let wordlist = "";
                             words.map(word => {
                                 wordlist = wordlist + " " + word.ACTIVITY_FILTER
@@ -1670,7 +1671,7 @@ module.exports = class Asset {
                                     outFormat: oracledb.OBJECT
                                 }).then(filterdata => {
                                     let filtersasset = [];
-                                    
+
                                     this.filterAssetBySearchString(finalList, filterdata, wordlist, filtersasset).then(res => {
                                         this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "").then(assets => {
                                             resolve(assets);
