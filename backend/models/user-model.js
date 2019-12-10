@@ -398,6 +398,8 @@ const createOrUpdateUser2 = (userdataArr) => {
             if (userdata.telephonenumber === null) {
                 userdata.telephonenumber = userdata.orclbeehivephonenumber
             }
+            console.log("===============================================");
+            console.log(JSON.stringify(userdata));
             userdata.lob = "Others"
             let manager_email = userdata.manager.split(',')[0].split('=')[1].toLowerCase().replace(/_/g, ".") + "@oracle.com";
             let name = userdata.displayname

@@ -94,7 +94,7 @@ const getLinksById = (assetId) => {
 }
 const getPromoteById = (assetId, email) => {
     const connection = getDb();
-    return connection.query(`SELECT * from ASSET_LOB_LEADER_PROMOTED_ASSETS  where ASSET_ID=:ASSET_ID and status=1`, [assetId],
+    return connection.query(`SELECT * from ASSET_LOB_LEADER_PROMOTED_ASSETS  where ASSET_ID=:ASSET_ID and status=1 and LOB_LEADER_LOB=(select user_lob from asset_user where user_email=:email)`, [assetId, email],
         {
             outFormat: oracledb.OBJECT
         })
