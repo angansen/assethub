@@ -1479,10 +1479,6 @@ module.exports = class Asset {
                     },
                 ).then(winList => {
                     // console.log(JSON.stringify(assetlist));
-
-
-
-
                     let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
                     where activity_type='FREETEXT' 
                     and activity_performed_by='` + userEmail + `' 
@@ -1500,7 +1496,9 @@ module.exports = class Asset {
                                 outFormat: oracledb.OBJECT
                             },
                         ).then(allwins => {
+                            console.log("------------------- Prefered win --------------");
                             console.log(JSON.stringify(words));
+                            console.log(JSON.stringify(filterids));
                             if (filterids.trim().length > 0 || words.length > 0) {
                                 finalList = [...winList];
                             } else {

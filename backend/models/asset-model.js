@@ -1044,7 +1044,6 @@ module.exports = class Asset {
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
                 wordlist.forEach(word => {
-                    console.log("Match Asset : " + combineContentToMatch.indexOf(word.toLowerCase()));
                     if (word.includes("+")) {
                         let isMatch = true;
                         let wordfrag = word.split("+");
@@ -1653,7 +1652,8 @@ module.exports = class Asset {
                             },
                         ).then(allassets => {
                             console.log("------------------- Prefered asset --------------");
-                            console.log("Prefered words" + JSON.stringify(words));
+                            console.log(JSON.stringify(words));
+                            console.log(JSON.stringify(filterids));
                             if (filterids.trim().length > 0 || words.length > 0) {
                                 finalList = [...assetlist];
                             } else {
