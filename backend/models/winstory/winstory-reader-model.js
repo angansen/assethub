@@ -1508,8 +1508,8 @@ module.exports = class Asset {
 
                                 combineContentToMatch = combineContentToMatch.toLowerCase();
                                 wordlist.forEach(word => {
-                                    console.log("------------------ WIN MATCH ----------------")
-                                    combineContentToMatch.indexOf(word.toLowerCase());
+                                    console.log("------------------ WIN MATCH ---------------- "+combineContentToMatch.indexOf(word.toLowerCase()));
+
                                     if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
                                         finalList.push(allwins[i]);
                                     }
