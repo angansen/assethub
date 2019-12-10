@@ -1509,7 +1509,7 @@ module.exports = class Asset {
                 and a.asset_id=b.asset_id and b.asset_status='Live'`;
                 } else {
                     fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
-                where d a.asset_id=b.asset_id and b.asset_status='Live'`;
+                where a.asset_id=b.asset_id and b.asset_status='Live'`;
                 }
                 // GET THE MAPPED ASSES FOR THE FILTERS
                 // let fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
