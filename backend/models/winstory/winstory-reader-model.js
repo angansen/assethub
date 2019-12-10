@@ -1233,9 +1233,9 @@ module.exports = class Asset {
                                                                                                 console.log(lob)
                                                                                                 let sqlquery = ``
                                                                                                 if (lob === 'Others') {
-                                                                                                    sqlquery = `SELECT asset_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
+                                                                                                    sqlquery = `SELECT winstory_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
                                                                                                 } else {
-                                                                                                    sqlquery = `SELECT asset_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in ('` + lob + `', 'Others')`
+                                                                                                    sqlquery = `SELECT winstory_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in ('` + lob + `', 'Others')`
                                                                                                 }
                                                                                                 connection.execute(sqlquery, [],
                                                                                                     //connection.execute(`SELECT WINSTORY_ID from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1`, [],
