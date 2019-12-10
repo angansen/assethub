@@ -1635,7 +1635,7 @@ module.exports = class Asset {
                 ).then(assetlist => {
                     // console.log(JSON.stringify(assetlist));
                     if (filterids.trim().length > 0) {
-                        finalList = [...winList];
+                        finalList = [...assetlist];
                     } else {
                         finalList = [];
                     }
@@ -1671,7 +1671,7 @@ module.exports = class Asset {
                                 }).then(filterdata => {
                                     let filtersasset = [];
                                     
-                                    this.filterAssetBySearchString(allassets, filterdata, wordlist, filtersasset).then(res => {
+                                    this.filterAssetBySearchString(finalList, filterdata, wordlist, filtersasset).then(res => {
                                         this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "").then(assets => {
                                             resolve(assets);
                                         })

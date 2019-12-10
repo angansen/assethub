@@ -1518,7 +1518,7 @@ module.exports = class Asset {
                                 }).then(filterdata => {
                                     let filtersasset = [];
 
-                                    this.filterAssetBySearchString(allwins, filterdata, wordlist, filtersasset).then(res => {
+                                    this.filterAssetBySearchString(finalList, filterdata, wordlist, filtersasset).then(res => {
                                         //console.log("Content filter ended : " + filtersasset.length);
                                         this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "").then(assets => {
                                             resolve(assets);
