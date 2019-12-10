@@ -1030,7 +1030,7 @@ module.exports = class Asset {
                 // searchString = searchString.replace(/ /g, "");
                 let wordlist = searchString.split(/ |,/);
                 console.log("----- WIN  WORD SPLIT ------")
-                
+
 
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
@@ -1468,7 +1468,13 @@ module.exports = class Asset {
                     },
                 ).then(winList => {
                     // console.log(JSON.stringify(assetlist));
-                    finalList = [...winList];
+                    
+                    if (filterids.trim().length > 0) {
+                        finalList = [...winList];
+                    }else{
+                        finalList=[];
+                    }
+
 
                     let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
                     where activity_type='FREETEXT' 
@@ -1508,7 +1514,7 @@ module.exports = class Asset {
 
                                 combineContentToMatch = combineContentToMatch.toLowerCase();
                                 wordlist.forEach(word => {
-                                    console.log("------------------ WIN MATCH ---------------- "+combineContentToMatch.indexOf(word.toLowerCase()));
+                                    console.log("------------------ WIN MATCH ---------------- " + combineContentToMatch.indexOf(word.toLowerCase()));
 
                                     if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
                                         finalList.push(allwins[i]);

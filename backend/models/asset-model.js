@@ -1524,7 +1524,11 @@ module.exports = class Asset {
                     },
                 ).then(assetlist => {
                     // console.log(JSON.stringify(assetlist));
-                    finalList = [...assetlist];
+                    if (filterids.trim().length > 0) {
+                        finalList = [...winList];
+                    }else{
+                        finalList=[];
+                    }
                     let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
                     where activity_type='FREETEXT' 
                     and activity_performed_by='` + userEmail + `' 
