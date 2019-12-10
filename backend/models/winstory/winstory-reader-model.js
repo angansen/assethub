@@ -2809,6 +2809,7 @@ module.exports = class Asset {
                                                                                                                 allAssetsObj.SALES_PLAY = salesPlays;
                                                                                                                 allAssetsObj.INDUSTRY = industry;
                                                                                                                 let winStatus = winStatusArray.filter(s => s.WINSTORY_ID == id);
+                                                                                                                allAssetsObj.WIN_STATUS=winStatus;
 
                                                                                                                 let promote = promotedArray.filter(s => s.WINSTORY_ID === id);
                                                                                                                 allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
