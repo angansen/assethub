@@ -641,8 +641,8 @@ exports.getAllPreferredAssets = (req, res) => {
 }
 
 exports.getAssetById = (req, res) => {
-    //const user_email = req.header("user_email")
-    Asset.fetchAssetsById(req.params.assetId, req.headers.host).then(result => {
+    const user_email = req.header("user_email")
+    Asset.fetchAssetsById(req.params.assetId, req.headers.host, user_email).then(result => {
         res.json(result);
     })
 }

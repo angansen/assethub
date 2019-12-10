@@ -407,6 +407,7 @@ const createOrUpdateUser2 = (userdataArr) => {
                    ,USER_LOB,USER_MANAGER_EMAIL,USER_CREATED_ON,USER_MODIFIED,USER_PHONE,USER_PILLAR) values(:0,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10)`;
             let saveUserOptions = [userdata.uid1, userdata.displayname, userdata.mail, "user", userdata.city, userdata.lob, manager_email, new Date(), 0, userdata.telephonenumber, 'N/A'];
 
+            console.log("Executing. . .");
             connection.execute(saveUserSql, saveUserOptions, {
                 autoCommit: true
             }).then(result => {
@@ -420,6 +421,8 @@ const createOrUpdateUser2 = (userdataArr) => {
                 }
 
             }).catch(err => {
+
+                console.log(JSON.stringify(err));
                 // console.log("User creation failed at db level request  for USER: " + name + i + JSON.stringify(err));
                 // if (i >= userdataArr.length - 1) {
                 //     connection.execute("BEGIN UPDATELOB; END;", {}, {
