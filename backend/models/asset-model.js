@@ -1037,7 +1037,7 @@ module.exports = class Asset {
                 assetFilters = filterdata
                     .filter(filter => data[i].ASSET_ID === filter.ASSET_ID)
                     .map((filter) => {
-                        combineContentToMatch += filter.FILTER_NAME + filter.FILTER_TYPE;
+                        combineContentToMatch += filter.FILTER_ID+filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
 
                 let wordlist = searchString.split(/ |,/);

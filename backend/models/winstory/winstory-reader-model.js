@@ -1023,7 +1023,7 @@ module.exports = class Asset {
                 assetFilters = filterdata
                     .filter(filter => data[i].WINSTORY_ID === filter.WINSTORY_ID)
                     .map((filter) => {
-                        combineContentToMatch += filter.FILTER_NAME + filter.FILTER_TYPE;
+                        combineContentToMatch += filter.FILTER_ID+filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
 
                 // searchString = searchString.replace(/ /g, "");
