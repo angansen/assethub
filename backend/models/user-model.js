@@ -388,7 +388,7 @@ exports.getAllLinks = () => {
 
 let count2 = 0;
 const createOrUpdateUser2 = (userdataArr) => {
-    // console.log(userdataArr.length)
+    console.log("user Count > "+userdataArr.length)
     let updateCount = 0;
     userdataArr.forEach((userdata, i) => {
         updateCount = i;

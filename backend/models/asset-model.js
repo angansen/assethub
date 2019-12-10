@@ -1846,7 +1846,7 @@ module.exports = class Asset {
     }
 
 
-    static fetchAssetsById(assetId, host) {
+    static fetchAssetsById(assetId, host, user_email) {
         let assetObj = {}
         let linkObjArr = [];
         let lobj = {};
@@ -1912,7 +1912,7 @@ module.exports = class Asset {
                                                                         getIndustryByAssetId(assetId)
                                                                             .then(res => {
                                                                                 assetObj.INDUSTRY = res;
-                                                                                getPromoteById(assetId)
+                                                                                getPromoteById(assetId, user_email)
                                                                                     .then(res => {
                                                                                         // console.log(res);
                                                                                         assetObj.PROMOTE = res.length == 0 ? false : true;
