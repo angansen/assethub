@@ -1580,7 +1580,6 @@ module.exports = class Asset {
                                     }
                                 })
                             }
-
                             console.log("Suggested assets : " + finalList.length);
                             this.refineAssets(host, offset, limit, finalList, sortBy, order, "", userEmail).then(assets => {
                                 resolve(assets);
