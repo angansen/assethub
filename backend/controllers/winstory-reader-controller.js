@@ -488,7 +488,7 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         email: email,
         searchtext: searchString
     }
-    
+
     // console.log("============= Win Controller Activity ==============")
     // console.log(JSON.stringify(activity));
     // console.log("================== Activity ==========================")
@@ -511,13 +511,13 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         ).then(result => {
             limit = result.rows[0].TOTAL;
             // console.log("new Limit" + limit)
-            winstoryreader.fetchAssets2(req.headers.host, offset, limit, filters, searchString, sortBy, order).then(result => {
+            winstoryreader.fetchAssets2(req.headers.host, offset, limit, filters, searchString, sortBy, order, "", email).then(result => {
                 res.json(result);
             })
         })
     }
     else {
-        winstoryreader.fetchAssets2(req.headers.host, offset, limit, filters, searchString, sortBy, order).then(result => {
+        winstoryreader.fetchAssets2(req.headers.host, offset, limit, filters, searchString, sortBy, order, "", email).then(result => {
             res.json(result);
         })
     }
@@ -573,7 +573,7 @@ exports.getAllAssetsByFilters = (req, res) => {
 exports.getAllPreferredWins1 = (req, res) => {
     const user_email = req.params.user_email;
 
-    winstoryreader.fetchPreferedWins(req.headers.host,user_email)
+    winstoryreader.fetchPreferedWins(req.headers.host, user_email)
         .then(list => {
             res.send(list);
         })
@@ -631,7 +631,7 @@ exports.getAllPreferredWins = (req, res) => {
 
 exports.getWinStoryById = (req, res) => {
     //console.log(req.params.winstoryId)
-    winstoryreader.fetchwinstoryById(req.headers.host, req.params.winstoryId).then(result => {
+    winstoryreader.fetchwinstoryById(req.headers.host, req.params.winstoryId, req.header('user_email')).then(result => {
         res.json(result);
     })
 }

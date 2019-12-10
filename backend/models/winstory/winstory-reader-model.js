@@ -32,8 +32,6 @@ const generateFileName = (sampleFile, assetId, filesArray, imageDescription) => 
     return filesArray;
 }
 
-
-
 const dynamicSort = (tAssets, sortBy, order) => {
     console.log("WIn Count :::: " + tAssets.length);
     if (sortBy && order === 'asc') {
@@ -94,7 +92,7 @@ const getLinksById = (assetId) => {
 }
 const getPromoteById = (assetId) => {
     const connection = getDb();
-    return connection.query(`SELECT * from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY  where WINSTORY_ID=:WINSTORY_ID and status=1`, [assetId],
+    return connection.query(`SELECT * from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY  where WINSTORY_ID=:WINSTORY_ID and status=1 and LOB_LEADER_LOB=(select user_lob from asset_user where user_email=:email)`, [assetId, email],
         {
             outFormat: oracledb.OBJECT
         })
@@ -1235,9 +1233,9 @@ module.exports = class Asset {
                                                                                                 console.log(lob)
                                                                                                 let sqlquery = ``
                                                                                                 if (lob === 'Others') {
-                                                                                                    sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
+                                                                                                    sqlquery = `SELECT asset_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
                                                                                                 } else {
-                                                                                                    sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in ('` + lob + `', 'Others')`
+                                                                                                    sqlquery = `SELECT asset_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in ('` + lob + `', 'Others')`
                                                                                                 }
                                                                                                 connection.execute(sqlquery, [],
                                                                                                     //connection.execute(`SELECT WINSTORY_ID from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1`, [],
@@ -2130,7 +2128,7 @@ module.exports = class Asset {
         })
     };
 
-    static fetchwinstoryById(host, assetId) {
+    static fetchwinstoryById(host, assetId, email) {
         let assetObj = {}
         let linkObjArr = [];
         let lobj = {};
@@ -2187,7 +2185,7 @@ module.exports = class Asset {
                                                                         getIndustryByAssetId(assetId)
                                                                             .then(res => {
                                                                                 assetObj.INDUSTRY = res;
-                                                                                getPromoteById(assetId)
+                                                                                getPromoteById(assetId, email)
                                                                                     .then(res => {
                                                                                         assetObj.PROMOTE = res.length == 0 ? false : true;
                                                                                         getAssetTypesByAssetId(assetId)

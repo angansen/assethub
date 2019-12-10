@@ -1044,6 +1044,7 @@ module.exports = class Asset {
 
                 combineContentToMatch = combineContentToMatch.toLowerCase();
                 wordlist.forEach(word => {
+                    console.log("Match Asset : "+combineContentToMatch.indexOf(word.toLowerCase()));
                     if (word.includes("+")) {
                         let isMatch = true;
                         let wordfrag = word.split("+");
