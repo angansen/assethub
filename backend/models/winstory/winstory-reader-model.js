@@ -1113,7 +1113,7 @@ module.exports = class Asset {
                                 let filtersasset = [];
                                 this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
                                     //console.log("Content filter ended : " + filtersasset.length);
-                                    this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action).then(assets => {
+                                    this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action, email).then(assets => {
                                         resolve(assets);
                                     })
                                 })
@@ -1520,7 +1520,7 @@ module.exports = class Asset {
 
                                     this.filterAssetBySearchString(finalList, filterdata, wordlist, filtersasset).then(res => {
                                         //console.log("Content filter ended : " + filtersasset.length);
-                                        this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "").then(assets => {
+                                        this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "", userEmail).then(assets => {
                                             resolve(assets);
                                         })
                                     })

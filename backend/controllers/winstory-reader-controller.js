@@ -471,7 +471,7 @@ exports.getAllAssetsBySearchString = (req, res) => {
     });
 }
 
-exports.getAllAssetsByFilters2 = (req, res) => {
+exports.getAllAssetsByFilters = (req, res) => {
     var obj = {};
     // obj.filters = [];
     let offset = req.header('offset');
@@ -524,51 +524,51 @@ exports.getAllAssetsByFilters2 = (req, res) => {
 
 }
 
-exports.getAllAssetsByFilters = (req, res) => {
-    var obj = {};
-    obj.filters = [];
-    const offset = req.header('offset');
-    let limit = req.header('limit');
-    const filters = req.header('filters');
-    const searchString = req.header('searchString')
-    const order = req.header('order');
-    const sortBy = req.header('sortBy');
-    const email = req.header('user_email');
-    obj.filters.push(filters)
+// exports.getAllAssetsByFilters = (req, res) => {
+//     var obj = {};
+//     obj.filters = [];
+//     const offset = req.header('offset');
+//     let limit = req.header('limit');
+//     const filters = req.header('filters');
+//     const searchString = req.header('searchString')
+//     const order = req.header('order');
+//     const sortBy = req.header('sortBy');
+//     const email = req.header('user_email');
+//     obj.filters.push(filters)
 
-    let activity = {
-        filters: filters,
-        email: email,
-        searchtext: searchString
-    }
+//     let activity = {
+//         filters: filters,
+//         email: email,
+//         searchtext: searchString
+//     }
 
-    try {
-        worker.captureSearch(activity);
-    } catch (err) {
-        console.log("search activity log error");
-    }
-    //console.log("limit  :" + limit)
-    if (limit === '-1') {
-        //console.log("-1 limit if")
-        const connection = getDb();
-        connection.execute(`SELECT count(*) total from ASSET_WINSTORY_DETAILS where lower(WINSTORY_STATUS)='live'`, {},
-            {
-                outFormat: oracledb.OBJECT
-            },
-        ).then(result => {
-            limit = result.rows[0].TOTAL;
-            // console.log("new Limit" + limit)
-            winstoryreader.fetchAssets(req.headers.host, offset, limit, obj.filters, searchString, sortBy, order).then(result => {
-                res.json(result);
-            })
-        })
-    }
-    else {
-        winstoryreader.fetchAssets(req.headers.host, offset, limit, obj.filters, searchString, sortBy, order).then(result => {
-            res.json(result);
-        })
-    }
-}
+//     try {
+//         worker.captureSearch(activity);
+//     } catch (err) {
+//         console.log("search activity log error");
+//     }
+//     //console.log("limit  :" + limit)
+//     if (limit === '-1') {
+//         //console.log("-1 limit if")
+//         const connection = getDb();
+//         connection.execute(`SELECT count(*) total from ASSET_WINSTORY_DETAILS where lower(WINSTORY_STATUS)='live'`, {},
+//             {
+//                 outFormat: oracledb.OBJECT
+//             },
+//         ).then(result => {
+//             limit = result.rows[0].TOTAL;
+//             // console.log("new Limit" + limit)
+//             winstoryreader.fetchAssets(req.headers.host, offset, limit, obj.filters, searchString, sortBy, order).then(result => {
+//                 res.json(result);
+//             })
+//         })
+//     }
+//     else {
+//         winstoryreader.fetchAssets(req.headers.host, offset, limit, obj.filters, searchString, sortBy, order).then(result => {
+//             res.json(result);
+//         })
+//     }
+// }
 
 exports.getAllPreferredWins1 = (req, res) => {
     const user_email = req.params.user_email;
