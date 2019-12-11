@@ -1242,6 +1242,8 @@ module.exports = class Asset {
                                                                                                     })
                                                                                                     .then(res => {
                                                                                                         promotedArray = res.rows;
+                                                                                                        console.log('=================promotedArray============================')
+                                                                                                        console.log(JSON.stringify(promotedArray));
                                                                                                         connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Win Status'`, {},
                                                                                                             {
                                                                                                                 outFormat: oracledb.OBJECT
