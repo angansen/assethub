@@ -1231,7 +1231,8 @@ module.exports = class Asset {
                                                                                                 console.log(lob)
                                                                                                 let sqlquery = ``
                                                                                                 console.log(email);
-                                                                                                if (email == undefined)
+                                                                                                console.log("email.length" + email.length);
+                                                                                                if (email.length > 0)
                                                                                                     lob.push({ "USER_LOB": 'Others' });
                                                                                                 console.log(lob)
                                                                                                 if (lob[0].USER_LOB === 'Others') {
