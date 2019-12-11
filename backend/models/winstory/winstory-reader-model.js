@@ -1222,7 +1222,7 @@ module.exports = class Asset {
                                                                                     })
                                                                                     .then(res => {
                                                                                         viewsArray = res.rows;
-                                                                                        connection.execute(`select USER_LOB from asset_user where USER_EMAIL='` + email + `'`, [],
+                                                                                        connection.query(`select USER_LOB from asset_user where USER_EMAIL='` + email + `'`, [],
                                                                                             {
                                                                                                 outFormat: oracledb.OBJECT
                                                                                             })
@@ -1230,13 +1230,10 @@ module.exports = class Asset {
                                                                                                 console.log('=================lob============================')
                                                                                                 console.log(lob)
                                                                                                 let sqlquery = ``
-                                                                                                if (lob === 'Others') {
+                                                                                                if (lob.USER_LOB === 'Others') {
                                                                                                     sqlquery = `SELECT winstory_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
                                                                                                 } else {
-                                                                                                    let lobs = 'Others';
-                                                                                                    lob.rows.forEach(type => {
-                                                                                                        lobs = +lobs + ',' + type.USER_LOB + '';
-                                                                                                    })
+                                                                                                    let lobs = "'Others','" + lob.USER_LOB + "'";
                                                                                                     console.log(lobs);
                                                                                                     sqlquery = `SELECT winstory_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in (` + lobs + `)`
                                                                                                 }
