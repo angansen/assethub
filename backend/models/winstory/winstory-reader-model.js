@@ -2462,11 +2462,6 @@ module.exports = class Asset {
                 })
         })
     }
-
-
-
-
-
     static getFavWins(user_email, host) {
         let assetsArray = [];
         let likesArray = [];
@@ -2497,6 +2492,7 @@ module.exports = class Asset {
                 })
                 .then(res => {
                     assetsArray = res
+                    console.log('Wins user_email: ' + user_email)
                     this.refineAssets(host, 0, -1, assetsArray, '', '', '', user_email).then(assets => {
                         resolve(assets);
                     })
