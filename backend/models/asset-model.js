@@ -2647,7 +2647,7 @@ module.exports = class Asset {
                     })
                     console.log(assetsArray.length);
                     console.log(JSON.stringify(assetsArray));
-                    this.refineAssets(host, '', '', '', assetsArray, '', "", user_email).then(assets => {
+                    this.refineAssets(host, '', '', assetsArray, '', '', "", user_email).then(assets => {
                         resolve(assets);
                     })
                 })
