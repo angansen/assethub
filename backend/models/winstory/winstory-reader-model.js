@@ -1235,7 +1235,7 @@ module.exports = class Asset {
                                                                                                 } else {
                                                                                                     let lobs = ['Others']
                                                                                                     lob.rows.forEach(type => {
-                                                                                                        lobs.push(type);
+                                                                                                        lobs.push(type.USER_LOB);
                                                                                                     })
                                                                                                     sqlquery = `SELECT winstory_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in ('` + lobs + `')`
                                                                                                 }
