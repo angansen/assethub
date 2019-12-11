@@ -1341,7 +1341,10 @@ module.exports = class Asset {
                                                                                                         let allObj = {};
                                                                                                         allObj.TOTALCOUNT = allAssets.length;
                                                                                                         tAssets = allAssets.slice(offset, limit);
-                                                                                                        dynamicSort(tAssets, sortBy, order)
+                                                                                                        if (sortBy.length > 0 && order.length > 0) {
+                                                                                                            dynamicSort(tAssets, sortBy, order)
+                                                                                                        }
+
 
                                                                                                         allObj.ASSETS = tAssets;
                                                                                                         console.log("Asset Count :::: " + tAssets.length);
@@ -2651,7 +2654,7 @@ module.exports = class Asset {
                         asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
                     })
                     console.log(assetsArray.length);
-                    this.refineAssets(host, "", "", assetsArray, "asc", "asc", "", user_email).then(assets => {
+                    this.refineAssets(host, "", "", assetsArray, "", "", "", user_email).then(assets => {
                         resolve(assets);
                     })
                 })
