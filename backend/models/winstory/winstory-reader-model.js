@@ -1232,7 +1232,7 @@ module.exports = class Asset {
                                                                                                 let sqlquery = ``
                                                                                                 console.log(email);
                                                                                                 console.log("email.length" + email.length);
-                                                                                                if (email.length > 0)
+                                                                                                if (email.length === 0 || email == undefined)
                                                                                                     lob.push({ "USER_LOB": 'Others' });
                                                                                                 console.log(lob)
                                                                                                 if (lob[0].USER_LOB === 'Others') {
