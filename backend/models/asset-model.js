@@ -1147,7 +1147,7 @@ module.exports = class Asset {
                 return asset;
             }
         })
-        // console.log(email+" Limit : " + limit);
+        console.log("Email: " + email);
         assetsArray = uniqueassetarray;
         let allAssetsObj = {};
         let tAssets = [];
