@@ -741,7 +741,7 @@ exports.getAllWinsByLob = (req, res) => {
         .then(user_lob => {
             console.log(user_lob.rows[0])
             if (user_lob.rows[0]) {
-                winstoryreader.getWinsByLob(req.headers.host, user_lob.rows[0].USER_LOB).then(result => {
+                winstoryreader.getWinsByLob(req.headers.host, user_lob.rows[0].USER_LOB, user_email).then(result => {
                     res.json(result)
                 })
             }
