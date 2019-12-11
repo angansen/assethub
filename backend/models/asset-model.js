@@ -1037,7 +1037,7 @@ module.exports = class Asset {
                 assetFilters = filterdata
                     .filter(filter => data[i].ASSET_ID === filter.ASSET_ID)
                     .map((filter) => {
-                        combineContentToMatch += filter.FILTER_ID+filter.FILTER_NAME + filter.FILTER_TYPE;
+                        combineContentToMatch += filter.FILTER_ID + filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
 
                 let wordlist = searchString.split(/ |,/);
@@ -1230,17 +1230,18 @@ module.exports = class Asset {
                                                                     .then(res => {
                                                                         industryArray = res.rows;
                                                                         //console.log(solutionAreasArray)
-                                                                        connection.execute(`select USER_LOB from asset_user where USER_EMAIL='` + email + `'`, [],
+                                                                        connection.query(`select USER_LOB from asset_user where USER_EMAIL='` + email + `'`, [],
                                                                             {
                                                                                 outFormat: oracledb.OBJECT
                                                                             })
                                                                             .then(lob => {
 
                                                                                 let sqlquery = ``
-                                                                                if (lob === 'Others') {
+                                                                                if (lob[0].USER_LOB === 'Others') {
                                                                                     sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
                                                                                 } else {
-                                                                                    sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in ('` + lob + `', 'Others')`
+                                                                                    let lobs = "'Others','" + lob[0].USER_LOB + "'";
+                                                                                    sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in (` + lobs + `)`
                                                                                 }
                                                                                 connection.execute(sqlquery, [],
                                                                                     {
@@ -1674,7 +1675,7 @@ module.exports = class Asset {
                                     let filtersasset = [];
 
                                     this.filterAssetBySearchString(finalList, filterdata, wordlist, filtersasset).then(res => {
-                                        this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "").then(assets => {
+                                        this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "", userEmail).then(assets => {
                                             resolve(assets);
                                         })
                                     })
@@ -2593,8 +2594,64 @@ module.exports = class Asset {
                 })
         })
     }
-
     static getAssetsByLob(lob, host) {
+        let assetsArray = [];
+        let likesArray = [];
+        let viewsArray = [];
+        let linksArray = [];
+        let imagesArray = [];
+        let allAssetsObj = {};
+        let allAssetsFinalArray = [];
+        let commentsArray = [];
+        let allObj = {};
+        let linkType = [];
+        var lobj2 = {};
+        let lobj = {};
+        let linkObjArr = [];
+        let solutionAreasArray = [];
+        let solutionAreas = [];
+        let assetTypes = [];
+        let assetTypesArray = [];
+        let salesPlays = [];
+        let salesPlaysArray = [];
+        let promotedArray = [];
+        let industryArray = []
+        let industry = [];
+        return new Promise((resolve, reject) => {
+            const connection = getDb();
+            let lobQuerySql;
+            let lobQueryOptions;
+            let promoteQuerySql;
+            let promoteQueryOptions;
+            if (lob !== 'Others') {
+                lobQuerySql = `select * from asset_details where asset_id in (select asset_id from asset_lob_asset_map where lob_id in (select lob_id from asset_lobs where lob_name=:LOB_NAME or lob_name='Others')) and asset_status='Live'`
+                lobQueryOptions = [lob]
+                promoteQuerySql = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and (LOB_LEADER_LOB=:LOB_NAME or LOB_LEADER_LOB='Others')`
+                promoteQueryOptions = [lob];
+            }
+            else {
+                lobQuerySql = `select * from asset_details where asset_id in (select distinct asset_id from asset_lob_asset_map) and asset_status='Live'`;
+                lobQueryOptions = [];
+                promoteQuerySql = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1`
+                promoteQueryOptions = [];
+            }
+            connection.query(lobQuerySql, lobQueryOptions,
+                {
+                    outFormat: oracledb.OBJECT
+                })
+                .then(res => {
+                    assetsArray = res
+                    assetsArray.forEach(asset => {
+                        asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
+                    })
+                    this.refineAssets(host, '', '', '', assetsArray, '', "", user_email).then(assets => {
+                        resolve(assets);
+                    })
+                })
+        })
+    }
+
+    static getAssetsByLob2(lob, host) {
         let assetsArray = [];
         let likesArray = [];
         let viewsArray = [];
