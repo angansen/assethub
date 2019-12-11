@@ -1233,7 +1233,11 @@ module.exports = class Asset {
                                                                                                 if (lob === 'Others') {
                                                                                                     sqlquery = `SELECT winstory_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
                                                                                                 } else {
-                                                                                                    sqlquery = `SELECT winstory_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in ('` + lob + `', 'Others')`
+                                                                                                    let lobs = ['Others']
+                                                                                                    lob.rows.forEach(type => {
+                                                                                                        lobs.push(type);
+                                                                                                    })
+                                                                                                    sqlquery = `SELECT winstory_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in ('` + lobs + `')`
                                                                                                 }
                                                                                                 connection.execute(sqlquery, [],
                                                                                                     //connection.execute(`SELECT WINSTORY_ID from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1`, [],
