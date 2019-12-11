@@ -1278,6 +1278,7 @@ module.exports = class Asset {
                                                                                                             salesPlays = salesPlaysArray.filter(s => s.ASSET_ID === id)
                                                                                                             industry = industryArray.filter(s => s.ASSET_ID === id);
                                                                                                             let promote = promotedArray.filter(s => s.ASSET_ID === id);
+                                                                                                            console.log("promote : " + promote.length);
                                                                                                             allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
                                                                                                             allAssetsObj.SOLUTION_AREAS = solutionAreas;
                                                                                                             allAssetsObj.ASSET_TYPE = assetTypes;
