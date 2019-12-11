@@ -1230,7 +1230,9 @@ module.exports = class Asset {
                                                                                                 console.log('=================lob============================')
                                                                                                 console.log(lob)
                                                                                                 let sqlquery = ``
-                                                                                                if (!email) lob[0].USER_LOB = 'Others'
+                                                                                                console.log(email);
+                                                                                                // if (email) 
+                                                                                                lob[0].USER_LOB = 'Others';
 
                                                                                                 if (lob[0].USER_LOB === 'Others') {
                                                                                                     sqlquery = `SELECT winstory_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
