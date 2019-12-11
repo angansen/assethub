@@ -2594,7 +2594,7 @@ module.exports = class Asset {
                 })
         })
     }
-    static getAssetsByLob(lob, host) {
+    static getAssetsByLob(lob, host, user_email) {
         let assetsArray = [];
         let likesArray = [];
         let viewsArray = [];

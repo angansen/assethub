@@ -710,8 +710,9 @@ exports.getAllFavAssets = (req, res) => {
 
 exports.getAllAssetsByLob = (req, res) => {
     const lob = req.params.lob
+    const user_email = req.header("user_email")
     console.log("Host >>> " + req.headers.host);
-    Asset.getAssetsByLob(lob, req.headers.host).then(result => {
+    Asset.getAssetsByLob(lob, req.headers.host, user_email).then(result => {
         res.json(result)
     })
 }
