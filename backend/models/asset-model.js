@@ -1268,6 +1268,7 @@ module.exports = class Asset {
                                                                                                         viewsArray = res.rows;
                                                                                                         assetsArray.forEach(asset => {
                                                                                                             const id = asset.ASSET_ID;
+                                                                                                            console.log("AssetID -> " + id);
                                                                                                             allAssetsObj = asset
                                                                                                             allAssetsObj.LINKS = [];
                                                                                                             var links = linksArray.filter(link => link.ASSET_ID === id)
