@@ -2649,8 +2649,7 @@ module.exports = class Asset {
                         asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
                     })
                     console.log(assetsArray.length);
-                    console.log(JSON.stringify(assetsArray));
-                    this.refineAssets(host, '', '', assetsArray, '', '', "", user_email).then(assets => {
+                    this.refineAssets(host, "", "", assetsArray, "", "", "", user_email).then(assets => {
                         resolve(assets);
                     })
                 })
