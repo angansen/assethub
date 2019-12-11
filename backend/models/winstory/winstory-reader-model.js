@@ -1023,7 +1023,7 @@ module.exports = class Asset {
                 assetFilters = filterdata
                     .filter(filter => data[i].WINSTORY_ID === filter.WINSTORY_ID)
                     .map((filter) => {
-                        combineContentToMatch += filter.FILTER_ID+filter.FILTER_NAME + filter.FILTER_TYPE;
+                        combineContentToMatch += filter.FILTER_ID + filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
 
                 // searchString = searchString.replace(/ /g, "");
@@ -1283,6 +1283,7 @@ module.exports = class Asset {
                                                                                                                     linkType = links.map(a => a.LINK_REPOS_TYPE)
                                                                                                                     linkType = [...new Set(linkType)]
                                                                                                                     let promote = promotedArray.filter(s => s.WINSTORY_ID === id);
+                                                                                                                    console.log(JSON.stringify(promote));
                                                                                                                     allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
                                                                                                                     linkType.forEach(type => {
                                                                                                                         var links2 = linksArray.filter(link => link.LINK_REPOS_TYPE === type && link.WINSTORY_ID === id)
