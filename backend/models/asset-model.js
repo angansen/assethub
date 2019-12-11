@@ -1140,7 +1140,7 @@ module.exports = class Asset {
 
         // REMOVE DUPLICATE ENTRIES
         let assetidtracker = {};
-        console.log(assetsArray.length());
+        console.log(assetsArray.length);
         let uniqueassetarray = assetsArray.filter(asset => {
             if (!assetidtracker[asset.ASSET_ID]) {
                 assetidtracker[asset.ASSET_ID] = 1;
