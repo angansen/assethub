@@ -2321,119 +2321,9 @@ module.exports = class Asset {
                 })
                 .then(res => {
                     assetsArray = res
-                    assetsArray.forEach(asset => {
-                        asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
+                    this.refineAssets(host, 0, -1, assetsArray, "", "", "", user_email).then(assets => {
+                        resolve(assets);
                     })
-                    connection.query(`select Count(*) comment_count,asset_id from 
-                    asset_comments group by asset_id`, [],
-                        {
-                            outFormat: oracledb.OBJECT
-                        })
-                        .then(res => {
-                            //console.log("comment count",res)
-                            commentsArray = res;
-                            connection.execute(`SELECT count(*) like_count,asset_id from ASSET_LIKES group by asset_id`, [],
-                                {
-                                    outFormat: oracledb.OBJECT
-                                })
-                                .then(res => {
-                                    //console.log("LIKES",res)
-                                    likesArray = res.rows;
-                                    connection.execute(`SELECT * from ASSET_IMAGES`, {},
-                                        {
-                                            outFormat: oracledb.OBJECT
-                                        }).then(res => {
-                                            imagesArray = res.rows
-                                            connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Solution Area'`, {},
-                                                {
-                                                    outFormat: oracledb.OBJECT
-                                                })
-                                                .then(res => {
-                                                    solutionAreasArray = res.rows;
-                                                    connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Asset Type'`, {},
-                                                        {
-                                                            outFormat: oracledb.OBJECT
-                                                        })
-                                                        .then(res => {
-                                                            assetTypesArray = res.rows;
-                                                            connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Play'`, {},
-                                                                {
-                                                                    outFormat: oracledb.OBJECT
-                                                                })
-                                                                .then(res => {
-                                                                    salesPlaysArray = res.rows;
-                                                                    connection.execute(`SELECT * from ASSET_LINKS  where link_active='true'`, {},
-                                                                        {
-                                                                            outFormat: oracledb.OBJECT
-                                                                        }).then(res => {
-                                                                            linksArray = res.rows
-                                                                            connection.execute(`SELECT count(*) view_count,asset_id from ASSET_VIEWS group by asset_id`, [],
-                                                                                {
-                                                                                    outFormat: oracledb.OBJECT
-                                                                                })
-                                                                                .then(res => {
-                                                                                    viewsArray = res.rows
-                                                                                    //console.log("All Arrays",assetsArray,likesArray,viewsArray)
-                                                                                    assetsArray.forEach(asset => {
-                                                                                        allAssetsObj = asset;
-                                                                                        allAssetsObj.createdDate = allAssetsObj.ASSET_CREATED_DATE;
-                                                                                        const id = asset.ASSET_ID;
-                                                                                        allAssetsObj.LINKS = [];
-                                                                                        var links = linksArray.filter(link => link.ASSET_ID === id)
-                                                                                        ////console.log('links:',links)
-                                                                                        solutionAreas = solutionAreasArray.filter(s => s.ASSET_ID === id);
-                                                                                        allAssetsObj.SOLUTION_AREAS = solutionAreas;
-                                                                                        assetTypes = assetTypesArray.filter(s => s.ASSET_ID === id);
-                                                                                        allAssetsObj.ASSET_TYPE = assetTypes;
-                                                                                        salesPlays = salesPlaysArray.filter(s => s.ASSET_ID === id);
-                                                                                        allAssetsObj.SALES_PLAY = salesPlays;
-                                                                                        linkType = links.map(a => a.LINK_REPOS_TYPE)
-                                                                                        linkType = [...new Set(linkType)]
-                                                                                        ////console.log(linkType)
-                                                                                        linkType.forEach(type => {
-                                                                                            var links2 = linksArray.filter(link => link.LINK_REPOS_TYPE === type && link.ASSET_ID === id)
-                                                                                            lobj.TYPE = type;
-                                                                                            lobj.arr = links2;
-                                                                                            lobj2 = lobj
-                                                                                            linkObjArr.push(lobj2);
-                                                                                            lobj = {}
-                                                                                        })
-                                                                                        allAssetsObj.LINKS = linkObjArr;
-
-                                                                                        linkObjArr = [];
-                                                                                        ////console.log(lobj2,"obj2")
-                                                                                        var images = imagesArray.filter(image => image.ASSET_ID === id);
-                                                                                        allAssetsObj.IMAGES = images;
-                                                                                        var likes = likesArray.filter(l => l.ASSET_ID === id)
-                                                                                        var comments = commentsArray.filter(c => c.ASSET_ID === id)
-                                                                                        var views = viewsArray.filter(v => v.ASSET_ID === id)
-                                                                                        if (!comments.length) {
-                                                                                            comments.push({ COMMENT_COUNT: 0 });
-                                                                                        }
-                                                                                        if (!likes.length) {
-                                                                                            likes.push({ LIKE_COUNT: 0, ASSET_ID: id })
-                                                                                        }
-                                                                                        if (!views.length) {
-                                                                                            views.push({ VIEW_COUNT: 0, ASSET_ID: id })
-                                                                                        }
-                                                                                        allAssetsObj.LIKES = likes[0];
-                                                                                        allAssetsObj.VIEWS = views[0];
-                                                                                        allAssetsObj.COMMENTS = comments[0];
-                                                                                        //console.log(allAssetsObj)
-                                                                                        allAssetsFinalArray.push(allAssetsObj)
-                                                                                        allAssetsObj = {};
-                                                                                    })
-                                                                                    allObj.TOTALCOUNT = allAssetsFinalArray.length;
-                                                                                    allObj.ASSETS = allAssetsFinalArray;
-                                                                                    resolve(allObj)
-                                                                                })
-                                                                        })
-                                                                })
-                                                        })
-                                                })
-                                        })
-                                })
-                        })
                 })
         })
     }
@@ -2638,9 +2528,9 @@ module.exports = class Asset {
                 })
                 .then(res => {
                     assetsArray = res
-                    assetsArray.forEach(asset => {
-                        asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
-                    })
+                    // assetsArray.forEach(asset => {
+                    //     asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
+                    // })
                     this.refineAssets(host, 0, -1, assetsArray, "", "", "", user_email).then(assets => {
                         resolve(assets);
                     })
