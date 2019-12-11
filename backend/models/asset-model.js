@@ -1234,7 +1234,8 @@ module.exports = class Asset {
                                                                                 outFormat: oracledb.OBJECT
                                                                             })
                                                                             .then(lob => {
-
+                                                                                if (email == undefined)
+                                                                                    lob.push({ "USER_LOB": 'Others' });
                                                                                 let sqlquery = ``
                                                                                 if (lob[0].USER_LOB === 'Others') {
                                                                                     sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
