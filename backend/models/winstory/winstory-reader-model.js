@@ -1230,10 +1230,10 @@ module.exports = class Asset {
                                                                                                 console.log('=================lob============================')
                                                                                                 console.log(lob)
                                                                                                 let sqlquery = ``
-                                                                                                if (lob.USER_LOB === 'Others') {
+                                                                                                if (lob[0].USER_LOB === 'Others') {
                                                                                                     sqlquery = `SELECT winstory_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
                                                                                                 } else {
-                                                                                                    let lobs = "'Others','" + lob.USER_LOB + "'";
+                                                                                                    let lobs = "'Others','" + lob[0].USER_LOB + "'";
                                                                                                     console.log(lobs);
                                                                                                     sqlquery = `SELECT winstory_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in (` + lobs + `)`
                                                                                                 }
@@ -1245,8 +1245,6 @@ module.exports = class Asset {
                                                                                                     .then(res => {
                                                                                                         promotedArray = res.rows;
                                                                                                         console.log(sqlquery);
-                                                                                                        console.log('=================promotedArray============================')
-                                                                                                        console.log(JSON.stringify(promotedArray));
                                                                                                         connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Win Status'`, {},
                                                                                                             {
                                                                                                                 outFormat: oracledb.OBJECT
