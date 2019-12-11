@@ -688,7 +688,6 @@ exports.getAllFilters = (req, res) => {
     })
 }
 exports.getWinStoryLobsList = (req, res) => {
-    //console.log('getWinStoryLobs controller');
     winstoryreader.WinstoryLobsList().then(result => {
         res.json(result);
     })
