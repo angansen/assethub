@@ -1140,14 +1140,12 @@ module.exports = class Asset {
 
         // REMOVE DUPLICATE ENTRIES
         let assetidtracker = {};
-        console.log("Refining asset : " + assetsArray.length);
         let uniqueassetarray = assetsArray.filter(asset => {
             if (!assetidtracker[asset.ASSET_ID]) {
                 assetidtracker[asset.ASSET_ID] = 1;
                 return asset;
             }
         })
-        console.log("Email: " + email);
         assetsArray = uniqueassetarray;
         let allAssetsObj = {};
         let tAssets = [];
@@ -1236,8 +1234,7 @@ module.exports = class Asset {
                                                                                 outFormat: oracledb.OBJECT
                                                                             })
                                                                             .then(lob => {
-                                                                                console.log('=================lob============================')
-                                                                                console.log(lob)
+
                                                                                 let sqlquery = ``
                                                                                 if (lob[0].USER_LOB === 'Others') {
                                                                                     sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in (select USER_LOB from asset_user)`
@@ -1250,9 +1247,7 @@ module.exports = class Asset {
                                                                                         outFormat: oracledb.OBJECT
                                                                                     })
                                                                                     .then(res => {
-                                                                                        console.log(sqlquery);
                                                                                         promotedArray = res;
-                                                                                        console.log("Promoted : " + promotedArray.length);
                                                                                         connection.execute(`SELECT count(*) like_count,asset_id from ASSET_LIKES group by asset_id`, [],
                                                                                             {
                                                                                                 outFormat: oracledb.OBJECT
@@ -1268,7 +1263,6 @@ module.exports = class Asset {
                                                                                                         viewsArray = res.rows;
                                                                                                         assetsArray.forEach(asset => {
                                                                                                             const id = asset.ASSET_ID;
-                                                                                                            console.log("AssetID -> " + id);
                                                                                                             allAssetsObj = asset
                                                                                                             allAssetsObj.LINKS = [];
                                                                                                             var links = linksArray.filter(link => link.ASSET_ID === id)
@@ -1278,7 +1272,6 @@ module.exports = class Asset {
                                                                                                             salesPlays = salesPlaysArray.filter(s => s.ASSET_ID === id)
                                                                                                             industry = industryArray.filter(s => s.ASSET_ID === id);
                                                                                                             let promote = promotedArray.filter(s => s.ASSET_ID === id);
-                                                                                                            console.log("promote : " + promote.length);
                                                                                                             allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
                                                                                                             allAssetsObj.SOLUTION_AREAS = solutionAreas;
                                                                                                             allAssetsObj.ASSET_TYPE = assetTypes;
@@ -1341,9 +1334,7 @@ module.exports = class Asset {
                                                                                                         let allObj = {};
                                                                                                         allObj.TOTALCOUNT = allAssets.length;
                                                                                                         tAssets = allAssets.slice(offset, limit);
-                                                                                                        if (sortBy.length > 0 && order.length > 0) {
-                                                                                                            dynamicSort(tAssets, sortBy, order)
-                                                                                                        }
+                                                                                                        dynamicSort(tAssets, sortBy, order)
 
 
                                                                                                         allObj.ASSETS = tAssets;
@@ -2446,10 +2437,7 @@ module.exports = class Asset {
                 })
         })
     }
-
-
-
-    static getFavAssets(user_email, host) {
+    static getFavAssets2(user_email, host) {
         let assetsArray = [];
         let likesArray = [];
         let viewsArray = [];
@@ -2653,7 +2641,6 @@ module.exports = class Asset {
                     assetsArray.forEach(asset => {
                         asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
                     })
-                    console.log(assetsArray.length);
                     this.refineAssets(host, 0, -1, assetsArray, "", "", "", user_email).then(assets => {
                         resolve(assets);
                     })
