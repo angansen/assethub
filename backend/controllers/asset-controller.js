@@ -514,14 +514,14 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         ).then(result => {
             limit = result.rows[0].TOTAL;
             console.log("new Limit" + limit)
-            Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, email).then(result => {
+            Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, '', email).then(result => {
                 res.json(result);
             })
         })
 
     }
     else {
-        Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, email).then(result => {
+        Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, '', email).then(result => {
             res.json(result);
         })
     }
@@ -730,7 +730,7 @@ exports.getAllAssetsByLob2 = (req, res) => {
         .then(user_lob => {
             console.log(user_lob.rows[0])
             if (user_lob.rows[0]) {
-                Asset.getAssetsByLob(user_lob.rows[0].USER_LOB, req.headers.host).then(result => {
+                Asset.getAssetsByLob(user_lob.rows[0].USER_LOB, req.headers.host, user_email).then(result => {
                     res.json(result)
                 })
             }
