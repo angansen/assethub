@@ -1237,6 +1237,7 @@ module.exports = class Asset {
                                                                                                     lob.rows.forEach(type => {
                                                                                                         lobs = +lobs + ',' + type.USER_LOB + '';
                                                                                                     })
+                                                                                                    console.log(lobs);
                                                                                                     sqlquery = `SELECT winstory_id from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1 and LOB_LEADER_LOB in (` + lobs + `)`
                                                                                                 }
                                                                                                 connection.execute(sqlquery, [],
