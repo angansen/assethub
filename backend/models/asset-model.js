@@ -1140,7 +1140,7 @@ module.exports = class Asset {
 
         // REMOVE DUPLICATE ENTRIES
         let assetidtracker = {};
-        console.log(JSON.stringify(assetsArray));
+        console.log(assetsArray.length());
         let uniqueassetarray = assetsArray.filter(asset => {
             if (!assetidtracker[asset.ASSET_ID]) {
                 assetidtracker[asset.ASSET_ID] = 1;
@@ -1245,13 +1245,14 @@ module.exports = class Asset {
                                                                                     let lobs = "'Others','" + lob[0].USER_LOB + "'";
                                                                                     sqlquery = `SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1 and LOB_LEADER_LOB in (` + lobs + `)`
                                                                                 }
-                                                                                connection.execute(sqlquery, [],
+                                                                                connection.query(sqlquery, [],
                                                                                     {
                                                                                         outFormat: oracledb.OBJECT
                                                                                     })
                                                                                     .then(res => {
                                                                                         console.log(sqlquery);
-                                                                                        promotedArray = res.rows;
+                                                                                        promotedArray = res;
+                                                                                        console.log("Promoted : " + promotedArray.length);
                                                                                         connection.execute(`SELECT count(*) like_count,asset_id from ASSET_LIKES group by asset_id`, [],
                                                                                             {
                                                                                                 outFormat: oracledb.OBJECT
