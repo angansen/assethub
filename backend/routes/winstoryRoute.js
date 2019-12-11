@@ -19,7 +19,7 @@ router.get('/filterWinsbylob', winstoryreaderController.getAllWinsByLob);
 router.get('/:winstoryId', winstoryreaderController.getWinStoryById);
 
 // Delete
-router.delete('/deleteWinstorybyId/:winstoryId', winstorywriterController.deleteAllWinStoryContent)
+router.delete('/deleteWinstorybyId/:winstoryId', winstorywriterController.deleteAllWinStoryContent);
 
 
 // POST

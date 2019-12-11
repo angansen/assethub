@@ -630,8 +630,9 @@ exports.getAllPreferredWins = (req, res) => {
 }
 
 exports.getWinStoryById = (req, res) => {
-    //console.log(req.params.winstoryId)
-    winstoryreader.fetchwinstoryById(req.headers.host, req.params.winstoryId, req.header('user_email')).then(result => {
+    //console.log(req.params.winstoryId)    
+    let email = req.header('user_email');
+    winstoryreader.fetchwinstoryById(req.headers.host, req.params.winstoryId, email).then(result => {
         res.json(result);
     })
 }
