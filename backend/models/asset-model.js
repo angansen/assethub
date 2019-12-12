@@ -1234,7 +1234,7 @@ module.exports = class Asset {
                                                                                 outFormat: oracledb.OBJECT
                                                                             })
                                                                             .then(lob => {
-                                                                                if (email.length === 0 || email == undefined)
+                                                                                if (email == undefined||email.length === 0)
                                                                                     lob.push({ "USER_LOB": 'Others' });
                                                                                 let sqlquery = ``
                                                                                 if (lob[0].USER_LOB === 'Others') {
