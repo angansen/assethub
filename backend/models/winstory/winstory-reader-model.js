@@ -1227,11 +1227,8 @@ module.exports = class Asset {
                                                                                                 outFormat: oracledb.OBJECT
                                                                                             })
                                                                                             .then(lob => {
-                                                                                                console.log('=================lob============================')
-                                                                                                console.log(lob)
+
                                                                                                 let sqlquery = ``
-                                                                                                console.log(email);
-                                                                                                console.log("email.length" + email.length);
                                                                                                 if (email == undefined ||email.length === 0)
                                                                                                     lob.push({ "USER_LOB": 'Others' });
                                                                                                 console.log(lob)
