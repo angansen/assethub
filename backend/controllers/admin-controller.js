@@ -106,3 +106,14 @@ exports.promote = (req, res) => {
         res.json('Please provide proper type')
     }
 }
+
+exports.visitors_Reports = (req, res) => {
+    console.log('Admin get filters' + req.body.start_date);
+    admin.visitorsReports(req.body)
+        .then(result => {
+            res.json(result)
+        })
+        .catch(err => {
+            res.json(err)
+        })
+}

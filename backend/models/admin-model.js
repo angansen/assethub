@@ -1006,3 +1006,17 @@ exports.promoteWins = (data) => {
             })
     })
 }
+
+exports.visitorsReports = (data) => {
+    const connection = getDb();
+    return new Promise((resolve, reject) => {
+        connection.query(`SELECT *
+        FROM   Asset_user_activity 
+        WHERE  ACTIVITY_ON BETWEEN to_date( :StartDate, 'dd-mm-yyyy') AND to_date( :EndDate, 'dd-mm1-yyyy')`, [data.start_date, data.end_date],
+            {
+                outFormat: oracledb.OBJECT
+            }).then(result => {
+                resolve(result);
+            })
+    })
+}
