@@ -1010,9 +1010,11 @@ exports.promoteWins = (data) => {
 exports.visitorsReports = (data) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
-        connection.query(`SELECT *
+        let sql = `SELECT *
         FROM   Asset_user_activity 
-        WHERE  ACTIVITY_ON BETWEEN to_date( :StartDate, 'dd-mm-yyyy') AND to_date( :EndDate, 'dd-mm1-yyyy')`, [data.start_date, data.end_date],
+        WHERE  ACTIVITY_ON BETWEEN to_date('`+ data.start_date + `', 'dd-mm-yyyy') AND to_date('` + data.end_date + `', 'dd-mm1-yyyy')`
+        console.log(sql);
+        connection.query(sql, [],
             {
                 outFormat: oracledb.OBJECT
             }).then(result => {
