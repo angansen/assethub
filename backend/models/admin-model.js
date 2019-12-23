@@ -1012,7 +1012,7 @@ exports.visitorsReports = (data) => {
     return new Promise((resolve, reject) => {
         let sql = `SELECT *
         FROM   Asset_user_activity 
-        WHERE  ACTIVITY_ON BETWEEN to_date('`+ data.start_date + `', 'dd-mm-yyyy') AND to_date('` + data.end_date + `', 'dd-mm1-yyyy')`
+        WHERE  ACTIVITY_ON BETWEEN to_date('`+ data.start_date + `', 'dd-mm-yyyy') AND to_date('` + data.end_date + `', 'dd-mm-yyyy')`
         console.log(sql);
         connection.query(sql, [],
             {
