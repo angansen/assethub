@@ -12,6 +12,7 @@ router.post('/mapfilters', adminController.mapFilter);
 router.post('/unmapfilters', adminController.unMapFilter);
 router.post('/remapfilters', adminController.reMapFilter);
 router.post('/promote', adminController.promote);
+
 router.post('/visitorsreports', adminController.visitors_Reports);
 //DELETE
 router.delete('/deletefilter', adminController.deletefilter);
