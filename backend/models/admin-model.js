@@ -463,8 +463,8 @@ exports.mapFilters = (filter) => {
                                 if (err || result.rowsAffected == 0) {
                                     console.log("Error while saving filters :" + err);
                                     mapCount.mappedAsset = mapCount.mappedAsset + 1;
-                                    if (count - 1 == 0)
-                                        resolve({ "status": 'Error', "message": "Filter already mapped" })
+                                    // if (count - 1 == 0)
+                                    //     resolve({ "status": 'Error', "message": "Filter already mapped" })
                                 }
                                 else {
                                     mapCount.newMappedAsset = mapCount.newMappedAsset + 1;
@@ -480,8 +480,8 @@ exports.mapFilters = (filter) => {
                         } else {
                             mapCount.mappedAsset = mapCount.mappedAsset + 1;
                             console.log('Map Count' + JSON.stringify(mapCount));
-                            if (count - 1 == 0)
-                                resolve({ "status": 'Success', "message": "Filter already mapped" })
+                            // if (count - 1 == 0)
+                            //     resolve({ "status": 'Success', "message": "Filter already mapped" })
                         }
                     })
                         .catch(console.error)
@@ -515,16 +515,16 @@ exports.mapFilters = (filter) => {
                                     console.log("Result is:", JSON.stringify(result));
                                     mapCount.mappedWins = mapCount.mappedWins + 1;
                                     console.log('Map Count' + JSON.stringify(mapCount));
-                                    if (count - 1 == 0)
-                                        resolve({ "status": 'Success', "message": "Filter mapped successfully" })
+                                    // if (count - 1 == 0)
+                                    //     resolve({ "status": 'Success', "message": "Filter mapped successfully" })
                                 }
 
                             });
                         } else {
                             mapCount.newMappedWins = mapCount.newMappedWins + 1;
                             console.log('Map Count' + JSON.stringify(mapCount));
-                            if (count - 1 == 0)
-                                resolve({ "status": 'Success', "message": "Filter already mapped" })
+                            // if (count - 1 == 0)
+                            //     resolve({ "status": 'Success', "message": "Filter already mapped" })
                         }
                     })
                         .catch(console.error)
