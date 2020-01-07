@@ -140,5 +140,5 @@ exports.deleteAllWinStoryContent = (req, res) => {
 }
 exports.saveSEAssistance = (req, res) => {
     console.log("Saving asset demo request");
-    user.SEAssistance(req.body, res);
+    winstorywriter.SEAssistance(req.body, res);
 }
