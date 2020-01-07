@@ -695,7 +695,7 @@ exports.SEAssistance = (request, res) => {
             res.status(404).json({ status: "failed", msg: "Could not SE Assistance request " });
         } else {
             console.log("Demo request is captured. . .");
-            emailnotification.triggerEmailNotificationforRequestDemo(request);
+            emailnotification.triggerEmailNotificationforSEAssistance(request);
             res.json({ status: "success", msg: "SE Assistance request saved and email notification sent successfully" })
         }
 

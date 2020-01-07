@@ -40,6 +40,38 @@ exports.triggerEmailNotificationforRequestDemo = (request) => {
         })
     });
 }
+exports.triggerEmailNotificationforSEAssistance = (request) => {
+    var body = `Q&D Team,
+    <br/><br/>There is a request for SE Assistance on wins ${request.winstory_name} by user ${request.name}.
+    <br/><br/>Provided below are the details:    
+    <br/>Wins ID: ${request.winstoryid}
+    <br/>Requester Email: ${request.email}
+    <br/>Requester Name: ${request.name}
+    <br/>Contact No:  ${request.mobile ? request.mobile : 'N/A'}
+    <br/>Location: ${request.location ? request.location : 'N/A'}
+    <br/>Pillar: ${request.pillar ? request.pillar : 'N/A'}
+    <br/>Opp ID: ${request.request_opportunity_id} 
+    <br/>Customer Name: ${request.se_assistance_customer_name ? request.se_assistance_customer_name : 'N/A'}
+    <br/>Demo Date: ${request.se_assistance_date ? request.se_assistance_date : 'N/A'} 
+    <br/>Notes: ${request.se_assistance_note ? request.se_assistance_note : 'N/A'} 
+    <br/><br/>Please process this request and engage the appropriate team to help qualify and support this request.    
+    <br/><br/>Dear ${request.name},
+    <br/><br/>Your request will be processed as soon as possible and you will be contacted with next steps.
+    <br/><br/>Please note: This is a system generated message. Please do not respond to this mail.`
+    //console.log(body);
+    return new Promise((resolve, reject) => {
+        axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', {
+            "from_email": request.email,
+            "to_email": `qualification-dispatch_in_grp@oracle.com,${request.WINSTORY_CREATED_BY},${request.email}`,
+            "body1": body,
+            "body_html": body,
+            "subject": `Request for demo on asset ${request.winstory_name} with asset ID ${request.winstoryid}`
+        }).then(res => {
+            console.log('Email Sent');
+            resolve('Email Sent')
+        })
+    });
+}
 exports.triggerEmailNotificationforFeedback = (request) => {
     console.log(JSON.stringify(request));
     var body = `Hi,
