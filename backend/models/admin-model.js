@@ -531,21 +531,33 @@ exports.mapFilters = (filter) => {
                 }
                 if (count - 1 == 0) {
                     let msg;
-                    if (mapCount.mappedAsset) {
+                    if (mapCount.mappedAsset > 0) {
                         let temp = `${mapCount.mappedAsset} number of Assets already mapped and`;
                         msg = msg.concat(temp);
                     }
-                    if (mapCount.newMappedAsset) {
+                    if (mapCount.newMappedAsset > 0) {
                         let temp = `${mapCount.newMappedAsset} number of Assets and`;
                         msg = msg.concat(temp);
                     }
-                    if (mapCount.mappedWins) {
-                        let temp = `${mapCount.mappedWins} of Wins already mapped to this filter`;
+                    if (mapCount.mappedWins > 0) {
+                        let temp = `${mapCount.mappedWins} of Wins already mapped and `;
                         msg = msg.concat(temp);
                     }
-                    if (mapCount.newMappedWins) {
+                    if (mapCount.newMappedWins > 0) {
                         let temp = `${mapCount.newMappedWins} of Wins mapped to this filter`;
                         msg = msg.concat(temp);
+                    }
+                    if (mapCount.mappedAsset > 0 && mapCount.newMappedWins == 0 && mapCount.mappedWins == 0 && mapCount.newMappedAsset == 0) {
+                        let temp = `${mapCount.mappedAsset} number of Assets already mapped to this filter`;
+                        msg = temp;
+                    }
+                    if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset > 0 && mapCount.newMappedWins == 0 && mapCount.mappedWins == 0) {
+                        let temp = `${mapCount.newMappedAsset} number of Assets mapped to this filter`;
+                        msg = temp;
+                    }
+                    if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset > 0 && mapCount.mappedWins == 0 && mapCount.newMappedWins > 0) {
+                        let temp = `${mapCount.newMappedAsset} number of Assets and ${mapCount.newMappedWins}  number of Wins mapped to this filter`;
+                        msg = temp;
                     }
                     resolve({ "status": 'Success', "message": msg })
                 }
