@@ -462,6 +462,7 @@ exports.mapFilters = (filter) => {
                                 console.log("Executed");
                                 if (err || result.rowsAffected == 0) {
                                     console.log("Error while saving filters :" + err);
+                                    mapCount.mappedAsset = mapCount.mappedAsset + 1;
                                     if (count - 1 == 0)
                                         resolve({ "status": 'Error', "message": "Filter already mapped" })
                                 }
@@ -471,8 +472,8 @@ exports.mapFilters = (filter) => {
                                     mappedFlag = true;
                                     console.log("Result is:", JSON.stringify(result));
                                     //updateFilterStatus(filterStatus);
-                                    if (count - 1 == 0)
-                                        resolve({ "status": 'Success', "message": "Filter mapped successfully" })
+                                    // if (count - 1 == 0)
+                                    //     resolve({ "status": 'Success', "message": "Filter mapped successfully" })
                                 }
 
                             });
@@ -527,6 +528,26 @@ exports.mapFilters = (filter) => {
                         }
                     })
                         .catch(console.error)
+                }
+                if (count - 1 == 0) {
+                    let msg;
+                    if (mapCount.mappedAsset) {
+                        let temp = `${mapCount.mappedAsset} number of Assets already mapped and`;
+                        msg = msg.concat(temp);
+                    }
+                    if (mapCount.newMappedAsset) {
+                        let temp = `${mapCount.newMappedAsset} number of Assets and`;
+                        msg = msg.concat(temp);
+                    }
+                    if (mapCount.mappedWins) {
+                        let temp = `${mapCount.mappedWins} of Wins already mapped to this filter`;
+                        msg = msg.concat(temp);
+                    }
+                    if (mapCount.newMappedWins) {
+                        let temp = `${mapCount.newMappedWins} of Wins mapped to this filter`;
+                        msg = msg.concat(temp);
+                    }
+                    resolve({ "status": 'Success', "message": msg })
                 }
 
             })
