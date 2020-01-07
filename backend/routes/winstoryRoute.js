@@ -28,7 +28,7 @@ router.post('/view', winstorywriterController.updateview);
 router.post('/uploadComment/', winstorywriterController.postWinStoryComment);
 router.post('/uploadLike/', winstorywriterController.postWinStoryLike);
 router.post('/winstorySocialData', winstorywriterController.getSocialData);
-
+router.post('/seassistance/', userController.saveSEAssistance);
 // PUT
 router.put('/save', winstorywriterController.updateWinstory);
 

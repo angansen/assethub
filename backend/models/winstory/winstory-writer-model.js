@@ -660,3 +660,48 @@ exports.deleteWinsStoryById = (winstoryId) => {
             })
     })
 }
+exports.SEAssistance = (request, res) => {
+    const connection = getDb();
+    let saveDemoRequestSql = `insert into ASSET_SE_ASSISTANCE (
+        REQUESTOR_NAME,
+        REQUEST_MOBILE,
+        REQUEST_LOCATION,
+        REQUEST_PILLAR,
+        WINSTORY_ID,
+        USER_EMAIL,
+        REQUEST_CREATED_ON,
+        REQUEST_DEMO_DATE,
+        REQUEST_OPPORTUNITY_ID,
+        REQUEST_DEMO_NOTE,
+        REQUEST_DEMO_CUSTOMER_NAME) values(:0,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10)`;
+    let saveDemoRequestOptions = [
+        request.name,
+        request.mobile,
+        request.location,
+        request.pillar,
+        request.winstoryid,
+        request.email,
+        new Date(),
+        request.request_demo_date,
+        request.request_opportunity_id,
+        request.request_demo_note,
+        request.request_demo_customer_name];
+
+    connection.execute(saveDemoRequestSql, saveDemoRequestOptions, {
+        autoCommit: true
+    }).then(result => {
+        if (result.rowsAffected === 0) {
+            console.log("Could not capture demo request. . .");
+            res.status(404).json({ status: "failed", msg: "Could not SE Assistance request " });
+        } else {
+            console.log("Demo request is captured. . .");
+            emailnotification.triggerEmailNotificationforRequestDemo(request);
+            res.json({ status: "success", msg: "SE Assistance request saved and email notification sent successfully" })
+        }
+
+    }).catch(err => {
+        console.log("Error occurred while saving SE Assistance request : " + JSON.stringify(err));
+        res.status(500).json({ status: "failed", msg: JSON.stringify(err) })
+    })
+
+}
