@@ -530,6 +530,7 @@ exports.mapFilters = (filter) => {
                     })
                         .catch(console.error)
                 }
+                console.log("count - 1 <= 0 : " + count);
                 if (count - 1 <= 0) {
                     let msg = '';
                     if (mapCount.mappedAsset > 0) {
@@ -560,6 +561,7 @@ exports.mapFilters = (filter) => {
                         let temp = `${mapCount.newMappedAsset} number of Assets and ${mapCount.newMappedWins}  number of Wins mapped to this filter`;
                         msg = temp;
                     }
+                    console.log(msg);
                     resolve({ "status": 'Success', "message": msg })
                 }
 
