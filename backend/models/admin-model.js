@@ -423,7 +423,7 @@ updateFilterStatus = (data) => {
     });
 }
 respMessage = (mapCount) => {
-    let msg;
+    let msg = '';
     if (mapCount.mappedAsset > 0) {
         let temp = `${mapCount.mappedAsset} number of Assets already mapped and`;
         msg = msg.concat(temp);
