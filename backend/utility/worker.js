@@ -355,7 +355,7 @@ exports.updateUserLob = (req, res) => {
 
         });
     } catch (err) {
-        console.log(JSON.stringify(err));
+        console.log("=> "+JSON.stringify(err));
         if (res != undefined) {
             res.send({ "status": "error triggered" });
         }
