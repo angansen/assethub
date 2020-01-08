@@ -358,23 +358,8 @@ async function checkMapping(data, query, filterId) {
 }
 async function generateMsg(mapCount) {
     let msg = '';
-    if (mapCount.mappedAsset > 0) {
-        let temp = `${mapCount.mappedAsset} number of Assets already mapped and`;
-        msg = msg.concat(temp);
-    }
-    if (mapCount.newMappedAsset > 0) {
-        let temp = `${mapCount.newMappedAsset} number of Assets and`;
-        msg = msg.concat(temp);
-    }
-    if (mapCount.mappedWins > 0) {
-        let temp = `${mapCount.mappedWins} of Wins already mapped and `;
-        msg = msg.concat(temp);
-    }
-    if (mapCount.newMappedWins > 0) {
-        let temp = `${mapCount.newMappedWins} of Wins mapped to this filter`;
-        msg = msg.concat(temp);
-    }
-    if (mapCount.mappedAsset > 0 && mapCount.newMappedWins == 0 && mapCount.mappedWins == 0 && mapCount.newMappedAsset == 0) {
+
+    if (mapCount.mappedAsset > 0 && mapCount.newMappedAsset == 0 && mapCount.newMappedWins == 0 && mapCount.mappedWins == 0) {
         let temp = `${mapCount.mappedAsset} number of Assets already mapped to this filter`;
         msg = temp;
     }
@@ -382,10 +367,27 @@ async function generateMsg(mapCount) {
         let temp = `${mapCount.newMappedAsset} number of Assets mapped to this filter`;
         msg = temp;
     }
+    if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset == 0 && mapCount.newMappedWins == 0 && mapCount.mappedWins > 0) {
+        let temp = `${mapCount.mappedAsset} number of Wins already mapped to this filter`;
+        msg = temp;
+    }
+    if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset > 0 && mapCount.newMappedWins > 0 && mapCount.mappedWins == 0) {
+        let temp = `${mapCount.newMappedAsset} number of Wins mapped to this filter`;
+        msg = temp;
+    }
     if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset > 0 && mapCount.mappedWins == 0 && mapCount.newMappedWins > 0) {
         let temp = `${mapCount.newMappedAsset} number of Assets and ${mapCount.newMappedWins}  number of Wins mapped to this filter`;
         msg = temp;
     }
+    if (mapCount.mappedAsset > 0 && mapCount.newMappedAsset == 0 && mapCount.mappedWins > 0 && mapCount.newMappedWins == 0) {
+        let temp = `${mapCount.mappedAsset} number of Assets and ${mapCount.mappedWins}  number of Wins already mapped to this filter`;
+        msg = temp;
+    }
+    if (mapCount.mappedAsset > 0 && mapCount.newMappedAsset > 0 && mapCount.mappedWins > 0 && mapCount.newMappedWins > 0) {
+        let temp = `${mapCount.newMappedAsset} number of Assets and ${mapCount.newMappedWins}  number of Wins mapped and ${mapCount.mappedAsset} number of Assets and ${mapCount.mappedWins}  number of Wins already mapped to this filter`;
+        msg = temp;
+    }
+
     return msg;
 }
 batchMapping = (type, binddata) => {
