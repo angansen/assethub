@@ -422,6 +422,38 @@ updateFilterStatus = (data) => {
 
     });
 }
+respMessage = (mapCount) => {
+    let msg;
+    if (mapCount.mappedAsset > 0) {
+        let temp = `${mapCount.mappedAsset} number of Assets already mapped and`;
+        msg = msg.concat(temp);
+    }
+    if (mapCount.newMappedAsset > 0) {
+        let temp = `${mapCount.newMappedAsset} number of Assets and`;
+        msg = msg.concat(temp);
+    }
+    if (mapCount.mappedWins > 0) {
+        let temp = `${mapCount.mappedWins} of Wins already mapped and `;
+        msg = msg.concat(temp);
+    }
+    if (mapCount.newMappedWins > 0) {
+        let temp = `${mapCount.newMappedWins} of Wins mapped to this filter`;
+        msg = msg.concat(temp);
+    }
+    if (mapCount.mappedAsset > 0 && mapCount.newMappedWins == 0 && mapCount.mappedWins == 0 && mapCount.newMappedAsset == 0) {
+        let temp = `${mapCount.mappedAsset} number of Assets already mapped to this filter`;
+        msg = temp;
+    }
+    if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset > 0 && mapCount.newMappedWins == 0 && mapCount.mappedWins == 0) {
+        let temp = `${mapCount.newMappedAsset} number of Assets mapped to this filter`;
+        msg = temp;
+    }
+    if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset > 0 && mapCount.mappedWins == 0 && mapCount.newMappedWins > 0) {
+        let temp = `${mapCount.newMappedAsset} number of Assets and ${mapCount.newMappedWins}  number of Wins mapped to this filter`;
+        msg = temp;
+    }
+    resolve({ "status": 'Success', "message": msg })
+}
 exports.mapFilters = (filter) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
@@ -459,28 +491,31 @@ exports.mapFilters = (filter) => {
                             console.log("Executing. . .");
                             console.log('bindassets.length:- ' + res.length);
                             connection.executeMany(createLinksSql, res, options, (err, result) => {
-                                console.log("Executed");
+                                console.log("Executed asset map");
                                 if (err || result.rowsAffected == 0) {
                                     console.log("Error while saving filters :" + err);
                                     mapCount.mappedAsset = mapCount.mappedAsset + 1;
-                                    // if (count - 1 == 0)
+                                    if (count - 1 == 0)
+                                        respMessage(mapCount);
                                     //     resolve({ "status": 'Error', "message": "Filter already mapped" })
                                 }
                                 else {
                                     mapCount.newMappedAsset = mapCount.newMappedAsset + 1;
-                                    console.log('Map Count' + JSON.stringify(mapCount));
+                                    console.log('Map Count assets' + JSON.stringify(mapCount));
                                     mappedFlag = true;
-                                    console.log("Result is:", JSON.stringify(result));
+                                    console.log("assets Result is:", JSON.stringify(result));
                                     //updateFilterStatus(filterStatus);
-                                    // if (count - 1 == 0)
+                                    if (count - 1 == 0)
+                                        respMessage(mapCount);
                                     //     resolve({ "status": 'Success', "message": "Filter mapped successfully" })
                                 }
 
                             });
                         } else {
                             mapCount.mappedAsset = mapCount.mappedAsset + 1;
-                            console.log('Map Count' + JSON.stringify(mapCount));
-                            // if (count - 1 == 0)
+                            console.log('Map Count assets ' + JSON.stringify(mapCount));
+                            if (count - 1 == 0)
+                                respMessage(mapCount);
                             //     resolve({ "status": 'Success', "message": "Filter already mapped" })
                         }
                     })
@@ -502,66 +537,41 @@ exports.mapFilters = (filter) => {
                                     { type: oracledb.STRING, maxSize: 20 }
                                 ]
                             };
-                            console.log("Executing. . .");
+                            console.log("Executing. . .wins");
                             console.log('bindWins.length:- ' + res.length);
                             connection.executeMany(createLinksSql, res, options, (err, result) => {
-                                console.log("Executed");
+                                console.log("Executed wins map");
                                 if (err || result.rowsAffected == 0) {
                                     mapCount.newMappedWins = mapCount.mappedWins + 1;
-                                    console.log("Error while saving filters :" + err);
+                                    console.log("Error while saving wins filters :" + err);
+                                    if (count - 1 == 0)
+                                        respMessage(mapCount);
                                     //resolve({ "status": 'Success', "message": "Filter already mapped" })
                                 }
                                 else {
                                     updateFilterStatus(filterStatus);
-                                    console.log("Result is:", JSON.stringify(result));
+                                    console.log("wins Result is:", JSON.stringify(result));
                                     mapCount.mappedWins = mapCount.newMappedWins + 1;
-                                    console.log('Map Count' + JSON.stringify(mapCount));
-                                    // if (count - 1 == 0)
+                                    console.log('wins Map Count' + JSON.stringify(mapCount));
+                                    if (count - 1 == 0)
+                                        respMessage(mapCount);
                                     //     resolve({ "status": 'Success', "message": "Filter mapped successfully" })
                                 }
 
                             });
                         } else {
                             mapCount.newMappedWins = mapCount.mappedWins + 1;
-                            console.log('Map Count' + JSON.stringify(mapCount));
-                            // if (count - 1 == 0)
+                            console.log('wins Map Count' + JSON.stringify(mapCount));
+                            if (count - 1 == 0)
+                                respMessage(mapCount);
                             //     resolve({ "status": 'Success', "message": "Filter already mapped" })
                         }
                     })
                         .catch(console.error)
                 }
-                if (count - 1 == 0) {
-                    let msg;
-                    if (mapCount.mappedAsset > 0) {
-                        let temp = `${mapCount.mappedAsset} number of Assets already mapped and`;
-                        msg = msg.concat(temp);
-                    }
-                    if (mapCount.newMappedAsset > 0) {
-                        let temp = `${mapCount.newMappedAsset} number of Assets and`;
-                        msg = msg.concat(temp);
-                    }
-                    if (mapCount.mappedWins > 0) {
-                        let temp = `${mapCount.mappedWins} of Wins already mapped and `;
-                        msg = msg.concat(temp);
-                    }
-                    if (mapCount.newMappedWins > 0) {
-                        let temp = `${mapCount.newMappedWins} of Wins mapped to this filter`;
-                        msg = msg.concat(temp);
-                    }
-                    if (mapCount.mappedAsset > 0 && mapCount.newMappedWins == 0 && mapCount.mappedWins == 0 && mapCount.newMappedAsset == 0) {
-                        let temp = `${mapCount.mappedAsset} number of Assets already mapped to this filter`;
-                        msg = temp;
-                    }
-                    if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset > 0 && mapCount.newMappedWins == 0 && mapCount.mappedWins == 0) {
-                        let temp = `${mapCount.newMappedAsset} number of Assets mapped to this filter`;
-                        msg = temp;
-                    }
-                    if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset > 0 && mapCount.mappedWins == 0 && mapCount.newMappedWins > 0) {
-                        let temp = `${mapCount.newMappedAsset} number of Assets and ${mapCount.newMappedWins}  number of Wins mapped to this filter`;
-                        msg = temp;
-                    }
-                    resolve({ "status": 'Success', "message": msg })
-                }
+                // if (count - 1 == 0) {
+
+                // }
 
             })
         }
