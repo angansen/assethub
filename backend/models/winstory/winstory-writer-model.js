@@ -669,11 +669,10 @@ exports.SEAssistance = (request, res) => {
         REQUEST_PILLAR,
         WINSTORY_ID,
         USER_EMAIL,
-        REQUEST_CREATED_ON,
         SE_ASSISTANCE_DATE,
         REQUEST_OPPORTUNITY_ID,
         SE_ASSISTANCE_NOTE,
-        SE_ASSISTANCE_CUSTOMER_NAME) values(:0,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10)`;
+        SE_ASSISTANCE_CUSTOMER_NAME) values(:0,:1,:2,:3,:4,:5,:6,:7,:8,:9)`;
     let saveDemoRequestOptions = [
         request.name,
         request.mobile,
@@ -681,7 +680,6 @@ exports.SEAssistance = (request, res) => {
         request.pillar,
         request.winstoryid,
         request.email,
-        new Date(),
         request.se_assistance_date,
         request.request_opportunity_id,
         request.se_assistance_note,
