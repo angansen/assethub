@@ -497,7 +497,7 @@ exports.mapFilters = (filter) => {
                                 if (err || result.rowsAffected == 0) {
                                     console.log("Error while saving filters :" + err);
                                     mapCount.mappedAsset = mapCount.mappedAsset + 1;
-                                    if (count - 1 <= 0) {
+                                    if (count - 1 == 0) {
                                         generateMsg(mapCount).then(msg => {
                                             console.log(msg);
                                             resolve({ "status": 'Success', "message": msg })
@@ -510,7 +510,7 @@ exports.mapFilters = (filter) => {
                                     mappedFlag = true;
                                     console.log("assets Result is:", JSON.stringify(result));
                                     //updateFilterStatus(filterStatus);
-                                    if (count - 1 <= 0) {
+                                    if (count - 1 == 0) {
                                         generateMsg(mapCount).then(msg => {
                                             console.log(msg);
                                             resolve({ "status": 'Success', "message": msg })
@@ -522,7 +522,7 @@ exports.mapFilters = (filter) => {
                         } else {
                             mapCount.mappedAsset = mapCount.mappedAsset + 1;
                             console.log('Map Count assets ' + JSON.stringify(mapCount));
-                            if (count - 1 <= 0) {
+                            if (count - 1 == 0) {
                                 generateMsg(mapCount).then(msg => {
                                     console.log(msg);
                                     resolve({ "status": 'Success', "message": msg })
@@ -554,7 +554,7 @@ exports.mapFilters = (filter) => {
                                 if (err || result.rowsAffected == 0) {
                                     mapCount.newMappedWins = mapCount.mappedWins + 1;
                                     console.log("Error while saving wins filters :" + err);
-                                    if (count - 1 <= 0) {
+                                    if (count - 1 == 0) {
                                         generateMsg(mapCount).then(msg => {
                                             console.log(msg);
                                             resolve({ "status": 'Success', "message": msg })
@@ -566,7 +566,7 @@ exports.mapFilters = (filter) => {
                                     console.log("wins Result is:", JSON.stringify(result));
                                     mapCount.mappedWins = mapCount.newMappedWins + 1;
                                     console.log('wins Map Count' + JSON.stringify(mapCount));
-                                    if (count - 1 <= 0) {
+                                    if (count - 1 == 0) {
                                         generateMsg(mapCount).then(msg => {
                                             console.log(msg);
                                             resolve({ "status": 'Success', "message": msg })
@@ -578,7 +578,7 @@ exports.mapFilters = (filter) => {
                         } else {
                             mapCount.newMappedWins = mapCount.mappedWins + 1;
                             console.log('wins Map Count' + JSON.stringify(mapCount));
-                            if (count - 1 <= 0) {
+                            if (count - 1 == 0) {
                                 generateMsg(mapCount).then(msg => {
                                     console.log(msg);
                                     resolve({ "status": 'Success', "message": msg })
