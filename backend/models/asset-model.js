@@ -2269,37 +2269,38 @@ module.exports = class Asset {
                                                     typeArr.forEach(type => {
                                                         console.log(JSON.stringify(type));
                                                         // console.log(JSON.stringify(filteredArr));
-                                                        // if (type = !'Asset Type') {
-                                                            if (filterObj != undefined) {
-                                                                filteredArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && !f.FILTER_NAME.toLowerCase().includes('other'));
+                                                        if (filterObj != undefined) {
+                                                            filteredArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && !f.FILTER_NAME.toLowerCase().includes('other'));
 
-                                                                filterObj.Type = type;
-                                                                filterObj.FILTER_TYPE_IMAGE = 'http://' + host + '/' + filteredArr[0].FILTER_TYPE_IMAGE;
-                                                                filteredArr.sort((a, b) => (a.FILTER_NAME > b.FILTER_NAME) ? 1 : -1)
-                                                                const otherArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && f.FILTER_NAME.toLowerCase().includes('other'))
-                                                                if (otherArr.length === 1) {
-                                                                    filteredArr.push(otherArr[0]);
-                                                                }
-                                                                else {
-                                                                    otherArr.forEach(o => {
-                                                                        filteredArr.push(o)
-                                                                    })
-                                                                }
-                                                                filteredArr.forEach(f => {
-                                                                    typeCountArr = countArr.filter(r => r.FILTER_ID === f.FILTER_ID)
-                                                                    winstorytypeCountArr = winstorycountArr.filter(r => r.FILTER_ID === f.FILTER_ID)
-                                                                    f.ASSET_COUNT = typeCountArr[0].CNT
-                                                                    f.WINSTORY_COUNT = winstorytypeCountArr[0].CNT
-                                                                    // console.log("f.FILTER_IMAGE" + ': ' + f.FILTER_IMAGE);
-                                                                    f.FILTER_TYPE_IMAGE = 'http://' + host + '/' + f.FILTER_TYPE_IMAGE;
-                                                                    f.FILTER_IMAGE = 'http://' + host + '/' + f.FILTER_IMAGE;
-                                                                })
-                                                                filterObj.filters = filteredArr;
-
-                                                                allFilters.push(filterObj);
-                                                                filterObj = {};
+                                                            filterObj.Type = type;
+                                                            filterObj.FILTER_TYPE_IMAGE = 'http://' + host + '/' + filteredArr[0].FILTER_TYPE_IMAGE;
+                                                            filteredArr.sort((a, b) => (a.FILTER_NAME > b.FILTER_NAME) ? 1 : -1)
+                                                            const otherArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && f.FILTER_NAME.toLowerCase().includes('other'))
+                                                            if (otherArr.length === 1) {
+                                                                filteredArr.push(otherArr[0]);
                                                             }
-                                                        // }
+                                                            else {
+                                                                otherArr.forEach(o => {
+                                                                    filteredArr.push(o)
+                                                                })
+                                                            }
+                                                            filteredArr.forEach(f => {
+                                                                typeCountArr = countArr.filter(r => r.FILTER_ID === f.FILTER_ID)
+                                                                winstorytypeCountArr = winstorycountArr.filter(r => r.FILTER_ID === f.FILTER_ID)
+                                                                f.ASSET_COUNT = typeCountArr[0].CNT
+                                                                f.WINSTORY_COUNT = winstorytypeCountArr[0].CNT
+                                                                // console.log("f.FILTER_IMAGE" + ': ' + f.FILTER_IMAGE);
+                                                                f.FILTER_TYPE_IMAGE = 'http://' + host + '/' + f.FILTER_TYPE_IMAGE;
+                                                                f.FILTER_IMAGE = 'http://' + host + '/' + f.FILTER_IMAGE;
+                                                            })
+                                                            filterObj.filters = filteredArr;
+
+                                                            if (filterObj.Type != "Asset Type") {
+                                                                allFilters.push(filterObj);
+                                                            }
+
+                                                            filterObj = {};
+                                                        }
                                                     })
                                                     finalFilterObj.allFilters = allFilters;
                                                     finalFilterObj.userPreferences = userPreferencesArr;
