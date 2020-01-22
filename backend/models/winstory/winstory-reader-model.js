@@ -1285,7 +1285,7 @@ module.exports = class Asset {
                                                                                                                             assetTypes = assetTypesArray.filter(s => s.WINSTORY_ID == id);
                                                                                                                             salesPlays = salesPlaysArray.filter(s => s.WINSTORY_ID == id);
                                                                                                                             industry = industryArray.filter(s => s.WINSTORY_ID == id);
-                                                                                                                            grouptype = groupTypeArray.filter(s => s.ASSET_ID === id);
+                                                                                                                            grouptype = groupTypeArray.filter(s => s.WINSTORY_ID === id);
                                                                                                                             let winStatus = winStatusArray.filter(s => s.WINSTORY_ID == id);
                                                                                                                             //console.log(solutionAreas);
                                                                                                                             allAssetsObj.GROUP_TYPE=grouptype;
