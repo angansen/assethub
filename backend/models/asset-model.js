@@ -2267,9 +2267,9 @@ module.exports = class Asset {
                                                         return 0; //default return value (no sorting)
                                                     });
                                                     typeArr.forEach(type => {
-                                                        // console.log(JSON.stringify(type));
+                                                        console.log(JSON.stringify(type));
                                                         // console.log(JSON.stringify(filteredArr));
-                                                        if (type = !'Asset Type') {
+                                                        // if (type = !'Asset Type') {
                                                             if (filterObj != undefined) {
                                                                 filteredArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && !f.FILTER_NAME.toLowerCase().includes('other'));
 
@@ -2299,7 +2299,7 @@ module.exports = class Asset {
                                                                 allFilters.push(filterObj);
                                                                 filterObj = {};
                                                             }
-                                                        }
+                                                        // }
                                                     })
                                                     finalFilterObj.allFilters = allFilters;
                                                     finalFilterObj.userPreferences = userPreferencesArr;
