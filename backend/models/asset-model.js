@@ -166,7 +166,7 @@ const getSalesPlayByAssetId = (assetId) => {
 }
 const getGroupTypeByAssetId = (assetId) => {
     const connection = getDb(); 
-    return connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where ASSET_ID=:ASSET_ID and filter_group like 'type_%'`, [assetId],
+    return connection.query(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where ASSET_ID=:ASSET_ID and filter_group like 'type_%'`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })
