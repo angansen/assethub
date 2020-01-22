@@ -164,7 +164,13 @@ const getSalesPlayByAssetId = (assetId) => {
             outFormat: oracledb.OBJECT
         })
 }
-
+const getGroupTypeByAssetId = (assetId) => {
+    const connection = getDb(); 
+    return connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where ASSET_ID=:ASSET_ID and filter_group like 'type_%'`, [assetId],
+        {
+            outFormat: oracledb.OBJECT
+        })
+}
 
 const getIndustryByAssetId = (assetId) => {
     const connection = getDb();
@@ -1169,8 +1175,8 @@ module.exports = class Asset {
         let salesPlays = [];
         let salesPlaysArray = [];
         let industry = [];
-        let grouptype=[];
-        let groupTypeArray=[];
+        let grouptype = [];
+        let groupTypeArray = [];
         let industryArray = [];
         let promotedArray = [];
         return new Promise((resolve, reject) => {
@@ -1281,7 +1287,7 @@ module.exports = class Asset {
                                                                                                                     industry = industryArray.filter(s => s.ASSET_ID === id);
                                                                                                                     grouptype = groupTypeArray.filter(s => s.ASSET_ID === id);
                                                                                                                     let promote = promotedArray.filter(s => s.ASSET_ID === id);
-                                                                                                                    allAssetsObj.GROUP_TYPE=grouptype;
+                                                                                                                    allAssetsObj.GROUP_TYPE = grouptype;
                                                                                                                     allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
                                                                                                                     allAssetsObj.SOLUTION_AREAS = solutionAreas;
                                                                                                                     allAssetsObj.ASSET_TYPE = assetTypes;
@@ -2033,32 +2039,36 @@ module.exports = class Asset {
                                                                                     .then(res => {
                                                                                         // console.log(res);
                                                                                         assetObj.PROMOTE = res.length == 0 ? false : true;
-                                                                                        getSalesPlayByAssetId(assetId)
-                                                                                            .then(res => {
-                                                                                                salesPlays = res.rows
-                                                                                                assetObj.SOLUTION_AREAS = solutionAreas
-                                                                                                assetObj.ASSET_TYPE = assetTypes
-                                                                                                assetObj.SALES_PLAY = salesPlays
-                                                                                                var avgArr = ratingAvg.map(r => r.RATE);
-                                                                                                assetObj.AVG_RATING = avgArr.reduce((a, b) => a + b, 0) / avgArr.length;
-                                                                                                getAssetFilterMapByIdandType(assetId).then(res => {
-                                                                                                    filterArr = [...res]
-                                                                                                    filterType = filterArr.map(a => a.FILTER_TYPE)
-                                                                                                    filterType = [...new Set(filterType)]
-                                                                                                    //console.log(filterType)
-                                                                                                    filterType.forEach(type => {
-                                                                                                        filterTypeArr = filterArr.filter(f => f.FILTER_TYPE === type)
-                                                                                                        filterObj.TYPE = type;
-                                                                                                        filterObj.arr = filterTypeArr;
-                                                                                                        filterArrFinal.push(filterObj)
-                                                                                                        filterObj = {};
-                                                                                                    })
-                                                                                                    //console.log(filterObj)
-                                                                                                    assetObj.FILTERMAP = filterArrFinal
-                                                                                                    resolve(assetObj)
+                                                                                        getGroupTypeByAssetId(assetId).then(res => {
+                                                                                            // console.log(res);
+                                                                                            assetObj.GROUP_TYPE = res;
+                                                                                            getSalesPlayByAssetId(assetId)
+                                                                                                .then(res => {
+                                                                                                    salesPlays = res.rows
+                                                                                                    assetObj.SOLUTION_AREAS = solutionAreas
+                                                                                                    assetObj.ASSET_TYPE = assetTypes
+                                                                                                    assetObj.SALES_PLAY = salesPlays
+                                                                                                    var avgArr = ratingAvg.map(r => r.RATE);
+                                                                                                    assetObj.AVG_RATING = avgArr.reduce((a, b) => a + b, 0) / avgArr.length;
+                                                                                                    getAssetFilterMapByIdandType(assetId).then(res => {
+                                                                                                        filterArr = [...res]
+                                                                                                        filterType = filterArr.map(a => a.FILTER_TYPE)
+                                                                                                        filterType = [...new Set(filterType)]
+                                                                                                        //console.log(filterType)
+                                                                                                        filterType.forEach(type => {
+                                                                                                            filterTypeArr = filterArr.filter(f => f.FILTER_TYPE === type)
+                                                                                                            filterObj.TYPE = type;
+                                                                                                            filterObj.arr = filterTypeArr;
+                                                                                                            filterArrFinal.push(filterObj)
+                                                                                                            filterObj = {};
+                                                                                                        })
+                                                                                                        //console.log(filterObj)
+                                                                                                        assetObj.FILTERMAP = filterArrFinal
+                                                                                                        resolve(assetObj)
 
+                                                                                                    })
                                                                                                 })
-                                                                                            })
+                                                                                        })
                                                                                     })
                                                                             })
                                                                     })

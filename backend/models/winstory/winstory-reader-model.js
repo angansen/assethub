@@ -98,6 +98,7 @@ const getPromoteById = (assetId, email) => {
         })
 }
 
+
 const getImagesById = (assetId) => {
     const connection = getDb();
     return connection.query(`SELECT * from ASSET_IMAGES where ASSET_ID=:WINSTORY_ID`, [assetId],
@@ -151,6 +152,13 @@ const getSolutionAreasByAssetId = (assetId) => {
 const getSalesPlayByAssetId = (assetId) => {
     const connection = getDb();
     return connection.query(`select m.filter_id,filter_type,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where  WINSTORY_ID=:WINSTORY_ID and filter_type='Sales Play'`, [assetId],
+        {
+            outFormat: oracledb.OBJECT
+        })
+}
+const getGroupTypeByWinId = (assetId) => {
+    const connection = getDb();
+    return connection.query(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where WINSTORY_ID=:WINSTORY_ID and filter_group like 'type_%'`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })
@@ -1158,7 +1166,7 @@ module.exports = class Asset {
         let salesPlaysArray = [];
         let industry = [];
         let grouptype = [];
-        let groupTypeArray=[];
+        let groupTypeArray = [];
         let industryArray = [];
         let promotedArray = [];
         return new Promise((resolve, reject) => {
@@ -1288,7 +1296,7 @@ module.exports = class Asset {
                                                                                                                             grouptype = groupTypeArray.filter(s => s.WINSTORY_ID === id);
                                                                                                                             let winStatus = winStatusArray.filter(s => s.WINSTORY_ID == id);
                                                                                                                             //console.log(solutionAreas);
-                                                                                                                            allAssetsObj.GROUP_TYPE=grouptype;
+                                                                                                                            allAssetsObj.GROUP_TYPE = grouptype;
                                                                                                                             allAssetsObj.WIN_STATUS = winStatus
                                                                                                                             allAssetsObj.SOLUTION_AREAS = solutionAreas
                                                                                                                             allAssetsObj.ASSET_TYPE = assetTypes;
@@ -2194,51 +2202,55 @@ module.exports = class Asset {
                                                                 getSalesPlayByAssetId(assetId)
                                                                     .then(res => {
                                                                         assetObj.SALES_PLAY = res
-                                                                        getIndustryByAssetId(assetId)
+                                                                        getGroupTypeByWinId(assetId)
                                                                             .then(res => {
-                                                                                assetObj.INDUSTRY = res;
-                                                                                getPromoteById(assetId, email)
+                                                                                assetObj.GROUP_TYPE = res
+                                                                                getIndustryByAssetId(assetId)
                                                                                     .then(res => {
-                                                                                        assetObj.PROMOTE = res.length == 0 ? false : true;
-                                                                                        getAssetTypesByAssetId(assetId)
+                                                                                        assetObj.INDUSTRY = res;
+                                                                                        getPromoteById(assetId, email)
                                                                                             .then(res => {
-                                                                                                assetTypes = res
-                                                                                                getWinStatusByAssetId(assetId)
+                                                                                                assetObj.PROMOTE = res.length == 0 ? false : true;
+                                                                                                getAssetTypesByAssetId(assetId)
                                                                                                     .then(res => {
-                                                                                                        let winStatus = res
-                                                                                                        assetObj.WIN_STATUS = winStatus
-                                                                                                        assetObj.SOLUTION_AREAS = solutionAreas
-                                                                                                        assetObj.ASSET_TYPE = assetTypes
-                                                                                                        var avgArr = res.map(r => r.RATE);
-                                                                                                        assetObj.AVG_RATING = avgArr.reduce((a, b) => a + b, 0) / avgArr.length;
-                                                                                                        getAssetFilterMapByIdandType(assetId).then(res => {
-                                                                                                            filterArr = [...res]
-                                                                                                            filterType = filterArr.map(a => a.FILTER_TYPE)
-                                                                                                            filterType = [...new Set(filterType)]
-                                                                                                            // console.log(filterType)
-                                                                                                            filterType.forEach(type => {
-                                                                                                                filterTypeArr = filterArr.filter(f => f.FILTER_TYPE === type)
-                                                                                                                filterObj.TYPE = type;
-                                                                                                                filterObj.arr = filterTypeArr;
-                                                                                                                filterArrFinal.push(filterObj)
-                                                                                                                filterObj = {};
+                                                                                                        assetTypes = res
+                                                                                                        getWinStatusByAssetId(assetId)
+                                                                                                            .then(res => {
+                                                                                                                let winStatus = res
+                                                                                                                assetObj.WIN_STATUS = winStatus
+                                                                                                                assetObj.SOLUTION_AREAS = solutionAreas
+                                                                                                                assetObj.ASSET_TYPE = assetTypes
+                                                                                                                var avgArr = res.map(r => r.RATE);
+                                                                                                                assetObj.AVG_RATING = avgArr.reduce((a, b) => a + b, 0) / avgArr.length;
+                                                                                                                getAssetFilterMapByIdandType(assetId).then(res => {
+                                                                                                                    filterArr = [...res]
+                                                                                                                    filterType = filterArr.map(a => a.FILTER_TYPE)
+                                                                                                                    filterType = [...new Set(filterType)]
+                                                                                                                    // console.log(filterType)
+                                                                                                                    filterType.forEach(type => {
+                                                                                                                        filterTypeArr = filterArr.filter(f => f.FILTER_TYPE === type)
+                                                                                                                        filterObj.TYPE = type;
+                                                                                                                        filterObj.arr = filterTypeArr;
+                                                                                                                        filterArrFinal.push(filterObj)
+                                                                                                                        filterObj = {};
+                                                                                                                    })
+                                                                                                                    //console.log(filterObj)
+                                                                                                                    let path = assetObj.WINSTORY_THUMBNAIL;
+                                                                                                                    if (path == null) {
+                                                                                                                        assetObj.WINSTORY_THUMBNAIL = `http://${host}/winstorylogo/Logo_Thumbnail.png`
+                                                                                                                    } else
+                                                                                                                        assetObj.WINSTORY_THUMBNAIL = `http://${host}/${path}`;
+
+                                                                                                                    let logopath = assetObj.WINSTORY_LOGO;
+                                                                                                                    if (logopath == null) {
+                                                                                                                        assetObj.WINSTORY_LOGO = `http://${host}/winstorylogo/Logo_Thumbnail.png`
+                                                                                                                    } else
+                                                                                                                        assetObj.WINSTORY_LOGO = `http://${host}/${logopath}`;
+                                                                                                                    assetObj.FILTERMAP = filterArrFinal
+                                                                                                                    resolve(assetObj)
+
+                                                                                                                })
                                                                                                             })
-                                                                                                            //console.log(filterObj)
-                                                                                                            let path = assetObj.WINSTORY_THUMBNAIL;
-                                                                                                            if (path == null) {
-                                                                                                                assetObj.WINSTORY_THUMBNAIL = `http://${host}/winstorylogo/Logo_Thumbnail.png`
-                                                                                                            } else
-                                                                                                                assetObj.WINSTORY_THUMBNAIL = `http://${host}/${path}`;
-
-                                                                                                            let logopath = assetObj.WINSTORY_LOGO;
-                                                                                                            if (logopath == null) {
-                                                                                                                assetObj.WINSTORY_LOGO = `http://${host}/winstorylogo/Logo_Thumbnail.png`
-                                                                                                            } else
-                                                                                                                assetObj.WINSTORY_LOGO = `http://${host}/${logopath}`;
-                                                                                                            assetObj.FILTERMAP = filterArrFinal
-                                                                                                            resolve(assetObj)
-
-                                                                                                        })
                                                                                                     })
                                                                                             })
                                                                                     })
