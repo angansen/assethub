@@ -34,7 +34,11 @@ exports.createWinstory = (host, story, res) => {
         WINSTORY_MAPPED_L2_FILTERS,
         WINSTORY_OTHER_FILTER,
         WINSTORY_USECASE,
-        WINSTORY_CUSTOMER_IMPACT) values (:0,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24)`
+        WINSTORY_CUSTOMER_IMPACT,
+        WINSTORY_CONSULTING_Q1,
+        WINSTORY_CONSULTING_Q2,
+        WINSTORY_CONSULTING_Q3,
+        WINSTORY_CONSULTING_Q4) values (:0,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28)`
     let insertwinstoryOption = [
         newAssetid,
         story.WINSTORY_NAME,
@@ -60,7 +64,12 @@ exports.createWinstory = (host, story, res) => {
         story.MAPPED_FILTERS.l2.toString(),
         JSON.stringify(story.WINSTORY_OTHER_FILTER),
         story.WINSTORY_USECASE,
-        story.WINSTORY_CUSTOMER_IMPACT
+        story.WINSTORY_CUSTOMER_IMPACT,
+        story.WINSTORY_CONSULTING_Q1,
+        story.WINSTORY_CONSULTING_Q2,
+        story.WINSTORY_CONSULTING_Q3,
+        story.WINSTORY_CONSULTING_Q4
+        
     ];
 
     connection.execute(insertwinstorysql, insertwinstoryOption, {
@@ -117,7 +126,11 @@ exports.saveWinstory = (host, story, res) => {
     WINSTORY_OTHER_FILTER=:20,
     WINSTORY_USECASE=:21,
     WINSTORY_CUSTOMER_IMPACT=:22,
-    WINSTORY_CREATED_ON=:23 where WINSTORY_ID=:24`;
+    WINSTORY_CONSULTING_Q1=:23,
+    WINSTORY_CONSULTING_Q2=:24,
+    WINSTORY_CONSULTING_Q3=:25,
+    WINSTORY_CONSULTING_Q4=:26,
+    WINSTORY_CREATED_ON=:27 where WINSTORY_ID=:28`;
 
     let updateWinStoryOptions = [
         story.WINSTORY_NAME,
@@ -143,6 +156,10 @@ exports.saveWinstory = (host, story, res) => {
         JSON.stringify(story.WINSTORY_OTHER_FILTER),
         story.WINSTORY_USECASE,
         story.WINSTORY_CUSTOMER_IMPACT,
+        story.WINSTORY_CONSULTING_Q1,
+        story.WINSTORY_CONSULTING_Q2,
+        story.WINSTORY_CONSULTING_Q3,
+        story.WINSTORY_CONSULTING_Q4,
         story.WINSTORY_CREATED_ON,
         story.WINSTORY_ID];
 
