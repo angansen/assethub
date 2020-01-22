@@ -1194,7 +1194,7 @@ module.exports = class Asset {
                                             })
                                             .then(res => {
                                                 solutionAreasArray = res.rows;
-                                                connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Asset Type'`, {},
+                                                connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_group like 'type_%'`, {},
                                                     {
                                                         outFormat: oracledb.OBJECT
                                                     })
