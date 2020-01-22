@@ -165,7 +165,7 @@ const getSalesPlayByAssetId = (assetId) => {
         })
 }
 const getGroupTypeByAssetId = (assetId) => {
-    const connection = getDb(); 
+    const connection = getDb();
     return connection.query(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where ASSET_ID=:ASSET_ID and filter_group like 'type_%'`, [assetId],
         {
             outFormat: oracledb.OBJECT
@@ -2269,34 +2269,36 @@ module.exports = class Asset {
                                                     typeArr.forEach(type => {
                                                         // console.log(JSON.stringify(type));
                                                         // console.log(JSON.stringify(filteredArr));
-                                                        if (filterObj != undefined) {
-                                                            filteredArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && !f.FILTER_NAME.toLowerCase().includes('other'));
+                                                        if (type = !'Asset Type') {
+                                                            if (filterObj != undefined) {
+                                                                filteredArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && !f.FILTER_NAME.toLowerCase().includes('other'));
 
-                                                            filterObj.Type = type;
-                                                            filterObj.FILTER_TYPE_IMAGE = 'http://' + host + '/' + filteredArr[0].FILTER_TYPE_IMAGE;
-                                                            filteredArr.sort((a, b) => (a.FILTER_NAME > b.FILTER_NAME) ? 1 : -1)
-                                                            const otherArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && f.FILTER_NAME.toLowerCase().includes('other'))
-                                                            if (otherArr.length === 1) {
-                                                                filteredArr.push(otherArr[0]);
-                                                            }
-                                                            else {
-                                                                otherArr.forEach(o => {
-                                                                    filteredArr.push(o)
+                                                                filterObj.Type = type;
+                                                                filterObj.FILTER_TYPE_IMAGE = 'http://' + host + '/' + filteredArr[0].FILTER_TYPE_IMAGE;
+                                                                filteredArr.sort((a, b) => (a.FILTER_NAME > b.FILTER_NAME) ? 1 : -1)
+                                                                const otherArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && f.FILTER_NAME.toLowerCase().includes('other'))
+                                                                if (otherArr.length === 1) {
+                                                                    filteredArr.push(otherArr[0]);
+                                                                }
+                                                                else {
+                                                                    otherArr.forEach(o => {
+                                                                        filteredArr.push(o)
+                                                                    })
+                                                                }
+                                                                filteredArr.forEach(f => {
+                                                                    typeCountArr = countArr.filter(r => r.FILTER_ID === f.FILTER_ID)
+                                                                    winstorytypeCountArr = winstorycountArr.filter(r => r.FILTER_ID === f.FILTER_ID)
+                                                                    f.ASSET_COUNT = typeCountArr[0].CNT
+                                                                    f.WINSTORY_COUNT = winstorytypeCountArr[0].CNT
+                                                                    // console.log("f.FILTER_IMAGE" + ': ' + f.FILTER_IMAGE);
+                                                                    f.FILTER_TYPE_IMAGE = 'http://' + host + '/' + f.FILTER_TYPE_IMAGE;
+                                                                    f.FILTER_IMAGE = 'http://' + host + '/' + f.FILTER_IMAGE;
                                                                 })
-                                                            }
-                                                            filteredArr.forEach(f => {
-                                                                typeCountArr = countArr.filter(r => r.FILTER_ID === f.FILTER_ID)
-                                                                winstorytypeCountArr = winstorycountArr.filter(r => r.FILTER_ID === f.FILTER_ID)
-                                                                f.ASSET_COUNT = typeCountArr[0].CNT
-                                                                f.WINSTORY_COUNT = winstorytypeCountArr[0].CNT
-                                                                // console.log("f.FILTER_IMAGE" + ': ' + f.FILTER_IMAGE);
-                                                                f.FILTER_TYPE_IMAGE = 'http://' + host + '/' + f.FILTER_TYPE_IMAGE;
-                                                                f.FILTER_IMAGE = 'http://' + host + '/' + f.FILTER_IMAGE;
-                                                            })
-                                                            filterObj.filters = filteredArr;
+                                                                filterObj.filters = filteredArr;
 
-                                                            allFilters.push(filterObj);
-                                                            filterObj = {};
+                                                                allFilters.push(filterObj);
+                                                                filterObj = {};
+                                                            }
                                                         }
                                                     })
                                                     finalFilterObj.allFilters = allFilters;
