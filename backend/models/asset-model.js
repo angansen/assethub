@@ -1170,6 +1170,7 @@ module.exports = class Asset {
         let salesPlaysArray = [];
         let industry = [];
         let grouptype=[];
+        let groupTypeArray=[];
         let industryArray = [];
         let promotedArray = [];
         return new Promise((resolve, reject) => {
