@@ -33,9 +33,9 @@ exports.saveWinstory = (req, res) => {
         WINSTORY_CREATED_ON: req.body.created_on,
         WINSTORY_OTHER_FILTER: req.body.winstory_other_filter,
         WINSTORY_CONSULTING_Q1: req.body.WINSTORY_CONSULTING_Q1,
-        WINSTORY_CONSULTING_Q2: req.body.WINSTORY_CONSULTING_Q1,
-        WINSTORY_CONSULTING_Q3: req.body.WINSTORY_CONSULTING_Q1,
-        WINSTORY_CONSULTING_Q4: req.body.WINSTORY_CONSULTING_Q1
+        WINSTORY_CONSULTING_Q2: req.body.WINSTORY_CONSULTING_Q2,
+        WINSTORY_CONSULTING_Q3: req.body.WINSTORY_CONSULTING_Q3,
+        WINSTORY_CONSULTING_Q4: req.body.WINSTORY_CONSULTING_Q4
     }
 
     //console.logJSON.stringify(winStory));
@@ -74,9 +74,9 @@ exports.updateWinstory = (req, res) => {
         WINSTORY_CREATED_ON: req.body.created_on,
         WINSTORY_OTHER_FILTER: req.body.winstory_other_filter,
         WINSTORY_CONSULTING_Q1: req.body.WINSTORY_CONSULTING_Q1,
-        WINSTORY_CONSULTING_Q2: req.body.WINSTORY_CONSULTING_Q1,
-        WINSTORY_CONSULTING_Q3: req.body.WINSTORY_CONSULTING_Q1,
-        WINSTORY_CONSULTING_Q4: req.body.WINSTORY_CONSULTING_Q1
+        WINSTORY_CONSULTING_Q2: req.body.WINSTORY_CONSULTING_Q2,
+        WINSTORY_CONSULTING_Q3: req.body.WINSTORY_CONSULTING_Q3,
+        WINSTORY_CONSULTING_Q4: req.body.WINSTORY_CONSULTING_Q4
     }
 
     //console.logJSON.stringify(winStory));
