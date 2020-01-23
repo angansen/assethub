@@ -42,9 +42,9 @@ exports.triggerEmailNotificationforRequestDemo = (request) => {
 }
 exports.triggerEmailNotificationforSEAssistance = (request) => {
     var body = `Q&D Team,
-    <br/><br/>There is a request for SE Assistance on wins ${request.winstory_name} by user ${request.name}.
+    <br/><br/>There is a request for SE Assistance on win ${request.winstory_name} by user ${request.name}.
     <br/><br/>Provided below are the details:    
-    <br/>Wins ID: ${request.winstoryid}
+    <br/>Win ID: ${request.winstoryid}
     <br/>Requester Email: ${request.email}
     <br/>Requester Name: ${request.name}
     <br/>Contact No:  ${request.mobile ? request.mobile : 'N/A'}
@@ -65,7 +65,7 @@ exports.triggerEmailNotificationforSEAssistance = (request) => {
             "to_email": `qualification-dispatch_in_grp@oracle.com,${request.WINSTORY_CREATED_BY},${request.email}`,
             "body1": body,
             "body_html": body,
-            "subject": `Request for demo on asset ${request.winstory_name} with asset ID ${request.winstoryid}`
+            "subject": `Request for SE Assistance on win ${request.winstory_name} with Win ID ${request.winstoryid}`
         }).then(res => {
             console.log('Email Sent');
             resolve('Email Sent')
