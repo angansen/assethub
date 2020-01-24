@@ -118,7 +118,7 @@ exports.visitors_Reports = (req, res) => {
         })
 }
 exports.addDeviceToken = (req, res) => {
-    console.log('Admin get filters' + req.body.DEVICE_TOKEN);
+    console.log('Admin get device_token' + req.body.device_token);
     admin.deviceToken(req.body)
         .then(result => {
             res.json(result)

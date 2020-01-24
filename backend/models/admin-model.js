@@ -1101,7 +1101,6 @@ exports.visitorsReports = (data) => {
 // Push Notifications
 exports.deviceToken = (data) => {
     const connection = getDb();
-    let newId = uniqid.process();
     let sql;
     let options;
     console.log(data)
@@ -1114,8 +1113,8 @@ exports.deviceToken = (data) => {
                 if (promote_count === 0) {
                     action = 'insert'
                     console.log("insert section")
-                    sql = `INSERT into ASSET_DEVICETOKEN(USER_EMAIL,DEVICE_TOKEN,DEVICE_TYPE) values(:PROMOTED_WINS_MAP_ID,:LOB_LEADER_EMAIL,:LOB_LEADER_LOB,:PROMOTE_CREATED,:WINSTORY_ID,1)`;
-                    options = [newId, data.lob_leader_email, data.lob_leader_lob, new Date(), data.winstoryId]
+                    sql = `INSERT into ASSET_DEVICETOKEN(USER_EMAIL,DEVICE_TOKEN,DEVICE_TYPE) values(:USER_EMAIL,:DEVICE_TOKEN,:DEVICE_TYPE)`;
+                    options = [data.user_email, data.device_token, data.device_type]
                 }
                 else {
                     //console.log("in like unlike section")
@@ -1129,7 +1128,7 @@ exports.deviceToken = (data) => {
                     })
                     .then(res => {
                         if (res.rowsAffected > 0) {
-                            resolve({ "status": "Wins promotion deactivated successfully" })
+                            resolve({ "status": "Device token added successfully" })
                         }
                     })
                     .catch(err => {
