@@ -14,6 +14,9 @@ router.post('/remapfilters', adminController.reMapFilter);
 router.post('/promote', adminController.promote);
 
 router.post('/visitorsreports', adminController.visitors_Reports);
+
+//Push Notificatios
+router.post('/adddevice', adminController.addDeviceToken);
 //DELETE
 router.delete('/deletefilter', adminController.deletefilter);
 router.delete('/deleteparent/:parentname', adminController.deleteparentbyname);
