@@ -3039,6 +3039,8 @@ module.exports = class Asset {
         let filteredAssetsArray = [];
         let statusObj = {};
         let finalArr = [];
+        let grouptype = [];
+        let groupTypeArray = [];
         let allStatusList = ['Pending Review', 'Live', 'Pending Rectification', 'Reject'];
         let tempStatusArr = [];
         return new Promise((resolve, reject) => {
@@ -3060,73 +3062,82 @@ module.exports = class Asset {
                         .then(res => {
                             //console.log("comment count",res)
                             commentsArray = res;
-                            connection.execute(`SELECT count(*) like_count,WINSTORY_ID from asset_winstory_likes group by WINSTORY_ID`, [],
+                            connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_group like 'type_%'`, {},
                                 {
                                     outFormat: oracledb.OBJECT
                                 })
                                 .then(res => {
-                                    //console.log("LIKES",res)
-                                    likesArray = res.rows;
-                                    connection.execute(`SELECT count(*) view_count,WINSTORY_ID from asset_winstory_views group by WINSTORY_ID`, [],
+                                    groupTypeArray = res;
+                                    connection.execute(`SELECT count(*) like_count,WINSTORY_ID from asset_winstory_likes group by WINSTORY_ID`, [],
                                         {
                                             outFormat: oracledb.OBJECT
                                         })
                                         .then(res => {
-                                            viewsArray = res.rows
-                                            statusArr = assetsArray.map(a => a.WINSTORY_STATUS)
-                                            statusArr = [...new Set(statusArr)];
-                                            //console.log("status Array",statusArr)
-                                            tempStatusArr = allStatusList.filter(s => statusArr.indexOf(s) === -1)
-                                            // console.log("temp status arr", tempStatusArr)
-                                            statusArr = [...statusArr, ...tempStatusArr]
-                                            statusArr = [...new Set(statusArr)];
-                                            // console.log("updated status arr", statusArr)
-                                            statusArr.forEach(status => {                                                             //loop each asset status type
-                                                //console.log(status + ' Array Length' + assetsArray.length);
-                                                filteredAssetsArray = assetsArray.filter(a => a.WINSTORY_STATUS === status)
-                                                statusObj.status = status;
-                                                //console.log("filteredAssetsArray", filteredAssetsArray)
-                                                filteredAssetsArray.forEach(asset => {           //loop each asset for current status type
-                                                    allAssetsObj = asset;
-                                                    const id = asset.WINSTORY_ID;
-                                                    var likes = likesArray.filter(l => l.WINSTORY_ID === id)
-                                                    var comments = commentsArray.filter(c => c.WINSTORY_ID === id)
-                                                    var views = viewsArray.filter(v => v.WINSTORY_ID === id)
-                                                    if (!comments.length) {
-                                                        comments.push({ COMMENT_COUNT: 0 });
-                                                    }
-                                                    if (!likes.length) {
-                                                        likes.push({ LIKE_COUNT: 0, WINSTORY_ID: id })
-                                                    }
-                                                    if (!views.length) {
-                                                        views.push({ VIEW_COUNT: 0, WINSTORY_ID: id })
-                                                    }
-                                                    allAssetsObj.LIKES = likes[0];
-                                                    allAssetsObj.VIEWS = views[0];
-                                                    allAssetsObj.COMMENTS = comments[0];
-
-                                                    let path = allAssetsObj.WINSTORY_THUMBNAIL;
-                                                    if (path == null) {
-                                                        allAssetsObj.WINSTORY_THUMBNAIL = `http://${host}/winstorylogo/Logo_Thumbnail.png`
-                                                    } else
-                                                        allAssetsObj.WINSTORY_THUMBNAIL = `http://${host}/${path}`;
-
-                                                    let logopath = allAssetsObj.WINSTORY_LOGO;
-                                                    if (logopath == null) {
-                                                        allAssetsObj.WINSTORY_LOGO = `http://${host}/winstorylogo/Logo_Thumbnail.png`
-                                                    } else
-                                                        allAssetsObj.WINSTORY_LOGO = `http://${host}/${logopath}`;
-
-                                                    allAssetsFinalArray.push(allAssetsObj)
-                                                    allAssetsObj = {};
+                                            //console.log("LIKES",res)
+                                            likesArray = res.rows;
+                                            connection.execute(`SELECT count(*) view_count,WINSTORY_ID from asset_winstory_views group by WINSTORY_ID`, [],
+                                                {
+                                                    outFormat: oracledb.OBJECT
                                                 })
-                                                statusObj.arr = allAssetsFinalArray;
-                                                allAssetsFinalArray = [];
-                                                finalArr.push(statusObj)
-                                                statusObj = {};
-                                            })
+                                                .then(res => {
+                                                    viewsArray = res.rows
+                                                    statusArr = assetsArray.map(a => a.WINSTORY_STATUS)
+                                                    statusArr = [...new Set(statusArr)];
+                                                    //console.log("status Array",statusArr)
+                                                    tempStatusArr = allStatusList.filter(s => statusArr.indexOf(s) === -1)
+                                                    // console.log("temp status arr", tempStatusArr)
+                                                    statusArr = [...statusArr, ...tempStatusArr]
+                                                    statusArr = [...new Set(statusArr)];
+                                                    // console.log("updated status arr", statusArr)
+                                                    statusArr.forEach(status => {                                                             //loop each asset status type
+                                                        //console.log(status + ' Array Length' + assetsArray.length);
+                                                        filteredAssetsArray = assetsArray.filter(a => a.WINSTORY_STATUS === status)
+                                                        statusObj.status = status;
+                                                        //console.log("filteredAssetsArray", filteredAssetsArray)
+                                                        filteredAssetsArray.forEach(asset => {           //loop each asset for current status type
+                                                            allAssetsObj = asset;
+                                                            const id = asset.WINSTORY_ID;
+                                                            var likes = likesArray.filter(l => l.WINSTORY_ID === id)
+                                                            var comments = commentsArray.filter(c => c.WINSTORY_ID === id)
+                                                            var views = viewsArray.filter(v => v.WINSTORY_ID === id)
+                                                            if (!comments.length) {
+                                                                comments.push({ COMMENT_COUNT: 0 });
+                                                            }
+                                                            if (!likes.length) {
+                                                                likes.push({ LIKE_COUNT: 0, WINSTORY_ID: id })
+                                                            }
+                                                            if (!views.length) {
+                                                                views.push({ VIEW_COUNT: 0, WINSTORY_ID: id })
+                                                            }
+                                                            allAssetsObj.LIKES = likes[0];
+                                                            allAssetsObj.VIEWS = views[0];
+                                                            allAssetsObj.COMMENTS = comments[0];
+                                                            grouptype = groupTypeArray.filter(s => s.WINSTORY_ID === id);
+                                                            allAssetsObj.GROUP_TYPE = grouptype;
 
-                                            resolve(finalArr)
+                                                            let path = allAssetsObj.WINSTORY_THUMBNAIL;
+                                                            if (path == null) {
+                                                                allAssetsObj.WINSTORY_THUMBNAIL = `http://${host}/winstorylogo/Logo_Thumbnail.png`
+                                                            } else
+                                                                allAssetsObj.WINSTORY_THUMBNAIL = `http://${host}/${path}`;
+
+                                                            let logopath = allAssetsObj.WINSTORY_LOGO;
+                                                            if (logopath == null) {
+                                                                allAssetsObj.WINSTORY_LOGO = `http://${host}/winstorylogo/Logo_Thumbnail.png`
+                                                            } else
+                                                                allAssetsObj.WINSTORY_LOGO = `http://${host}/${logopath}`;
+
+                                                            allAssetsFinalArray.push(allAssetsObj)
+                                                            allAssetsObj = {};
+                                                        })
+                                                        statusObj.arr = allAssetsFinalArray;
+                                                        allAssetsFinalArray = [];
+                                                        finalArr.push(statusObj)
+                                                        statusObj = {};
+                                                    })
+
+                                                    resolve(finalArr)
+                                                })
                                         })
                                 })
                         })
