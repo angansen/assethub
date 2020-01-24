@@ -1000,6 +1000,77 @@ exports.promoteAsset = (data) => {
             })
     })
 }
+exports.deviceToken = (data) => {
+    const connection = getDb();
+    let newId = uniqid.process();
+    let sql;
+    let action;
+    let options;
+    console.log(data)
+    return new Promise((resolve, reject) => {
+        connection.execute(`Select count(*) "device_count" from ASSET_DEVICETOKEN where  USER_EMAIL=:USER_EMAIL and DEVICE_TYPE=:DEVICE_TYPE`, [data.user_email, data.device_type],
+            {
+                outFormat: oracledb.OBJECT
+            }).then(result => {
+                let promote_count = result.rows[0].device_count;
+                if (promote_count === 0) {
+                    action = 'insert'
+                    console.log("insert section")
+                    sql = `INSERT into ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY(PROMOTED_WINS_MAP_ID,LOB_LEADER_EMAIL,LOB_LEADER_LOB,PROMOTE_CREATED,WINSTORY_ID,STATUS) values(:PROMOTED_WINS_MAP_ID,:LOB_LEADER_EMAIL,:LOB_LEADER_LOB,:PROMOTE_CREATED,:WINSTORY_ID,1)`;
+                    options = [newId, data.lob_leader_email, data.lob_leader_lob, new Date(), data.winstoryId]
+                }
+                else {
+                    //console.log("in like unlike section")
+                    sql = `UPDATE ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY SET STATUS=0, DEMOTE_DATE=:DEMOTE_DATE, DEMOTED_BY=:DEMOTED_BY  WHERE WINSTORY_ID=:WINSTORY_ID and LOB_LEADER_EMAIL=:lob_leader_email`;
+                    options = [new Date(), data.lob_leader_email, data.winstoryId, data.lob_leader_email]
+                }
+                connection.execute(`select lob_id from asset_lobs where lob_name=:LOB_NAME`, [data.lob_leader_lob],
+                    {
+                        outFormat: oracledb.Object,
+                        autoCommit: true
+                    })
+                    .then(lobdata => {
+                        let lobId = lobdata.rows[0][0];
+                        connection.execute(sql, options,
+                            {
+                                outFormat: oracledb.Object,
+                                autoCommit: true
+                            })
+                            .then(res => {
+                                if (res.rowsAffected > 0) {
+                                    resolve({ "status": "Wins promotion deactivated successfully" })
+                                }
+                            })
+                            .catch(err => {
+                                console.log(err)
+                            })
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
+
+            })
+    })
+}
+
+exports.visitorsReports = (data) => {
+    const connection = getDb();
+    return new Promise((resolve, reject) => {
+        let sql = `SELECT *
+        FROM   Asset_user_activity 
+        WHERE  ACTIVITY_ON BETWEEN to_date('`+ data.start_date + `', 'dd-mm-yyyy') AND to_date('` + data.end_date + `', 'dd-mm-yyyy')`
+        console.log(sql);
+        connection.query(sql, [],
+            {
+                outFormat: oracledb.OBJECT
+            }).then(result => {
+                resolve(result);
+            })
+    })
+}
+
+// Push Notifications
+
 exports.promoteWins = (data) => {
     const connection = getDb();
     let newId = uniqid.process();
@@ -1077,22 +1148,6 @@ exports.promoteWins = (data) => {
                         console.log(err)
                     })
 
-            })
-    })
-}
-
-exports.visitorsReports = (data) => {
-    const connection = getDb();
-    return new Promise((resolve, reject) => {
-        let sql = `SELECT *
-        FROM   Asset_user_activity 
-        WHERE  ACTIVITY_ON BETWEEN to_date('`+ data.start_date + `', 'dd-mm-yyyy') AND to_date('` + data.end_date + `', 'dd-mm-yyyy')`
-        console.log(sql);
-        connection.query(sql, [],
-            {
-                outFormat: oracledb.OBJECT
-            }).then(result => {
-                resolve(result);
             })
     })
 }
