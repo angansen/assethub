@@ -3062,12 +3062,12 @@ module.exports = class Asset {
                         .then(res => {
                             //console.log("comment count",res)
                             commentsArray = res;
-                            connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_group like 'type_%'`, {},
+                            connection.query(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_group like 'type_%'`, {},
                                 {
                                     outFormat: oracledb.OBJECT
                                 })
                                 .then(res => {
-                                    groupTypeArray = res;
+                                    groupTypeArray = res.row;
                                     connection.execute(`SELECT count(*) like_count,WINSTORY_ID from asset_winstory_likes group by WINSTORY_ID`, [],
                                         {
                                             outFormat: oracledb.OBJECT
