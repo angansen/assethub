@@ -1107,14 +1107,13 @@ exports.deviceToken = (data) => {
     console.log(data.user_email)
     console.log(data.device_token)
     console.log(data.device_type)
-
     return new Promise((resolve, reject) => {
         connection.execute(`Select count(*) "device_count" from ASSET_DEVICETOKEN where  USER_EMAIL=:USER_EMAIL and DEVICE_TYPE=:DEVICE_TYPE`, [data.user_email, data.device_type],
             {
                 outFormat: oracledb.OBJECT
             }).then(result => {
-                let promote_count = result.rows[0].device_count;
-                if (promote_count === 0) {
+                let device_count = result.rows[0].device_count;
+                if (device_count === 0) {
                     action = 'insert'
                     console.log("insert section")
                     sql = `INSERT into ASSET_DEVICETOKEN(USER_EMAIL,DEVICE_TOKEN,DEVICE_TYPE) values(:USER_EMAIL,:DEVICE_TOKEN,:DEVICE_TYPE)`;
