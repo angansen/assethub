@@ -475,7 +475,8 @@ exports.markNotificationRead = (param, res) => {
     connection.query(getNotificationSql, option, {
         autoCommit: true,
         outFormat: oracledb.OBJECT
-    }).then(notification => {
+    }).then(notifications => {
+        let notification=notifications[0];
         console.log(notification.NOTIFICATION_READ);
         let readlist = notification.NOTIFICATION_READ==undefined?"":notification.NOTIFICATION_READ;
         console.log("notification fetched successfully . . ."+readlist.includes(param.email));
@@ -506,7 +507,8 @@ exports.markNotificationDelete = (param, res) => {
     connection.query(getNotificationSql, option, {
         autoCommit: true,
         outFormat: oracledb.OBJECT
-    }).then(notification => {
+    }).then(notifications => {
+        let notification=notifications[0];
         let readlist = notification.NOTIFICATION_DELETE==undefined?"":notification.NOTIFICATION_DELETE;
         console.log("notification fetched successfully . . .")
         console.log(JSON.stringify(notification));
