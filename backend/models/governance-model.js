@@ -1,5 +1,4 @@
 const getDb = require('../database/db').getDb;
-const usercontroller = require('../controller/user-controller');
 var uniqid = require('uniqid');
 const oracledb = require('oracledb');
 
@@ -127,31 +126,31 @@ exports.postAssetReviewNote = (review_note, asset_status, assetId) => {
             })
             .then(result => {
                 if (asset.ASSET_STATUS == 'Live') {
-                    let getassetdetailsSql = `select asset_title from asset_details where asset_id=:0`;
-                    let getassetdetailsOption = [assetId];
-                    connection.execute(getassetdetailsSql, getassetdetailsOption,
-                        {
-                            outFormat: oracledb.OBJECT,
-                            autoCommit: true
-                        })
-                        .then(asset => {
-                            let notification = {
-                                NOTIFICATION_CONTENT_ID: assetId,
-                                NOTIFICATION_CONTENT_TYPE: "asset",
-                                NOTIFICATION_CONTENT_NAME: asset.ASSET_TITLE
-                            }
-                            let getusersql = `select user_email from asset_user`;
-                            let getuseroption = [];
-                            connection.execute(getusersql, getuseroption,
-                                {
-                                    outFormat: oracledb.OBJECT,
-                                    autoCommit: true
-                                })
-                                .then(userdetails => {
-                                    usercontroller.registernotofication(notification, userdetails.user_email);
-                                })
+                    // let getassetdetailsSql = `select asset_title from asset_details where asset_id=:0`;
+                    // let getassetdetailsOption = [assetId];
+                    // connection.execute(getassetdetailsSql, getassetdetailsOption,
+                    //     {
+                    //         outFormat: oracledb.OBJECT,
+                    //         autoCommit: true
+                    //     })
+                    //     .then(asset => {
+                    //         let notification = {
+                    //             NOTIFICATION_CONTENT_ID: assetId,
+                    //             NOTIFICATION_CONTENT_TYPE: "asset",
+                    //             NOTIFICATION_CONTENT_NAME: asset.ASSET_TITLE
+                    //         }
+                    //         let getusersql = `select user_email from asset_user`;
+                    //         let getuseroption = [];
+                    //         connection.execute(getusersql, getuseroption,
+                    //             {
+                    //                 outFormat: oracledb.OBJECT,
+                    //                 autoCommit: true
+                    //             })
+                    //             .then(userdetails => {
+                    //                 usercontroller.registernotofication(notification, userdetails.user_email);
+                    //             })
 
-                        })
+                    //     })
                 }
                 resolve(result)
             })
