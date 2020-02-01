@@ -1,5 +1,5 @@
 const getDb = require('../database/db').getDb;
-const user = require('user-model');
+const user = require('/user-model');
 var uniqid = require('uniqid');
 const oracledb = require('oracledb');
 
@@ -148,7 +148,7 @@ exports.postAssetReviewNote = (review_note, asset_status, assetId) => {
                                     autoCommit: true
                                 })
                                 .then(user => {
-                                    user.createNotification(notification, user.user_email);
+                                    user.registernotofication(notification, user.user_email);
                                 })
 
                         })
