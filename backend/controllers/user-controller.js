@@ -55,7 +55,7 @@ exports.registerPushNotification = (notification, user) => {
     user.createNotification(notification, user);
 }
 
-exports.retriveNotifications=(res,req)=>{
+exports.retriveNotifications=(req,res)=>{
     user.fetchNotifications(req,res);
 }
 

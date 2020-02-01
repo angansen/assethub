@@ -461,8 +461,7 @@ exports.fetchNotifications = (req, res) => {
         outFormat: oracledb.OBJECT
     }).then(notification => {
         console.log("notification fetched successfully . . .")
-        console.log(JSON.stringify(notification));
-        res.send(notification);
+        res.status(200).json(notification);
     }).catch(err => {
         console.log("notification fetching failed . . . "+JSON.stringify(err));
     })
