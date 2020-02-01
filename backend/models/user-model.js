@@ -466,6 +466,17 @@ exports.fetchNotifications = (req, res) => {
         console.log("notification fetching failed . . . "+JSON.stringify(err));
     })
 }
+
+exports.markNotificationRead=(param,res)=>{
+    console.log(" >>> "+param.email);
+    res.send({'msg':"success"});
+
+}
+exports.markNotificationDelete=(param,res)=>{
+    console.log(" >>> "+param.email);
+    res.send({'msg':"success"});
+}
+
 exports.createNotification = (notification, user) => {
     console.log("Registering notification step 2");
     let notification_id = uniqid();

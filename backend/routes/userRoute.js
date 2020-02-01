@@ -22,5 +22,12 @@ router.get('/getactivitybyuser',userController.fetchActivityByemail);
 router.get('/notification',userController.retriveNotifications);
 
 
+// PUT
+router.put('/notification/:email/:notificationid',userController.markNotificationRead);
+
+// DELETE
+router.delete('/notification/:email/:notificationid',userController.markNotificationDelete);
+
+
 
 module.exports = router;

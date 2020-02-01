@@ -59,6 +59,14 @@ exports.retriveNotifications=(req,res)=>{
     user.fetchNotifications(req,res);
 }
 
+exports.markNotificationRead=(req,res)=>{
+    user.markNotificationRead(req.params,res);
+}
+
+exports.markNotificationDelete=(req,res)=>{
+    user.markNotificationDelete(req.params,res);
+}
+
 exports.getLdapUsersComplete = (req, res) => {
     user.getLdapInfoComplete()
         .then(data => {
