@@ -469,11 +469,37 @@ exports.fetchNotifications = (req, res) => {
 
 exports.markNotificationRead=(param,res)=>{
     console.log(param.id+" READ >>> "+param.email);
+    const connection = getDb();
+    let getNotificationSql = `select * from asset_winstory_notifications where notfication_id=:0`;
+    let option=[param.id]
+    connection.query(getNotificationSql, option, {
+        autoCommit: true,
+        outFormat: oracledb.OBJECT
+    }).then(notification => {
+        console.log("notification fetched successfully . . .")
+        console.log(JSON.stringify(notification));
+        res.status(200).json(notification);
+    }).catch(err => {
+        console.log("notification fetching failed . . . "+JSON.stringify(err));
+    })
     res.send({'msg':"success"});
 
 }
 exports.markNotificationDelete=(param,res)=>{
     console.log(param.id+" DELETE >>> "+param.email);
+    const connection = getDb();
+    let getNotificationSql = `select * from asset_winstory_notifications where notfication_id=:0`;
+    let option=[param.id]
+    connection.query(getNotificationSql, option, {
+        autoCommit: true,
+        outFormat: oracledb.OBJECT
+    }).then(notification => {
+        console.log("notification fetched successfully . . .")
+        console.log(JSON.stringify(notification));
+        res.status(200).json(notification);
+    }).catch(err => {
+        console.log("notification fetching failed . . . "+JSON.stringify(err));
+    })
     res.send({'msg':"success"});
 }
 
