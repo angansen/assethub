@@ -463,44 +463,65 @@ exports.fetchNotifications = (req, res) => {
         console.log("notification fetched successfully . . .")
         res.status(200).json(notification);
     }).catch(err => {
-        console.log("notification fetching failed . . . "+JSON.stringify(err));
+        console.log("notification fetching failed . . . " + JSON.stringify(err));
     })
 }
 
-exports.markNotificationRead=(param,res)=>{
-    console.log(param.id+" READ >>> "+param.email);
+exports.markNotificationRead = (param, res) => {
+    console.log(param.id + " READ >>> " + param.email);
     const connection = getDb();
     let getNotificationSql = `select * from asset_winstory_notifications where notfication_id=:0`;
-    let option=[param.id]
+    let option = [param.id]
     connection.query(getNotificationSql, option, {
         autoCommit: true,
         outFormat: oracledb.OBJECT
     }).then(notification => {
         console.log("notification fetched successfully . . .")
         console.log(JSON.stringify(notification));
-        res.status(200).json(notification);
-    }).catch(err => {
-        console.log("notification fetching failed . . . "+JSON.stringify(err));
+        let readlist = notification.NOTIFICATION_AUDIANCE_READ;
+        if (!readlist.includes(param.email)) {
+            readlist += "," + param.email;
+        }
+        let updateNotificationSql = `update asset_winstory_notifications set notification_read=:0 where notfication_id=:1`;
+        let option = [readlist, param.id];
+        connection.query(updateNotificationSql, option, {
+            autoCommit: true,
+            outFormat: oracledb.OBJECT
+        }).then(result => {
+            console.log(JSON.stringify(result));
+            res.send({ 'msg': "success" });
+        })
+
     })
-    res.send({'msg':"success"});
 
 }
-exports.markNotificationDelete=(param,res)=>{
-    console.log(param.id+" DELETE >>> "+param.email);
+exports.markNotificationDelete = (param, res) => {
+    console.log(param.id + " DELETE >>> " + param.email);
     const connection = getDb();
     let getNotificationSql = `select * from asset_winstory_notifications where notfication_id=:0`;
-    let option=[param.id]
+    let option = [param.id]
     connection.query(getNotificationSql, option, {
         autoCommit: true,
         outFormat: oracledb.OBJECT
     }).then(notification => {
         console.log("notification fetched successfully . . .")
         console.log(JSON.stringify(notification));
-        res.status(200).json(notification);
-    }).catch(err => {
-        console.log("notification fetching failed . . . "+JSON.stringify(err));
+        let readlist = notification.NOTIFICATION_AUDIANCE_READ;
+        if (!readlist.includes(param.email)) {
+            readlist += "," + param.email;
+        }
+        let updateNotificationSql = `update asset_winstory_notifications set notification_delete=:0 where notfication_id=:1`;
+        let option = [readlist, param.id];
+        connection.query(updateNotificationSql, option, {
+            autoCommit: true,
+            outFormat: oracledb.OBJECT
+        }).then(result => {
+            console.log(JSON.stringify(result));
+            res.send({ 'msg': "success" });
+        })
+
     })
-    res.send({'msg':"success"});
+
 }
 
 exports.createNotification = (notification, user) => {
