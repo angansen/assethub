@@ -478,8 +478,8 @@ exports.markNotificationRead = (param, res) => {
     }).then(notification => {
         console.log("notification fetched successfully . . .")
         console.log(JSON.stringify(notification));
-        let readlist = notification.NOTIFICATION_AUDIANCE_READ;
-        if (!readlist.includes(param.email)) {
+        let readlist = notification.NOTIFICATION_READ;
+        if (readlist == undefined || !readlist.includes(param.email)) {
             readlist += "," + param.email;
         }
         let updateNotificationSql = `update asset_winstory_notifications set notification_read=:0 where notfication_id=:1`;
@@ -506,8 +506,8 @@ exports.markNotificationDelete = (param, res) => {
     }).then(notification => {
         console.log("notification fetched successfully . . .")
         console.log(JSON.stringify(notification));
-        let readlist = notification.NOTIFICATION_AUDIANCE_READ;
-        if (!readlist.includes(param.email)) {
+        let readlist = notification.NOTIFICATION_DELETE;
+        if (readlist == undefined || !readlist.includes(param.email)) {
             readlist += "," + param.email;
         }
         let updateNotificationSql = `update asset_winstory_notifications set notification_delete=:0 where notfication_id=:1`;
