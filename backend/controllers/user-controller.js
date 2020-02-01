@@ -55,6 +55,10 @@ exports.registerPushNotification = (notification, user) => {
     user.createNotification(notification, user);
 }
 
+exports.retriveNotifications=(res,req)=>{
+    user.fetchNotifications(req,res);
+}
+
 exports.getLdapUsersComplete = (req, res) => {
     user.getLdapInfoComplete()
         .then(data => {

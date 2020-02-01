@@ -399,7 +399,7 @@ const createOrUpdateUser2 = (userdataArr) => {
             if (userdata.telephonenumber === null) {
                 userdata.telephonenumber = userdata.orclbeehivephonenumber
             }
-            console.log("===============================================: "+userdata.manager);
+            console.log("===============================================: " + userdata.manager);
             console.log(JSON.stringify(userdata));
             userdata.lob = "Others";
             let manager_email = " ";
@@ -452,14 +452,28 @@ const createOrUpdateUser2 = (userdataArr) => {
     worker.userUpdateCount = updateCount;
 }
 
-const createNotification=(notification, user)=>{
+exports.fetchNotifications = (req, res) => {
+
+    const connection = getDb();
+    let getNotificationSql = `select * from asset_winstory_notifications`;
+    connection.query(getNotificationSql, [], {
+        autoCommit: true,
+        outFormat: oracledb.OBJECT
+    }).then(notification => {
+        console.log("notification fetched successfully . . .")
+        res.send(notification);
+    }).catch(err => {
+        console.log("Notification fetching failed . . .");
+    })
+}
+exports.createNotification = (notification, user) => {
     console.log("Registering notification step 2");
     let notification_id = uniqid();
     const connection = getDb();
-    let createNotificationSql=`insert into asset_winstory_notifications (notfication_id,NOTIFICATION_CONTENT_ID,NOTIFICATION_CONTENT_TYPE,NOTIFICATION_CONTENT_NAME) values (:0,:1,:2,:3)`;
-    let notificationOptions=[notification_id,notification.NOTIFICATION_CONTENT_ID,notification.NOTIFICATION_CONTENT_TYPE,notification.NOTIFICATION_CONTENT_NAME]
+    let createNotificationSql = `insert into asset_winstory_notifications (notfication_id,NOTIFICATION_CONTENT_ID,NOTIFICATION_CONTENT_TYPE,NOTIFICATION_CONTENT_NAME) values (:0,:1,:2,:3)`;
+    let notificationOptions = [notification_id, notification.NOTIFICATION_CONTENT_ID, notification.NOTIFICATION_CONTENT_TYPE, notification.NOTIFICATION_CONTENT_NAME]
 
-    connection.execute(createNotificationSql,notificationOptions, {
+    connection.execute(createNotificationSql, notificationOptions, {
         autoCommit: true
     }).then(result => {
         if (result.rowsAffected === 0) {
