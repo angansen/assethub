@@ -465,7 +465,7 @@ exports.fetchNotifications = (param, res) => {
     }).then(notification => {
         notification.filter(notification => {
             if (notification.NOTIFICATION_DELETE == undefined || !notification.NOTIFICATION_DELETE.includes(email)) {
-                if (notification.NOTIFICATION_READ.includes(email)) {
+                if (notification.NOTIFICATION_READ != undefined && notification.NOTIFICATION_READ.includes(email)) {
                     readlist.push(notification);
                 } else {
                     unreadlist.push(notification);
