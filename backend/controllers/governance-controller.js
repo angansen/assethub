@@ -1,6 +1,6 @@
 const Governance = require('../models/governance-model');
 const getDb = require('../database/db').getDb;
-const userController= require('/user-controller');
+const userController= require('../controllers/user-controller');
 const oracledb = require('oracledb');
 const axios = require('axios');
 
