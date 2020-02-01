@@ -19,7 +19,7 @@ router.get('/ldap',userController.getLdapUsers);
 router.get('/ldapcompletelist',worker.triggerWorkers);
 router.get('/ldapupdate',worker.triggerWorkeronce);
 router.get('/getactivitybyuser',userController.fetchActivityByemail);
-router.get('/notification',userController.retriveNotifications);
+router.get('/notification/:email',userController.retriveNotifications);
 
 
 // PUT

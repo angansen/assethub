@@ -452,16 +452,32 @@ const createOrUpdateUser2 = (userdataArr) => {
     worker.userUpdateCount = updateCount;
 }
 
-exports.fetchNotifications = (req, res) => {
-
+exports.fetchNotifications = (param, res) => {
+    let email = param.email;
+    let readlist = [];
+    let unreadlist = [];
+    let notificationObj = [];
     const connection = getDb();
     let getNotificationSql = `select * from asset_winstory_notifications`;
     connection.query(getNotificationSql, [], {
         autoCommit: true,
         outFormat: oracledb.OBJECT
     }).then(notification => {
+        notification.filter(notification => {
+            if (!notification.NOTIFICATION_DELETE.includes(email)) {
+                if (notification.NOTIFICATION_READ.includes(email)) {
+                    readlist.push(notification);
+                } else {
+                    unreadlist.push(notification);
+                }
+            }
+        })
+        notificationObj = {
+            read: readlist,
+            unread: unreadlist
+        }
         console.log("notification fetched successfully . . .")
-        res.status(200).json(notification);
+        res.status(200).json(notificationObj);
     }).catch(err => {
         console.log("notification fetching failed . . . " + JSON.stringify(err));
     })
@@ -476,15 +492,15 @@ exports.markNotificationRead = (param, res) => {
         autoCommit: true,
         outFormat: oracledb.OBJECT
     }).then(notifications => {
-        let notification=notifications[0];
+        let notification = notifications[0];
         console.log(notification.NOTIFICATION_READ);
-        let readlist = notification.NOTIFICATION_READ==undefined?"":notification.NOTIFICATION_READ;
-        console.log("notification fetched successfully . . ."+readlist.includes(param.email));
+        let readlist = notification.NOTIFICATION_READ == undefined ? "" : notification.NOTIFICATION_READ;
+        console.log("notification fetched successfully . . ." + readlist.includes(param.email));
         console.log(JSON.stringify(readlist));
         console.log(JSON.stringify(notification));
-        
+
         if (readlist == undefined || !readlist.includes(param.email)) {
-            readlist = readlist+"," + param.email;
+            readlist = readlist + "," + param.email;
         }
         console.log(JSON.stringify(readlist));
         let updateNotificationSql = `update asset_winstory_notifications set notification_read=:0 where notfication_id=:1`;
@@ -508,13 +524,13 @@ exports.markNotificationDelete = (param, res) => {
         autoCommit: true,
         outFormat: oracledb.OBJECT
     }).then(notifications => {
-        let notification=notifications[0];
-        let readlist = notification.NOTIFICATION_DELETE==undefined?"":notification.NOTIFICATION_DELETE;
+        let notification = notifications[0];
+        let readlist = notification.NOTIFICATION_DELETE == undefined ? "" : notification.NOTIFICATION_DELETE;
         console.log("notification fetched successfully . . .")
         console.log(JSON.stringify(notification));
-       
+
         if (readlist == undefined || !readlist.includes(param.email)) {
-            readlist = readlist+"," + param.email;
+            readlist = readlist + "," + param.email;
         }
 
         console.log(JSON.stringify(readlist));
