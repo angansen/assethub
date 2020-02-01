@@ -468,12 +468,12 @@ exports.fetchNotifications = (req, res) => {
 }
 
 exports.markNotificationRead=(param,res)=>{
-    console.log(" >>> "+param.email);
+    console.log(param.id+" READ >>> "+param.email);
     res.send({'msg':"success"});
 
 }
 exports.markNotificationDelete=(param,res)=>{
-    console.log(" >>> "+param.email);
+    console.log(param.id+" DELETE >>> "+param.email);
     res.send({'msg':"success"});
 }
 

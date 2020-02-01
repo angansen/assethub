@@ -23,10 +23,10 @@ router.get('/notification',userController.retriveNotifications);
 
 
 // PUT
-router.put('/notification/:email/:notificationid',userController.markNotificationRead);
+router.put('/notification/:email/:id',userController.markNotificationRead);
 
 // DELETE
-router.delete('/notification/:email/:notificationid',userController.markNotificationDelete);
+router.delete('/notification/:email/:id',userController.markNotificationDelete);
 
 
 
