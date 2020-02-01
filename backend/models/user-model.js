@@ -478,6 +478,7 @@ exports.markNotificationRead = (param, res) => {
     }).then(notification => {
         let readlist = notification.NOTIFICATION_READ==undefined?"":notification.NOTIFICATION_READ;
         console.log("notification fetched successfully . . ."+readlist.includes(param.email));
+        console.log(JSON.stringify(readlist));
         console.log(JSON.stringify(notification));
         
         if (readlist == undefined || !readlist.includes(param.email)) {
