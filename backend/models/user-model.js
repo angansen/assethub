@@ -453,7 +453,7 @@ const createOrUpdateUser2 = (userdataArr) => {
 }
 
 const createNotification=(notification, user)=>{
-
+    console.log("Registering notification step 2");
     let notification_id = uniqid();
     const connection = getDb();
     let createNotificationSql=`insert into asset_winstory_notifications (notfication_id,NOTIFICATION_CONTENT_ID,NOTIFICATION_CONTENT_TYPE,NOTIFICATION_CONTENT_NAME) values (:0,:1,:2,:3)`;

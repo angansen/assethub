@@ -50,6 +50,7 @@ exports.addAssetReviewNote = (req, res) => {
 }
 
 const generateNotification = (assetId) => {
+    console.log("Registering notification step 0");
     const connection = getDb();
     let getassetdetailsSql = `select asset_title from asset_details where asset_id=:0`;
     let getassetdetailsOption = [assetId];

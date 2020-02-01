@@ -51,6 +51,7 @@ exports.fetchActivityByemail = (req, res) => {
 }
 
 exports.registerPushNotification = (notification, user) => {
+    console.log("Registering notification step 1");
     user.createNotification(notification, user);
 }
 
