@@ -483,6 +483,7 @@ exports.markNotificationRead = (param, res) => {
         if (readlist == undefined || !readlist.includes(param.email)) {
             readlist += "," + param.email;
         }
+        console.log(JSON.stringify(readlist));
         let updateNotificationSql = `update asset_winstory_notifications set notification_read=:0 where notfication_id=:1`;
         let option = [readlist, param.id];
         connection.execute(updateNotificationSql, option, {
@@ -491,7 +492,7 @@ exports.markNotificationRead = (param, res) => {
             console.log(JSON.stringify(result));
             res.send({ 'msg': "success" });
         })
-
+        res.send({ 'msg': "successS" });
     })
 
 }
@@ -511,6 +512,8 @@ exports.markNotificationDelete = (param, res) => {
         if (readlist == undefined || !readlist.includes(param.email)) {
             readlist += "," + param.email;
         }
+
+        console.log(JSON.stringify(readlist));
         let updateNotificationSql = `update asset_winstory_notifications set notification_delete=:0 where notfication_id=:1`;
         let option = [readlist, param.id];
         connection.execute(updateNotificationSql, option, {
@@ -519,7 +522,7 @@ exports.markNotificationDelete = (param, res) => {
             console.log(JSON.stringify(result));
             res.send({ 'msg': "success" });
         })
-
+        res.send({ 'msg': "successS" });
     })
 
 }
