@@ -125,6 +125,7 @@ exports.postAssetReviewNote = (review_note, asset_status, assetId) => {
                 autoCommit: true
             })
             .then(result => {
+                console.log("posted and state: "+asset.ASSET_STATUS);
                 if (asset.ASSET_STATUS == 'Live') {
                     // let getassetdetailsSql = `select asset_title from asset_details where asset_id=:0`;
                     // let getassetdetailsOption = [assetId];
