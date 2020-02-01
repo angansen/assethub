@@ -484,9 +484,8 @@ exports.markNotificationRead = (param, res) => {
         }
         let updateNotificationSql = `update asset_winstory_notifications set notification_read=:0 where notfication_id=:1`;
         let option = [readlist, param.id];
-        connection.query(updateNotificationSql, option, {
-            autoCommit: true,
-            outFormat: oracledb.OBJECT
+        connection.execute(updateNotificationSql, option, {
+            autoCommit: true
         }).then(result => {
             console.log(JSON.stringify(result));
             res.send({ 'msg': "success" });
@@ -512,9 +511,8 @@ exports.markNotificationDelete = (param, res) => {
         }
         let updateNotificationSql = `update asset_winstory_notifications set notification_delete=:0 where notfication_id=:1`;
         let option = [readlist, param.id];
-        connection.query(updateNotificationSql, option, {
-            autoCommit: true,
-            outFormat: oracledb.OBJECT
+        connection.execute(updateNotificationSql, option, {
+            autoCommit: true
         }).then(result => {
             console.log(JSON.stringify(result));
             res.send({ 'msg': "success" });
