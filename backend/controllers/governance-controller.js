@@ -28,7 +28,9 @@ exports.addAssetReviewNote = (req, res) => {
     else {
         Governance.postAssetReviewNote(review_note, asset_status, assetId)
             .then(result => {
+                console.log("Review submitted. . .");
                 if (asset_status === 'Live') {
+                    console.log("generating notification. . .");
                     generateNotification(assetId);
                     res.json({ "status": "The asset has been approved successfully." })
                 }
