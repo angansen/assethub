@@ -50,6 +50,9 @@ exports.fetchActivityByemail = (req, res) => {
     user.fetchuseractivity(res);
 }
 
+exports.registerPushNotification = (notification, user) => {
+    user.createNotification(notification, user);
+}
 
 exports.getLdapUsersComplete = (req, res) => {
     user.getLdapInfoComplete()

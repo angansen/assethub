@@ -452,16 +452,35 @@ const createOrUpdateUser2 = (userdataArr) => {
     worker.userUpdateCount = updateCount;
 }
 
-const purgeUserRecords2 = () => {
+const createNotification=(notification, user)=>{
 
+    let notification_id = uniqid();
+    const connection = getDb();
+    let createNotificationSql=`insert into asset_winstory_notifications (notfication_id,NOTIFICATION_CONTENT_ID,NOTIFICATION_CONTENT_TYPE,NOTIFICATION_CONTENT_NAME) values (:0,:1,:2,:3)`;
+    let notificationOptions=[notification_id,notification.NOTIFICATION_CONTENT_ID,notification.NOTIFICATION_CONTENT_TYPE,notification.NOTIFICATION_CONTENT_NAME]
+
+    connection.execute(createNotificationSql,notificationOptions, {
+        autoCommit: true
+    }).then(result => {
+        if (result.rowsAffected === 0) {
+            console.log("Notification creation failed . . .");
+        } else {
+            console.log("Notification creation successful . . .");
+        }
+    }).catch(err => {
+        console.log("Notification creation failed . . .");
+    })
+}
+
+
+const purgeUserRecords2 = () => {
     const connection = getDb();
     let truncateUserSql = `delete from asset_user where USER_MODIFIED=0`;
-
     connection.execute(truncateUserSql, [], {
         autoCommit: true
     }).then(result => {
         if (result.rowsAffected === 0) {
-            console.log("User record truncation failed . .");
+            console.log("User record truncation failed . . . ");
         } else {
             createduser++;
             console.log("User record truncation successful. . . " + "/" + count);

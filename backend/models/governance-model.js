@@ -1,4 +1,5 @@
 const getDb = require('../database/db').getDb;
+const user = require('user-model');
 var uniqid = require('uniqid');
 const oracledb = require('oracledb');
 
@@ -75,7 +76,7 @@ formatAssetByStatus = (result, host) => {
 
     let rejectList = [];
 
-    let liveList=[];
+    let liveList = [];
 
 
     let assetlist = [{
@@ -87,7 +88,7 @@ formatAssetByStatus = (result, host) => {
     }, {
         status: "Reject",
         list: rejectList
-    },{
+    }, {
         status: "Live",
         list: liveList
     }];
@@ -100,7 +101,7 @@ formatAssetByStatus = (result, host) => {
             pendingRectificationList.push(asset);
         } else if (asset.ASSET_STATUS == 'Reject') {
             rejectList.push(asset);
-        }else if (asset.ASSET_STATUS == 'Live') {
+        } else if (asset.ASSET_STATUS == 'Live') {
             liveList.push(asset);
         }
     })
@@ -112,7 +113,7 @@ formatAssetByStatus = (result, host) => {
 exports.postAssetReviewNote = (review_note, asset_status, assetId) => {
     const connection = getDb();
     review_note = JSON.stringify(review_note)
-    console.log(asset_status)
+
 
     let insertReviewNoteSql = `UPDATE ASSET_DETAILS SET ASSET_REVIEW_NOTE = :ASSET_REVIEW_NOTE,
     ASSET_STATUS=:ASSET_STATUS
@@ -125,6 +126,33 @@ exports.postAssetReviewNote = (review_note, asset_status, assetId) => {
                 autoCommit: true
             })
             .then(result => {
+                if (asset.ASSET_STATUS == 'Live') {
+                    let getassetdetailsSql = `select asset_title from asset_details where asset_id=:0`;
+                    let getassetdetailsOption = [assetId];
+                    connection.execute(getassetdetailsSql, getassetdetailsOption,
+                        {
+                            outFormat: oracledb.OBJECT,
+                            autoCommit: true
+                        })
+                        .then(asset => {
+                            let notification = {
+                                NOTIFICATION_CONTENT_ID: assetId,
+                                NOTIFICATION_CONTENT_TYPE: "asset",
+                                NOTIFICATION_CONTENT_NAME: asset.ASSET_TITLE
+                            }
+                            let getusersql = `select user_email from asset_user`;
+                            let getuseroption = [];
+                            connection.execute(getusersql, getuseroption,
+                                {
+                                    outFormat: oracledb.OBJECT,
+                                    autoCommit: true
+                                })
+                                .then(user => {
+                                    user.createNotification(notification, user.user_email);
+                                })
+
+                        })
+                }
                 resolve(result)
             })
             .catch(err => {
