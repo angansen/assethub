@@ -477,9 +477,7 @@ exports.fetchNotifications = (param, res) => {
             unread: unreadlist
         }
         console.log("notification fetched successfully . . .")
-        res.status(200).json(notificationObj);
-    }).catch(err => {
-        console.log("notification fetching failed . . . " + JSON.stringify(err));
+        res.send(notificationObj);
     })
 }
 
@@ -495,9 +493,6 @@ exports.markNotificationRead = (param, res) => {
         let notification = notifications[0];
         console.log(notification.NOTIFICATION_READ);
         let readlist = notification.NOTIFICATION_READ == undefined ? "" : notification.NOTIFICATION_READ;
-        console.log("notification fetched successfully . . ." + readlist.includes(param.email));
-        console.log(JSON.stringify(readlist));
-        console.log(JSON.stringify(notification));
 
         if (readlist == undefined || !readlist.includes(param.email)) {
             readlist = readlist + "," + param.email;
