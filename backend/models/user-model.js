@@ -587,7 +587,7 @@ exports.preparenotification = (contentId, contentType) => {
             }
             createNotification(notification);
         })
-    }else if(contentType.includes('wins')){
+    }else if(contentType.includes('win')){
         let getassetDetailsSql = `select winstory_name from asset_winstory_details where winstory_id=:0`;
         let option = [contentId];
     
