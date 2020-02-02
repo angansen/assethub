@@ -118,19 +118,19 @@ exports.postAssetReviewNote = (review_note, asset_status, assetId) => {
     let insertReviewNoteSql = `UPDATE ASSET_DETAILS SET ASSET_REVIEW_NOTE = :ASSET_REVIEW_NOTE,
     ASSET_STATUS=:ASSET_STATUS where ASSET_ID=:ASSET_ID`;
     let insertReviewNoteOptions = [review_note, asset_status, assetId]
-    return new Promise((resolve, reject) => {
-        connection.execute(insertReviewNoteSql, insertReviewNoteOptions,
-            {
-                outFormat: oracledb.OBJECT,
-                autoCommit: true
-            })
-            .then(result => {
-                console.log("posted and state: " + asset.ASSET_STATUS);
-                resolve(result)
-            })
-            .catch(err => {
-                reject(err)
-            })
-    })
+    // return new Promise((resolve, reject) => {
+    //     connection.execute(insertReviewNoteSql, insertReviewNoteOptions,
+    //         {
+    //             outFormat: oracledb.OBJECT,
+    //             autoCommit: true
+    //         })
+    //         .then(result => {
+    //             console.log("posted and state: " + asset.ASSET_STATUS);
+    //             resolve(result)
+    //         })
+    //         .catch(err => {
+    //             reject(err)
+    //         })
+    // })
 
 }
