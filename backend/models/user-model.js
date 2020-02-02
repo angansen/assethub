@@ -573,19 +573,36 @@ exports.preparenotification = (contentId, contentType) => {
     console.log("Registering notification step 2");
 
     const connection = getDb();
-    let getassetDetailsSql = `select asset_title from asset_details where asset_id=:0`;
-    let option = [contentId];
+    if(contentType.includes('asset')){
+        let getassetDetailsSql = `select asset_title from asset_details where asset_id=:0`;
+        let option = [contentId];
+    
+        connection.query(getassetDetailsSql, option, {
+            autoCommit: true
+        }).then(result => {
+            let notification={
+                NOTIFICATION_CONTENT_ID:contentId,
+                NOTIFICATION_CONTENT_NAME:result[0].ASSET_TITLE,
+                NOTIFICATION_CONTENT_TYPE:contentType
+            }
+            createNotification(notification);
+        })
+    }else if(contentType.includes('wins')){
+        let getassetDetailsSql = `select winstory_name from asset_winstory_details where winstory_id=:0`;
+        let option = [contentId];
+    
+        connection.query(getassetDetailsSql, option, {
+            autoCommit: true
+        }).then(result => {
+            let notification={
+                NOTIFICATION_CONTENT_ID:contentId,
+                NOTIFICATION_CONTENT_NAME:result[0].WINSTORY_NAME,
+                NOTIFICATION_CONTENT_TYPE:contentType
+            }
+            createNotification(notification);
+        })
+    }
 
-    connection.query(getassetDetailsSql, option, {
-        autoCommit: true
-    }).then(result => {
-        let notification={
-            NOTIFICATION_CONTENT_ID:contentId,
-            NOTIFICATION_CONTENT_NAME:result[0].ASSET_TITLE,
-            NOTIFICATION_CONTENT_TYPE:contentType
-        }
-        createNotification(notification);
-    })
 }
 const purgeUserRecords2 = () => {
     const connection = getDb();
