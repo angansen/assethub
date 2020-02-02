@@ -566,7 +566,11 @@ exports.createNotification = (notification, user) => {
     })
 }
 
-
+exports.interceptCall = () => {
+    console.log("-----------------");
+    console.log("from user model");
+    console.log("-----------------");
+}
 const purgeUserRecords2 = () => {
     const connection = getDb();
     let truncateUserSql = `delete from asset_user where USER_MODIFIED=0`;

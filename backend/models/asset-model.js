@@ -1,6 +1,7 @@
 const getDb = require('../database/db').getDb;
 const doRelease = require('../database/db').getDb;
 const worker = require('../utility/worker');
+const usermodel=require('../models/user-model');
 var uniqid = require('uniqid');
 const oracledb = require('oracledb');
 const path = require('path');

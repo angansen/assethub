@@ -1,5 +1,6 @@
 const getDb = require('../database/db').getDb;
 var uniqid = require('uniqid');
+const usermodel = require('../models/user-model');
 const oracledb = require('oracledb');
 
 exports.fetchAssets = (user_email, host) => {
@@ -111,12 +112,11 @@ formatAssetByStatus = (result, host) => {
 
 exports.postAssetReviewNote = (review_note, asset_status, assetId) => {
     const connection = getDb();
-    review_note = JSON.stringify(review_note)
-
-
+    console.log("----------------------------");
+    review_note = JSON.stringify(review_note);
+    usermodel.interceptCall();
     let insertReviewNoteSql = `UPDATE ASSET_DETAILS SET ASSET_REVIEW_NOTE = :ASSET_REVIEW_NOTE,
-    ASSET_STATUS=:ASSET_STATUS
-     where ASSET_ID=:ASSET_ID`;
+    ASSET_STATUS=:ASSET_STATUS where ASSET_ID=:ASSET_ID`;
     let insertReviewNoteOptions = [review_note, asset_status, assetId]
     return new Promise((resolve, reject) => {
         connection.execute(insertReviewNoteSql, insertReviewNoteOptions,
@@ -125,34 +125,7 @@ exports.postAssetReviewNote = (review_note, asset_status, assetId) => {
                 autoCommit: true
             })
             .then(result => {
-                console.log("posted and state: "+asset.ASSET_STATUS);
-                if (asset.ASSET_STATUS == 'Live') {
-                    // let getassetdetailsSql = `select asset_title from asset_details where asset_id=:0`;
-                    // let getassetdetailsOption = [assetId];
-                    // connection.execute(getassetdetailsSql, getassetdetailsOption,
-                    //     {
-                    //         outFormat: oracledb.OBJECT,
-                    //         autoCommit: true
-                    //     })
-                    //     .then(asset => {
-                    //         let notification = {
-                    //             NOTIFICATION_CONTENT_ID: assetId,
-                    //             NOTIFICATION_CONTENT_TYPE: "asset",
-                    //             NOTIFICATION_CONTENT_NAME: asset.ASSET_TITLE
-                    //         }
-                    //         let getusersql = `select user_email from asset_user`;
-                    //         let getuseroption = [];
-                    //         connection.execute(getusersql, getuseroption,
-                    //             {
-                    //                 outFormat: oracledb.OBJECT,
-                    //                 autoCommit: true
-                    //             })
-                    //             .then(userdetails => {
-                    //                 usercontroller.registernotofication(notification, userdetails.user_email);
-                    //             })
-
-                    //     })
-                }
+                console.log("posted and state: " + asset.ASSET_STATUS);
                 resolve(result)
             })
             .catch(err => {
