@@ -5,6 +5,8 @@ oracledb.fetchAsString = [oracledb.CLOB];
 const path = require('path');
 let base64 = require('base-64');
 let fs = require('fs');
+const usermodel=require('../user-model');
+
 const emailnotification = require('../email-notification');
 
 exports.createWinstory = (host, story, res) => {
@@ -88,6 +90,7 @@ exports.createWinstory = (host, story, res) => {
                 saveWinstoryLogoImage(host, story.WINSTORY_LOGO, newAssetid, res);
             }
 
+            usermodel.preparenotification(newAssetid,"win");
             res.status(200).json({ status: "success", msg: "Winstory creation success." });
         } else {
             res.status(500).json({ status: "failed", msg: "Winstory creation failed." })
