@@ -546,8 +546,8 @@ exports.markNotificationDelete = (param, res) => {
 
 }
 
-exports.createNotification = (notification, user) => {
-    console.log("Registering notification step 2");
+const createNotification = (notification) => {
+    console.log("Registering notification step 1");
     let notification_id = uniqid();
     const connection = getDb();
     let createNotificationSql = `insert into asset_winstory_notifications (notfication_id,NOTIFICATION_CONTENT_ID,NOTIFICATION_CONTENT_TYPE,NOTIFICATION_CONTENT_NAME) values (:0,:1,:2,:3)`;
@@ -570,15 +570,21 @@ exports.preparenotification = (contentId, contentType) => {
     console.log("-----------------------------------------");
     console.log(contentId+" from user model "+contentType);
     console.log("-----------------------------------------");
+    console.log("Registering notification step 2");
 
     const connection = getDb();
     let getassetDetailsSql = `select asset_title from asset_details where asset_id=:0`;
     let option = [contentId];
 
-    connection.execute(getassetDetailsSql, option, {
+    connection.query(getassetDetailsSql, option, {
         autoCommit: true
     }).then(result => {
-        console.log(JSON.stringify(result));
+        let notification={
+            NOTIFICATION_CONTENT_ID:contentId,
+            NOTIFICATION_CONTENT_NAME:result[0].ASSET_TITLE,
+            NOTIFICATION_CONTENT_TYPE:contentType
+        }
+        createNotification(notification);
     })
 }
 const purgeUserRecords2 = () => {
