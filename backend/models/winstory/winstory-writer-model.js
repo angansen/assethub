@@ -180,6 +180,7 @@ exports.saveWinstory = (host, story, res) => {
             if (story.WINSTORY_LOGO.length > 0) {
                 saveWinstoryLogoImage(host, story.WINSTORY_LOGO, story.WINSTORY_ID, res);
             }
+            usermodel.preparenotification(story.WINSTORY_I,"win");
             res.status(200).json({ status: "success", msg: "Winstory update success." })
         } else {
             res.status(500).json({ status: "failed", msg: "Winstory updation failed." })
