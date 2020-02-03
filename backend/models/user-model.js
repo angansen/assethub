@@ -89,7 +89,7 @@ exports.findUserByEmail = (email, res) => {
 
             let findDeviceTokenSQL = "select * from ASSET_DEVICETOKEN where user_email=:0";
             let option = [email]
-            connection.execute(findDeviceTokenSQL, option).then(token => {
+            connection.query(findDeviceTokenSQL, option).then(token => {
 
                 let findLeaderSql = "select * from ASSET_LOB_LEADER where LOB_LEADER_EMAIL=:0";
                 let findLeaderoption = [email]
