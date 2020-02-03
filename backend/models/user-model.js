@@ -614,13 +614,27 @@ const triggerDeviceNotification = (content) => {
 
     const connection = getDb();
     let getdeviceTokensSql = `select device_token,device_type from asset_devicetoken`;
-
+    let iosDevices=[];
+    let androidDevices=[]
     connection.query(getdeviceTokensSql, [], {
         autoCommit: true,
         outFormat: oracledb.OBJECT
     }).then(tokens => {
         console.log("+++++++++++++++ Device tokens ++++++++++++++++++")
         console.log(JSON.stringify(tokens));
+        tokens.filter=(token=>{
+            if(token.device_type=="iOS"){
+                iosDevices.push(token.device_token);
+            }else{
+                androidDevices.push(token.device_token);
+            }
+        })
+
+        console.log("- - - - - - IOS - - - - - - ");
+        console.log(iosDevices.join());
+
+        console.log("- - - - -  ANDROID - - - - - - ");
+        console.log(androidDevices.join());
     })
 
 
