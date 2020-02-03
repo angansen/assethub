@@ -624,9 +624,9 @@ const triggerDeviceNotification = (content) => {
         console.log(JSON.stringify(tokens));
         tokens.filter=(token=>{
             if(token.device_type=="iOS"){
-                iosDevices.push(token.device_token);
+                iosDevices.push(token.DEVICE_TOKEN);
             }else{
-                androidDevices.push(token.device_token);
+                androidDevices.push(token.DEVICE_TOKEN);
             }
         })
 
