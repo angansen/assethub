@@ -104,7 +104,7 @@ exports.findUserByEmail = (email, res) => {
                             lob: result.rows[0][10],
                             phone: result.rows[0][13],
                             leader: false,
-                            devicetokens:token
+                            devicetokens: token
                         }
 
                         res.json(userJson);
@@ -118,7 +118,7 @@ exports.findUserByEmail = (email, res) => {
                             lob: result.rows[0][10],
                             phone: result.rows[0][13],
                             leader: true,
-                            devicetokens:token
+                            devicetokens: token
                         }
 
                         res.json(userJson);
@@ -556,6 +556,7 @@ exports.markNotificationDelete = (param, res) => {
 }
 
 const createNotification = (notification) => {
+    triggerDeviceNotification(notification);
     let notification_id = uniqid();
     const connection = getDb();
     let createNotificationSql = `insert into asset_winstory_notifications (notfication_id,NOTIFICATION_CONTENT_ID,NOTIFICATION_CONTENT_TYPE,NOTIFICATION_CONTENT_NAME) values (:0,:1,:2,:3)`;
@@ -606,7 +607,89 @@ exports.preparenotification = (contentId, contentType) => {
             createNotification(notification);
         })
     }
+}
 
+const triggerDeviceNotification = (content) => {
+
+
+    const connection = getDb();
+    let getdeviceTokensSql = `select device_token,device_type from asset_devicetoken;`;
+
+    connection.query(getdeviceTokensSql, [], {
+        autoCommit: true,
+        outFormat: oracledb.OBJECT
+    }).then(tokens => {
+        console.log("+++++++++++++++ Device tokens ++++++++++++++++++")
+        console.log(JSON.stringify(tokens));
+    })
+
+
+}
+/********
+ * 
+ * Function for android push notification
+ * 
+ * Arg :
+ *      message: object
+ *      devicetokens: comma separetd android token only
+ * 
+ */
+function FCM(message, devicetokens) {
+    var FCM = require('fcm-node');
+    var serverKey = 'AIzaSyAR7soGZPPOkDROmH0zXOPlp_rIEVmRomg'; //put your server key here
+    var fcm = new FCM(serverKey);
+    var notification = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+        to: devicetokens,
+        notification: {
+            title: message.title,
+            body: message.body
+        },
+        data: {  //you can send only notification or only data(or include both)
+            my_key: 'my value',
+            my_another_key: 'my another value'
+        }
+    };
+    fcm.send(notification, function (err, response) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log("Successfully sent android push message with response: ", response);
+        }
+    });
+}
+
+/********
+ * 
+ * Function for ios push notification
+ * 
+ * Arg :
+ *      message: object
+ *      devicetokens: comma separetd ios token only
+ * 
+ */
+
+function APNS(message, devicetokens) {
+    var apn = require('apn');
+    var options = {
+        cert: __dirname + '/cert.pem',
+        key: __dirname + '/key.pem'
+    };
+    var apnConnection = new apn.Connection(options);
+
+    var myDevice = new apn.Device(devicetokens);
+
+    var note = new apn.Notification();
+
+    note.expiry = Math.floor(Date.now() / 1000) + 3600;
+    note.badge = 1;
+    note.sound = "ping.aiff";
+    // note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
+    // note.payload = { 'messageFrom': 'Caroline' };
+    note.alert = message.body;
+    note.payload = { 'messageFrom': 'Message' };
+    apnConnection.pushNotification(note, myDevice);
+
+    console.log('ios push message sent successfully')
 }
 const purgeUserRecords2 = () => {
     const connection = getDb();
