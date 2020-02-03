@@ -11,6 +11,11 @@ const emailnotification = require('./email-notification');
 const worker = require('../utility/worker');
 // GIT CHECK IN TEST
 
+var apn = require('apn');
+var FCM = require('fcm-node');
+var serverKey = 'AIzaSyAR7soGZPPOkDROmH0zXOPlp_rIEVmRomg'; //put your server key here
+var fcm = new FCM(serverKey);
+
 exports.saveuserlogin = (activity, res) => {
 
     const connection = getDb();
@@ -632,11 +637,18 @@ const triggerDeviceNotification = (content) => {
             }
         })
 
+        let msg={
+            title:content.NOTIFICATION_CONTENT_TYPE+" is live now.",
+            body:content.NOTIFICATION_CONTENT_NAME
+        }
+
         console.log("- - - - - - IOS - - - - - - ");
         console.log(iosDevices.join());
+        sendToAPNS(msg,iosDevices.join());
 
         console.log("- - - - -  ANDROID - - - - - - ");
         console.log(androidDevices.join());
+        sendToFCM(msg,iosDevices.join());
     })
 
 
@@ -650,8 +662,7 @@ const triggerDeviceNotification = (content) => {
  *      devicetokens: comma separetd android token only
  * 
  */
-function FCM(message, devicetokens) {
-    var FCM = require('fcm-node');
+function sendToFCM(message, devicetokens) {
     var serverKey = 'AIzaSyAR7soGZPPOkDROmH0zXOPlp_rIEVmRomg'; //put your server key here
     var fcm = new FCM(serverKey);
     var notification = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
@@ -684,11 +695,10 @@ function FCM(message, devicetokens) {
  * 
  */
 
-function APNS(message, devicetokens) {
-    var apn = require('apn');
+function sendToAPNS(message, devicetokens) {
     var options = {
-        cert: __dirname + '/cert.pem',
-        key: __dirname + '/key.pem'
+        cert: __dirname + '../certs/cert.pem',
+        key: __dirname + '../certs/key.pem'
     };
     var apnConnection = new apn.Connection(options);
 
