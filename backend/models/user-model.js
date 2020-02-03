@@ -613,7 +613,7 @@ const triggerDeviceNotification = (content) => {
 
 
     const connection = getDb();
-    let getdeviceTokensSql = `select device_token,device_type from asset_devicetoken;`;
+    let getdeviceTokensSql = `select device_token,device_type from asset_devicetoken`;
 
     connection.query(getdeviceTokensSql, [], {
         autoCommit: true,
