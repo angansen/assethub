@@ -11,11 +11,6 @@ const emailnotification = require('./email-notification');
 const worker = require('../utility/worker');
 // GIT CHECK IN TEST
 
-var apn = require('apn');
-var FCM = require('fcm-node');
-var serverKey = 'AIzaSyAR7soGZPPOkDROmH0zXOPlp_rIEVmRomg'; //put your server key here
-var fcm = new FCM(serverKey);
-
 exports.saveuserlogin = (activity, res) => {
 
     const connection = getDb();
@@ -663,6 +658,7 @@ const triggerDeviceNotification = (content) => {
  * 
  */
 function sendToFCM(message, devicetokens) {
+    var FCM = require('fcm-node');
     var serverKey = 'AIzaSyAR7soGZPPOkDROmH0zXOPlp_rIEVmRomg'; //put your server key here
     var fcm = new FCM(serverKey);
     var notification = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
@@ -696,6 +692,7 @@ function sendToFCM(message, devicetokens) {
  */
 
 function sendToAPNS(message, devicetokens) {
+    var apn = require('apn');
     var options = {
         cert: __dirname + '../certs/cert.pem',
         key: __dirname + '../certs/key.pem'
