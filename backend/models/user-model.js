@@ -76,7 +76,7 @@ exports.saveUser = (user, res) => {
         console.log("Error: " + err)
     })
 }
-
+//select * from ASSET_DEVICETOKEN where user_email='amit.pati@oracle.com'
 exports.findUserByEmail = (email, res) => {
     console.log("finding user with >> " + email);
     const connection = getDb();
@@ -86,37 +86,46 @@ exports.findUserByEmail = (email, res) => {
         if (result.rows.length === 0) {
             res.json({ exist: "no" })
         } else {
-            let findLeaderSql = "select * from ASSET_LOB_LEADER where LOB_LEADER_EMAIL=:0";
-            let findLeaderoption = [email]
-            connection.execute(findLeaderSql, findLeaderoption).then(leader => {
-                if (leader.rows.length === 0) {
-                    let userJson = {
-                        exist: "yes",
-                        name: result.rows[0][1],
-                        role: result.rows[0][4],
-                        location: result.rows[0][6],
-                        pillar: result.rows[0][7],
-                        lob: result.rows[0][10],
-                        phone: result.rows[0][13],
-                        leader: false
-                    }
 
-                    res.json(userJson);
-                } else {
-                    let userJson = {
-                        exist: "yes",
-                        name: result.rows[0][1],
-                        role: result.rows[0][4],
-                        location: result.rows[0][6],
-                        pillar: result.rows[0][7],
-                        lob: result.rows[0][10],
-                        phone: result.rows[0][13],
-                        leader: true
-                    }
+            let findDeviceTokenSQL = "select * from ASSET_DEVICETOKEN where user_email=:0";
+            let option = [email]
+            connection.execute(findDeviceTokenSQL, option).then(token => {
 
-                    res.json(userJson);
-                }
+                let findLeaderSql = "select * from ASSET_LOB_LEADER where LOB_LEADER_EMAIL=:0";
+                let findLeaderoption = [email]
+                connection.execute(findLeaderSql, findLeaderoption).then(leader => {
+                    if (leader.rows.length === 0) {
+                        let userJson = {
+                            exist: "yes",
+                            name: result.rows[0][1],
+                            role: result.rows[0][4],
+                            location: result.rows[0][6],
+                            pillar: result.rows[0][7],
+                            lob: result.rows[0][10],
+                            phone: result.rows[0][13],
+                            leader: false,
+                            devicetokens:token
+                        }
+
+                        res.json(userJson);
+                    } else {
+                        let userJson = {
+                            exist: "yes",
+                            name: result.rows[0][1],
+                            role: result.rows[0][4],
+                            location: result.rows[0][6],
+                            pillar: result.rows[0][7],
+                            lob: result.rows[0][10],
+                            phone: result.rows[0][13],
+                            leader: true,
+                            devicetokens:token
+                        }
+
+                        res.json(userJson);
+                    }
+                })
             })
+
             //res.json(userJson);
         }
     })
@@ -547,7 +556,6 @@ exports.markNotificationDelete = (param, res) => {
 }
 
 const createNotification = (notification) => {
-    console.log("Registering notification step 1");
     let notification_id = uniqid();
     const connection = getDb();
     let createNotificationSql = `insert into asset_winstory_notifications (notfication_id,NOTIFICATION_CONTENT_ID,NOTIFICATION_CONTENT_TYPE,NOTIFICATION_CONTENT_NAME) values (:0,:1,:2,:3)`;
@@ -567,37 +575,33 @@ const createNotification = (notification) => {
 }
 
 exports.preparenotification = (contentId, contentType) => {
-    console.log("-----------------------------------------");
-    console.log(contentId+" from user model "+contentType);
-    console.log("-----------------------------------------");
-    console.log("Registering notification step 2");
 
     const connection = getDb();
-    if(contentType.includes('asset')){
+    if (contentType.includes('asset')) {
         let getassetDetailsSql = `select asset_title from asset_details where asset_id=:0`;
         let option = [contentId];
-    
+
         connection.query(getassetDetailsSql, option, {
             autoCommit: true
         }).then(result => {
-            let notification={
-                NOTIFICATION_CONTENT_ID:contentId,
-                NOTIFICATION_CONTENT_NAME:result[0].ASSET_TITLE,
-                NOTIFICATION_CONTENT_TYPE:contentType
+            let notification = {
+                NOTIFICATION_CONTENT_ID: contentId,
+                NOTIFICATION_CONTENT_NAME: result[0].ASSET_TITLE,
+                NOTIFICATION_CONTENT_TYPE: contentType
             }
             createNotification(notification);
         })
-    }else if(contentType.includes('win')){
+    } else if (contentType.includes('win')) {
         let getassetDetailsSql = `select winstory_name from asset_winstory_details where winstory_id=:0`;
         let option = [contentId];
-    
+
         connection.query(getassetDetailsSql, option, {
             autoCommit: true
         }).then(result => {
-            let notification={
-                NOTIFICATION_CONTENT_ID:contentId,
-                NOTIFICATION_CONTENT_NAME:result[0].WINSTORY_NAME,
-                NOTIFICATION_CONTENT_TYPE:contentType
+            let notification = {
+                NOTIFICATION_CONTENT_ID: contentId,
+                NOTIFICATION_CONTENT_NAME: result[0].WINSTORY_NAME,
+                NOTIFICATION_CONTENT_TYPE: contentType
             }
             createNotification(notification);
         })
