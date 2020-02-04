@@ -634,7 +634,7 @@ const triggerDeviceNotification = (content) => {
 
         let msg={
             title:content.NOTIFICATION_CONTENT_TYPE+" is live now.",
-            body:content.NOTIFICATION_CONTENT_NAME
+            body: content.NOTIFICATION_CONTENT_TYPE+"|"+content.NOTIFICATION_CONTENT_NAME+"|"+content.NOTIFICATION_CONTENT_ID
         }
 
         console.log("- - - - - - IOS - - - - - - ");
@@ -643,7 +643,7 @@ const triggerDeviceNotification = (content) => {
 
         console.log("- - - - -  ANDROID - - - - - - ");
         console.log(androidDevices.join());
-        sendToFCM(msg,iosDevices.join());
+        sendToFCM(msg,androidDevices);
     })
 
 
@@ -661,18 +661,22 @@ function sendToFCM(message, devicetokens) {
     var FCM = require('fcm-node');
     var serverKey = 'AIzaSyAR7soGZPPOkDROmH0zXOPlp_rIEVmRomg'; //put your server key here
     var fcm = new FCM(serverKey);
-    var notification = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
-        to: devicetokens,
+    console.log(JSON.stringify(devicetokens));
+    var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+        //to: devicetokens,
+        registration_ids: devicetokens,
         notification: {
             title: message.title,
-            body: message.body
+            body: message.body,
+            image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
+
         },
         data: {  //you can send only notification or only data(or include both)
             my_key: 'my value',
             my_another_key: 'my another value'
         }
     };
-    fcm.send(notification, function (err, response) {
+    fcm.send(message, function (err, response) {
         if (err) {
             console.log(err)
         } else {
@@ -694,8 +698,8 @@ function sendToFCM(message, devicetokens) {
 function sendToAPNS(message, devicetokens) {
     var apn = require('apn');
     var options = {
-        cert: __dirname + '../certs/cert.pem',
-        key: __dirname + '../certs/key.pem'
+        cert: '/u01/ahweb/backend/certs/cert.pem',
+        key: '/u01/ahweb/backend/certs/key.pem'
     };
     var apnConnection = new apn.Connection(options);
 
