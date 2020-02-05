@@ -1084,7 +1084,7 @@ module.exports = class Asset {
                 const connection = getDb();
                 let fetchfilterDetailssql = `select filter_name,filter_type,filter_id from asset_filter where filter_id in(` + filterString + `)`;
                 let fetchfilterDetailsOption = {};
-
+                console.log("fetchfilterDetailssql" + fetchfilterDetailssql)
                 connection.query(fetchfilterDetailssql, fetchfilterDetailsOption,
                     {
                         outFormat: oracledb.OBJECT
