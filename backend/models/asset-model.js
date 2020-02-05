@@ -1124,7 +1124,7 @@ module.exports = class Asset {
                     }).then(data => {
                         // WE ARE THE GETTING THE FILTERED ASSETS BASED ON SELECTION
                         let fetchAllFilterSQL = `select a.filter_id,a.filter_name,a.filter_type,b.asset_id from asset_filter a, asset_filter_asset_map b where a.filter_id=b.filter_id and a.filter_status=1`;
-
+                        console.log("asset  count ***** : " + data.length);
                         connection.query(fetchAllFilterSQL, {},
                             {
                                 outFormat: oracledb.OBJECT
