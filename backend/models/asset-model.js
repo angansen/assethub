@@ -1131,7 +1131,7 @@ module.exports = class Asset {
                             }).then(filterdata => {
                                 let filtersasset = [];
                                 this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
-                                    // console.log("Content filter ended : " + filtersasset.length);
+                                    console.log("Content filter ended : " + filtersasset.length);
                                     this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action, email).then(assets => {
                                         resolve(assets);
                                     })
@@ -1146,8 +1146,8 @@ module.exports = class Asset {
     static refineAssets(host, offset, limit, assetsArray, sortBy, order, action, email) {
 
         // REMOVE DUPLICATE ENTRIES
-        console.log("refineAssets fun start")
-        console.log(assetsArray)
+        console.log("*****************************************refineAssets fun start*******************************************")
+        console.log(assetsArray.length)
         let assetidtracker = {};
         let uniqueassetarray = assetsArray.filter(asset => {
             if (!assetidtracker[asset.ASSET_ID]) {
