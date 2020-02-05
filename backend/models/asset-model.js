@@ -1,7 +1,7 @@
 const getDb = require('../database/db').getDb;
 const doRelease = require('../database/db').getDb;
 const worker = require('../utility/worker');
-const usermodel=require('../models/user-model');
+const usermodel = require('../models/user-model');
 var uniqid = require('uniqid');
 const oracledb = require('oracledb');
 const path = require('path');
@@ -1146,6 +1146,8 @@ module.exports = class Asset {
     static refineAssets(host, offset, limit, assetsArray, sortBy, order, action, email) {
 
         // REMOVE DUPLICATE ENTRIES
+        console.log("refineAssets fun start")
+        console.log(assetsArray)
         let assetidtracker = {};
         let uniqueassetarray = assetsArray.filter(asset => {
             if (!assetidtracker[asset.ASSET_ID]) {
