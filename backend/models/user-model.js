@@ -726,18 +726,18 @@ function sendToAPNS(message, devicetokens) {
     note.expiry = Math.floor(Date.now() / 1000) + 3600;
     note.badge = 1;
     note.sound = "ping.aiff";
-    // note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
+    note.alert = message.title;
     // note.payload = { 'messageFrom': 'Caroline' };
-    note.alert = {
-        title: message.title,
-        subtitle: message.subtitle
-    }
+    // note.alert = {
+    //     title: message.title,
+    //     subtitle: message.subtitle
+    // }
     note.payload = {
-        id: message.payload.id,
-        notification_id: message.payload.notification_id,
-        type: message.payload.type,
-        title: message.payload.title,
-        body: message.payload.body
+        id: message.id,
+        notification_id: message.notification_id,
+        type: message.type,
+        title: message.title,
+        body: message.body
     }
 
     console.log(JSON.stringify(message));
