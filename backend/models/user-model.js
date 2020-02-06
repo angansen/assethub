@@ -732,13 +732,18 @@ function sendToAPNS(message, devicetokens) {
     //     title: message.title,
     //     subtitle: message.subtitle
     // }
-    note.payload = {
-        id: message.id,
-        notification_id: message.notification_id,
-        type: message.type,
-        title: message.title,
-        body: message.body
-    }
+    note.payload.id=message.id;
+    note.payload.notification_id=message.notification_id;
+    note.payload.type=message.type;
+    note.payload.title=message.title;
+    note.payload.body=message.body;
+    // note.payload = {
+    //     'id': message.id,
+    //     'notification_id': message.notification_id,
+    //     'type': message.type,
+    //     'title': message.title,
+    //     'body': message.body
+    // }
 
     console.log(JSON.stringify(message));
     console.log("-------- IOS  PAYLOAD ------------");
