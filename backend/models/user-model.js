@@ -647,8 +647,8 @@ const triggerDeviceNotification = (content) => {
         }
 
         console.log("- - - - - - IOS - - - - - - ");
-        console.log(iosDevices.join());
-        sendToAPNS(msg,iosDevices.join());
+        console.log(iosDevices);
+        sendToAPNS(msg,iosDevices);
 
         console.log("- - - - -  ANDROID - - - - - - ");
         console.log(JSON.stringify(androidDevices));
@@ -674,18 +674,6 @@ function sendToFCM(msg, devicetokens) {
     var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
         //to: devicetokens,
         registration_ids: devicetokens,
-        // notification: {
-        //     title: 'New Asset Added',
-        //     body: 'Control HR Data in the Oracle Autonomous Data Warehouse',
-        //     image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
-        //   },
-        //   data: {  //you can send only notification or only data(or include both)
-        //     id: 'AH-000005',
-        //     notification_id: 'NA5767',
-        //     type: 'asset',
-        //     title: 'New Asset Added',
-        //     body: 'Control HR Data in the Oracle Autonomous Data Warehouse'
-        //   }
         notification: {
             title: msg.title,
             body: msg.body,
@@ -731,7 +719,7 @@ function sendToAPNS(message, devicetokens) {
     };
     var apnConnection = new apn.Connection(options);
 
-    var myDevice = new apn.Device(devicetokens);
+    var myDevice = devicetokens;
 
     var note = new apn.Notification();
 
