@@ -695,7 +695,7 @@ function sendToFCM(msg, devicetokens) {
         data: msg.payload
     };
     console.log("--------  PAYLOAD ------------");
-    console.log(JSON.stringify(msg));
+    console.log(JSON.stringify(message));
     fcm.send(message, function (err, response) {
         if (err) {
             console.log(err)
