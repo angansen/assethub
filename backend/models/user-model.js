@@ -728,12 +728,12 @@ function sendToAPNS(message, devicetokens) {
     note.sound = "ping.aiff";
     note.alert = message.title;
     // note.payload = { 'messageFrom': 'Caroline' };
-    // note.alert = {
-    //     title: message.title,
-    //     subtitle: message.subtitle
-    // }
+    note.alert = {
+        title: message.title,
+        subtitle: message.subtitle
+    }
     note.payload=message.payload;
-    
+
     // note.payload = {
     //     'id': message.id,
     //     'notification_id': message.notification_id,
