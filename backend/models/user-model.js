@@ -651,7 +651,7 @@ const triggerDeviceNotification = (content) => {
         sendToAPNS(msg,iosDevices.join());
 
         console.log("- - - - -  ANDROID - - - - - - ");
-        console.log(androidDevices.join());
+        console.log(JSON.stringify(androidDevices));
         sendToFCM(msg,androidDevices);
     })
 
