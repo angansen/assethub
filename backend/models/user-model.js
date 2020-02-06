@@ -666,7 +666,7 @@ const triggerDeviceNotification = (content) => {
  *      devicetokens: comma separetd android token only
  * 
  */
-function sendToFCM(message, devicetokens) {
+function sendToFCM(meg, devicetokens) {
     var FCM = require('fcm-node');
     var serverKey = 'AIzaSyAR7soGZPPOkDROmH0zXOPlp_rIEVmRomg'; //put your server key here
     var fcm = new FCM(serverKey);
@@ -674,26 +674,28 @@ function sendToFCM(message, devicetokens) {
     var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
         //to: devicetokens,
         registration_ids: devicetokens,
-        notification: {
-            title: 'New Asset Added',
-            body: 'Control HR Data in the Oracle Autonomous Data Warehouse',
-            image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
-          },
-          data: {  //you can send only notification or only data(or include both)
-            id: 'AH-000005',
-            notification_id: 'NA5767',
-            type: 'asset',
-            title: 'New Asset Added',
-            body: 'Control HR Data in the Oracle Autonomous Data Warehouse'
-          }
         // notification: {
-        //     title: message.title,
-        //     body: message.body,
+        //     title: 'New Asset Added',
+        //     body: 'Control HR Data in the Oracle Autonomous Data Warehouse',
         //     image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
+        //   },
+        //   data: {  //you can send only notification or only data(or include both)
+        //     id: 'AH-000005',
+        //     notification_id: 'NA5767',
+        //     type: 'asset',
+        //     title: 'New Asset Added',
+        //     body: 'Control HR Data in the Oracle Autonomous Data Warehouse'
+        //   }
+        notification: {
+            title: meg.title,
+            body: meg.body,
+            image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
 
-        // },
-        // data: message.payload
+        },
+        data: meg.payload
     };
+    console.log("--------  PAYLOAD ------------");
+    console.log(JSON.stringify(msg));
     fcm.send(message, function (err, response) {
         if (err) {
             console.log(err)
