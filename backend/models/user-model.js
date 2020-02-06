@@ -556,8 +556,9 @@ exports.markNotificationDelete = (param, res) => {
 }
 
 const createNotification = (notification) => {
-    triggerDeviceNotification(notification);
     let notification_id = uniqid();
+    notification.NOTIFICATION_ID=notification_id;
+    triggerDeviceNotification(notification);
     const connection = getDb();
     let createNotificationSql = `insert into asset_winstory_notifications (notfication_id,NOTIFICATION_CONTENT_ID,NOTIFICATION_CONTENT_TYPE,NOTIFICATION_CONTENT_NAME) values (:0,:1,:2,:3)`;
     let notificationOptions = [notification_id, notification.NOTIFICATION_CONTENT_ID, notification.NOTIFICATION_CONTENT_TYPE, notification.NOTIFICATION_CONTENT_NAME]
@@ -634,7 +635,15 @@ const triggerDeviceNotification = (content) => {
 
         let msg={
             title:content.NOTIFICATION_CONTENT_TYPE+" is live now.",
-            body: content.NOTIFICATION_CONTENT_TYPE+"|"+content.NOTIFICATION_CONTENT_NAME+"|"+content.NOTIFICATION_CONTENT_ID
+            subtitle:content.NOTIFICATION_CONTENT_NAME,
+            body:content.NOTIFICATION_CONTENT_NAME,
+            payload:{
+                id:content.NOTIFICATION_CONTENT_ID,
+                notification_id:content.NOTIFICATION_ID,
+                type:content.NOTIFICATION_CONTENT_TYPE,
+                body:content.NOTIFICATION_CONTENT_NAME,
+                title:content.NOTIFICATION_CONTENT_TYPE+" is live now",
+            }
         }
 
         console.log("- - - - - - IOS - - - - - - ");
@@ -671,10 +680,7 @@ function sendToFCM(message, devicetokens) {
             image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
 
         },
-        data: {  //you can send only notification or only data(or include both)
-            my_key: 'my value',
-            my_another_key: 'my another value'
-        }
+        data: message.payload
     };
     fcm.send(message, function (err, response) {
         if (err) {
@@ -699,7 +705,8 @@ function sendToAPNS(message, devicetokens) {
     var apn = require('apn');
     var options = {
         cert: '/u01/ahweb/backend/certs/cert.pem',
-        key: '/u01/ahweb/backend/certs/key.pem'
+        key: '/u01/ahweb/backend/certs/key.pem',
+        production:true
     };
     var apnConnection = new apn.Connection(options);
 
@@ -712,8 +719,11 @@ function sendToAPNS(message, devicetokens) {
     note.sound = "ping.aiff";
     // note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
     // note.payload = { 'messageFrom': 'Caroline' };
-    note.alert = message.body;
-    note.payload = { 'messageFrom': 'Message' };
+    note.alert = {
+        title:message.title,
+        subtitle:message.subtitle
+    }
+    note.payload = message.payload;
     apnConnection.pushNotification(note, myDevice);
 
     console.log('ios push message sent successfully')
