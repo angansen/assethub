@@ -2348,6 +2348,7 @@ module.exports = class Asset {
                 })
                 .then(res => {
                     assetsArray = res
+                    console.log('getFavAssets Length: ' + res.length)
                     this.refineAssets(host, 0, -1, assetsArray, "", "", "", user_email).then(assets => {
                         resolve(assets);
                     })
