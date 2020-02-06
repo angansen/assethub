@@ -675,12 +675,24 @@ function sendToFCM(message, devicetokens) {
         //to: devicetokens,
         registration_ids: devicetokens,
         notification: {
-            title: message.title,
-            body: message.body,
+            title: 'New Asset Added',
+            body: 'Control HR Data in the Oracle Autonomous Data Warehouse',
             image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
+          },
+          data: {  //you can send only notification or only data(or include both)
+            id: 'AH-000005',
+            notification_id: 'NA5767',
+            type: 'asset',
+            title: 'New Asset Added',
+            body: 'Control HR Data in the Oracle Autonomous Data Warehouse'
+          }
+        // notification: {
+        //     title: message.title,
+        //     body: message.body,
+        //     image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
 
-        },
-        data: message.payload
+        // },
+        // data: message.payload
     };
     fcm.send(message, function (err, response) {
         if (err) {
