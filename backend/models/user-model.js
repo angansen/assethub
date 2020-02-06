@@ -740,6 +740,7 @@ function sendToAPNS(message, devicetokens) {
         body: message.body
     }
 
+    console.log(JSON.stringify(message));
     console.log("-------- IOS  PAYLOAD ------------");
     console.log(JSON.stringify(note));
 
