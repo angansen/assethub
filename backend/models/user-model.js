@@ -689,7 +689,7 @@ function sendToFCM(msg, devicetokens) {
         }
     };
     console.log(JSON.stringify(msg));
-    console.log("--------  PAYLOAD ------------");
+    console.log("-------- ANDROID PAYLOAD ------------");
     console.log(JSON.stringify(message));
     fcm.send(message, function (err, response) {
         if (err) {
@@ -739,6 +739,10 @@ function sendToAPNS(message, devicetokens) {
         title: message.title,
         body: message.body
     }
+
+    console.log("-------- IOS  PAYLOAD ------------");
+    console.log(JSON.stringify(note));
+
     apnConnection.pushNotification(note, myDevice);
 
     console.log('ios push message sent successfully')
