@@ -692,8 +692,15 @@ function sendToFCM(msg, devicetokens) {
             image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
 
         },
-        data: msg.payload
+        data: {
+            id:msg.id,
+            notification_id:msg.notification_id,
+            type:msg.type,
+            title:msg.title,
+            body:msg.body
+        }
     };
+    console.log(JSON.stringify(msg));
     console.log("--------  PAYLOAD ------------");
     console.log(JSON.stringify(message));
     fcm.send(message, function (err, response) {
