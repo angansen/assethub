@@ -691,13 +691,13 @@ function sendToFCM(msg, devicetokens) {
     console.log(JSON.stringify(msg));
     console.log("-------- ANDROID PAYLOAD ------------");
     console.log(JSON.stringify(message));
-    // fcm.send(message, function (err, response) {
-    //     if (err) {
-    //         console.log(err)
-    //     } else {
-    //         console.log("Successfully sent android push message with response: ", response);
-    //     }
-    // });
+    fcm.send(message, function (err, response) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log("Successfully sent android push message with response: ", response);
+        }
+    });
 }
 
 /********
@@ -746,7 +746,7 @@ function sendToAPNS(message, devicetokens) {
     console.log("-------- IOS  PAYLOAD ------------");
     console.log(JSON.stringify(note));
 
-    // apnConnection.pushNotification(note, myDevice);
+    apnConnection.pushNotification(note, myDevice);
 
     console.log('ios push message sent successfully')
 }
