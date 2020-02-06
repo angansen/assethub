@@ -557,7 +557,7 @@ exports.markNotificationDelete = (param, res) => {
 
 const createNotification = (notification) => {
     let notification_id = uniqid();
-    notification.NOTIFICATION_ID=notification_id;
+    notification.NOTIFICATION_ID = notification_id;
     triggerDeviceNotification(notification);
     const connection = getDb();
     let createNotificationSql = `insert into asset_winstory_notifications (notfication_id,NOTIFICATION_CONTENT_ID,NOTIFICATION_CONTENT_TYPE,NOTIFICATION_CONTENT_NAME) values (:0,:1,:2,:3)`;
@@ -615,44 +615,44 @@ const triggerDeviceNotification = (content) => {
 
     const connection = getDb();
     let getdeviceTokensSql = `select device_token,device_type from asset_devicetoken`;
-    let iosDevices=[];
-    let androidDevices=[]
+    let iosDevices = [];
+    let androidDevices = []
     connection.query(getdeviceTokensSql, [], {
         autoCommit: true,
         outFormat: oracledb.OBJECT
     }).then(tokens => {
         console.log("+++++++++++++++ Device tokens ++++++++++++++++++")
         console.log(JSON.stringify(tokens));
-        tokens.filter(token=>{
+        tokens.filter(token => {
             console.log(JSON.stringify(token));
-            
-            if(token.DEVICE_TYPE.toLowerCase().includes("ios")){
+
+            if (token.DEVICE_TYPE.toLowerCase().includes("ios")) {
                 iosDevices.push(token.DEVICE_TOKEN);
-            }else{
+            } else {
                 androidDevices.push(token.DEVICE_TOKEN);
             }
         })
 
-        let msg={
-            title:content.NOTIFICATION_CONTENT_TYPE+" is live now.",
-            subtitle:content.NOTIFICATION_CONTENT_NAME,
-            body:content.NOTIFICATION_CONTENT_NAME,
-            payload:{
-                id:content.NOTIFICATION_CONTENT_ID,
-                notification_id:content.NOTIFICATION_ID,
-                type:content.NOTIFICATION_CONTENT_TYPE,
-                body:content.NOTIFICATION_CONTENT_NAME,
-                title:content.NOTIFICATION_CONTENT_TYPE+" is live now",
+        let msg = {
+            title: content.NOTIFICATION_CONTENT_TYPE + " is live now.",
+            subtitle: content.NOTIFICATION_CONTENT_NAME,
+            body: content.NOTIFICATION_CONTENT_NAME,
+            payload: {
+                id: content.NOTIFICATION_CONTENT_ID,
+                notification_id: content.NOTIFICATION_ID,
+                type: content.NOTIFICATION_CONTENT_TYPE,
+                body: content.NOTIFICATION_CONTENT_NAME,
+                title: content.NOTIFICATION_CONTENT_TYPE + " is live now",
             }
         }
 
         console.log("- - - - - - IOS - - - - - - ");
         console.log(iosDevices);
-        sendToAPNS(msg,iosDevices);
+        sendToAPNS(msg, iosDevices);
 
         console.log("- - - - -  ANDROID - - - - - - ");
         console.log(JSON.stringify(androidDevices));
-        sendToFCM(msg,androidDevices);
+        sendToFCM(msg, androidDevices);
     })
 
 
@@ -681,11 +681,11 @@ function sendToFCM(msg, devicetokens) {
 
         },
         data: {
-            id:msg.id,
-            notification_id:msg.notification_id,
-            type:msg.type,
-            title:msg.title,
-            body:msg.body
+            id: msg.id,
+            notification_id: msg.notification_id,
+            type: msg.type,
+            title: msg.title,
+            body: msg.body
         }
     };
     console.log(JSON.stringify(msg));
@@ -715,7 +715,7 @@ function sendToAPNS(message, devicetokens) {
     var options = {
         cert: '/u01/ahweb/backend/certs/cert.pem',
         key: '/u01/ahweb/backend/certs/key.pem',
-        production:true
+        production: true
     };
     var apnConnection = new apn.Connection(options);
 
@@ -729,10 +729,16 @@ function sendToAPNS(message, devicetokens) {
     // note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
     // note.payload = { 'messageFrom': 'Caroline' };
     note.alert = {
-        title:message.title,
-        subtitle:message.subtitle
+        title: message.title,
+        subtitle: message.subtitle
     }
-    note.payload = message.payload;
+    note.payload = {
+        id: message.id,
+        notification_id: message.notification_id,
+        type: message.type,
+        title: message.title,
+        body: message.body
+    }
     apnConnection.pushNotification(note, myDevice);
 
     console.log('ios push message sent successfully')
