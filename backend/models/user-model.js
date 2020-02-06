@@ -670,7 +670,7 @@ function sendToFCM(message, devicetokens) {
     var FCM = require('fcm-node');
     var serverKey = 'AIzaSyAR7soGZPPOkDROmH0zXOPlp_rIEVmRomg'; //put your server key here
     var fcm = new FCM(serverKey);
-    console.log(JSON.stringify(devicetokens.split(',')));
+    console.log(JSON.stringify(devicetokens.length));
     var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
         //to: devicetokens,
         registration_ids: devicetokens,
