@@ -666,7 +666,7 @@ const triggerDeviceNotification = (content) => {
  *      devicetokens: comma separetd android token only
  * 
  */
-function sendToFCM(meg, devicetokens) {
+function sendToFCM(msg, devicetokens) {
     var FCM = require('fcm-node');
     var serverKey = 'AIzaSyAR7soGZPPOkDROmH0zXOPlp_rIEVmRomg'; //put your server key here
     var fcm = new FCM(serverKey);
@@ -687,12 +687,12 @@ function sendToFCM(meg, devicetokens) {
         //     body: 'Control HR Data in the Oracle Autonomous Data Warehouse'
         //   }
         notification: {
-            title: meg.title,
-            body: meg.body,
+            title: msg.title,
+            body: msg.body,
             image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
 
         },
-        data: meg.payload
+        data: msg.payload
     };
     console.log("--------  PAYLOAD ------------");
     console.log(JSON.stringify(msg));
