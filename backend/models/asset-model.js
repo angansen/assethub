@@ -2322,24 +2322,6 @@ module.exports = class Asset {
     }
     static getFavAssets(user_email, host) {
         let assetsArray = [];
-        let likesArray = [];
-        let viewsArray = [];
-        let linksArray = [];
-        let imagesArray = [];
-        let allAssetsObj = {};
-        let allAssetsFinalArray = [];
-        let commentsArray = [];
-        let allObj = {};
-        let linkType = [];
-        var lobj2 = {};
-        let lobj = {};
-        let linkObjArr = [];
-        let solutionAreasArray = [];
-        let solutionAreas = [];
-        let assetTypes = [];
-        let assetTypesArray = [];
-        let salesPlays = [];
-        let salesPlaysArray = [];
         return new Promise((resolve, reject) => {
             const connection = getDb();
             connection.query(`select * from asset_details where asset_id in (select asset_id from asset_likes where LIKE_BY=:LIKE_BY)`, [user_email],
