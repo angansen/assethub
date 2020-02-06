@@ -733,11 +733,11 @@ function sendToAPNS(message, devicetokens) {
         subtitle: message.subtitle
     }
     note.payload = {
-        id: message.id,
-        notification_id: message.notification_id,
-        type: message.type,
-        title: message.title,
-        body: message.body
+        id: message.payload.id,
+        notification_id: message.payload.notification_id,
+        type: message.payload.type,
+        title: message.payload.title,
+        body: message.payload.body
     }
 
     console.log(JSON.stringify(message));
