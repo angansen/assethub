@@ -713,8 +713,8 @@ function sendToFCM(msg, devicetokens) {
 function sendToAPNS(msg, devicetokens) {
     var apn = require('apn');
     var options = {
-        cert: __dirname + '/u01/ahweb/backend/certs/cert.pem',
-        key: __dirname + '/u01/ahweb/backend/certs/key.pem',
+        cert: '/u01/ahweb/backend/certs/cert.pem',
+        key: '/u01/ahweb/backend/certs/key.pem',
         production: true
     };
     var apnConnection = new apn.Connection(options);
