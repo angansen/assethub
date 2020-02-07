@@ -1156,6 +1156,8 @@ module.exports = class Asset {
             }
         })
         assetsArray = uniqueassetarray;
+
+        console.log('****uniqueassetarray Length:***** ' + assetsArray.length)
         let allAssetsObj = {};
         let tAssets = [];
         let allAssets = [];
