@@ -85,7 +85,7 @@ const getRatingsById = (assetId) => {
 
 const getLinksById = (assetId) => {
     const connection = getDb();
-    return connection.query(`SELECT * from ASSET_WINSTORY_LINKS  where link_active='true' and WINSTORY_ID=:WINSTORY_ID`, [assetId],
+    return connection.query(`SELECT * from ASSET_WINSTORY_LINKS  where WINSTORY_ID=:WINSTORY_ID`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })
@@ -336,7 +336,7 @@ module.exports = class Asset {
                             })
                         }
                         else {
-                            return connection.query(`SELECT * from asset_links where link_active='true'`, {})
+                            return connection.query(`SELECT * from asset_links `, {})
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
@@ -435,7 +435,7 @@ module.exports = class Asset {
                         }
                         else {
                             // console.log("oj is empty")
-                            return connection.query(`SELECT * from asset_links where link_active='true'`, {})
+                            return connection.query(`SELECT * from asset_links `, {})
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
@@ -556,7 +556,7 @@ module.exports = class Asset {
                             })
                         }
                         else {
-                            return connection.query(`SELECT * from asset_links where link_active='true'`, {})
+                            return connection.query(`SELECT * from asset_links `, {})
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
@@ -655,7 +655,7 @@ module.exports = class Asset {
                         }
                         else {
                             //console.log("oj is empty")
-                            return connection.query(`SELECT * from asset_links where link_active='true'`, {})
+                            return connection.query(`SELECT * from asset_links `, {})
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
@@ -1171,7 +1171,7 @@ module.exports = class Asset {
         return new Promise((resolve, reject) => {
 
             const connection = getDb();
-            connection.execute(`SELECT * from ASSET_WINSTORY_LINKS  where link_active='true'`, {},
+            connection.execute(`SELECT * from ASSET_WINSTORY_LINKS  `, {},
                 {
                     outFormat: oracledb.OBJECT
                 },
@@ -1650,7 +1650,7 @@ module.exports = class Asset {
                     })
                     .then(res => {
                         assetsArray = res
-                        connection.execute(`SELECT * from ASSET_WINSTORY_LINKS  where link_active='true'`, {},
+                        connection.execute(`SELECT * from ASSET_WINSTORY_LINKS  `, {},
                             {
                                 outFormat: oracledb.OBJECT
                             },
@@ -1878,7 +1878,7 @@ module.exports = class Asset {
         let promotedArray = [];
 
         const connection = getDb();
-        connection.execute(`SELECT * from ASSET_WINSTORY_LINKS  where link_active='true'`, {},
+        connection.execute(`SELECT * from ASSET_WINSTORY_LINKS  `, {},
             {
                 outFormat: oracledb.OBJECT
             },
@@ -2462,7 +2462,7 @@ module.exports = class Asset {
                     //                                                             })
                     //                                                             .then(res => {
                     //                                                                 let winStatusArray = res.rows;
-                    //                                                                 connection.execute(`SELECT * from ASSET_WINSTORY_LINKS  where link_active='true'`, {},
+                    //                                                                 connection.execute(`SELECT * from ASSET_WINSTORY_LINKS  `, {},
                     //                                                                     {
                     //                                                                         outFormat: oracledb.OBJECT
                     //                                                                     }).then(res => {
@@ -2638,7 +2638,7 @@ module.exports = class Asset {
                                                                 })
                                                                 .then(res => {
                                                                     assetTypesArray = res.rows;
-                                                                    connection.execute(`SELECT * from ASSET_LINKS where link_active='true'`, {},
+                                                                    connection.execute(`SELECT * from ASSET_LINKS `, {},
                                                                         {
                                                                             outFormat: oracledb.OBJECT
                                                                         }).then(res => {
@@ -2818,7 +2818,7 @@ module.exports = class Asset {
                     //                                                             })
                     //                                                             .then(res => {
                     //                                                                 industryArray = res.rows;
-                    //                                                                 connection.execute(`SELECT * from ASSET_WINSTORY_LINKS  where link_active='true'`, {},
+                    //                                                                 connection.execute(`SELECT * from ASSET_WINSTORY_LINKS  `, {},
                     //                                                                     {
                     //                                                                         outFormat: oracledb.OBJECT
                     //                                                                     }).then(res => {
