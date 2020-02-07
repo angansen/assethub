@@ -734,7 +734,8 @@ function sendToAPNS(msg, devicetokens) {
         'title': msg.payload.title,
         'body': msg.payload.body
     };
-    console.log(note)
+    console.log("-------- IOS Note --------");
+    console.log(note);
     apnConnection.pushNotification(note, myDevice)
     apnConnection.on('error', function (error) {
         console.error('APNS: Initialization error', error);
