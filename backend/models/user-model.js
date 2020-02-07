@@ -710,46 +710,82 @@ function sendToFCM(msg, devicetokens) {
  * 
  */
 
-function sendToAPNS(message, devicetokens) {
+function sendToAPNS(msg, devicetokens) {
     var apn = require('apn');
     var options = {
-        cert: '/u01/ahweb/backend/certs/cert.pem',
-        key: '/u01/ahweb/backend/certs/key.pem',
+        cert: __dirname + '/u01/ahweb/backend/certs/cert.pem',
+        key: __dirname + '/u01/ahweb/backend/certs/key.pem',
         production: true
     };
     var apnConnection = new apn.Connection(options);
-
-    var myDevice = devicetokens;
-
+    let myDevice = devicetokens;
     var note = new apn.Notification();
-
     note.expiry = Math.floor(Date.now() / 1000) + 3600;
-    note.badge = 1;
+    note.badge = 0;
     note.sound = "ping.aiff";
-    note.alert = message.title;
-    // note.payload = { 'messageFrom': 'Caroline' };
     note.alert = {
-        title: message.title,
-        subtitle: message.subtitle
+        "title": msg.title,
+        "subtitle": msg.payload.body
     }
-    note.payload=message.payload;
-
-    // note.payload = {
-    //     'id': message.id,
-    //     'notification_id': message.notification_id,
-    //     'type': message.type,
-    //     'title': message.title,
-    //     'body': message.body
-    // }
-
-    console.log(JSON.stringify(message));
-    console.log("-------- IOS  PAYLOAD ------------");
-    console.log(JSON.stringify(note));
-
-    apnConnection.pushNotification(note, myDevice);
-
+    note.payload = {
+        'id': msg.payload.id,
+        'notification_id': msg.payload.notification_id,
+        'type': msg.payload.type,
+        'title': msg.payload.title,
+        'body': msg.payload.body
+    };
+    console.log(note)
+    apnConnection.pushNotification(note, myDevice)
+    apnConnection.on('error', function (error) {
+        console.error('APNS: Initialization error', error);
+    });
+    // A submission action has completed. This just means the message was submitted, not actually delivered.
+    apnConnection.on('completed', function (a) {
+        console.log('APNS: Completed sending', a);
+    });
     console.log('ios push message sent successfully')
 }
+
+// function sendToAPNS(message, devicetokens) {
+//     var apn = require('apn');
+//     var options = {
+//         cert: '/u01/ahweb/backend/certs/cert.pem',
+//         key: '/u01/ahweb/backend/certs/key.pem',
+//         production: true
+//     };
+//     var apnConnection = new apn.Connection(options);
+
+//     var myDevice = devicetokens;
+
+//     var note = new apn.Notification();
+
+//     note.expiry = Math.floor(Date.now() / 1000) + 3600;
+//     note.badge = 1;
+//     note.sound = "ping.aiff";
+//     note.alert = message.title;
+//     // note.payload = { 'messageFrom': 'Caroline' };
+//     note.alert = {
+//         title: message.title,
+//         subtitle: message.subtitle
+//     }
+//     note.payload=message.payload;
+
+//     // note.payload = {
+//     //     'id': message.id,
+//     //     'notification_id': message.notification_id,
+//     //     'type': message.type,
+//     //     'title': message.title,
+//     //     'body': message.body
+//     // }
+
+//     console.log(JSON.stringify(message));
+//     console.log("-------- IOS  PAYLOAD ------------");
+//     console.log(JSON.stringify(note));
+
+//     apnConnection.pushNotification(note, myDevice);
+
+//     console.log('ios push message sent successfully')
+// }
 const purgeUserRecords2 = () => {
     const connection = getDb();
     let truncateUserSql = `delete from asset_user where USER_MODIFIED=0`;
