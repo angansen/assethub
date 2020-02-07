@@ -1355,7 +1355,7 @@ module.exports = class Asset {
                                                                                                                 let allObj = {};
                                                                                                                 allObj.TOTALCOUNT = allAssets.length;
 
-                                                                                                                console.log("Asset Count before slice :::: " + tAssets.length);
+                                                                                                                console.log(offset + ' ----- ' + limit + "Asset Count before slice :::: " + allAssets.length);
                                                                                                                 tAssets = allAssets.slice(offset, limit);
 
                                                                                                                 console.log("Asset Count after slice :::: " + tAssets.length);
