@@ -685,6 +685,13 @@ exports.deleteAllAssetContent = (req, res) => {
         })
 }
 
+exports.deleteMySearchHistory = (req, res) => {
+    const user_email = req.header("user_email")
+    Asset.deleteSearchHistory(user_email, req.headers.host).then(result => {
+        res.json(result);
+    })
+}
+
 exports.getBannerDetails = (req, res) => {
     Asset.getBannerCounts().then(result => {
         res.json(result);

@@ -23,6 +23,7 @@ router.delete('/deleteImages/:assetId/', assetController.deleteAllUploadedImage)
 router.delete('/deleteLinks/:assetId/:linkId', assetController.deleteLink)
 router.delete('/deleteLinks/:assetId/', assetController.deleteAllLinks)
 router.delete('/deleteAssetbyId/:assetId', assetController.deleteAllAssetContent)
+router.delete('/deleteMySearchHistory', assetController.deleteMySearchHistory)
 
 
 router.post('/editAsset', assetController.postEditAsset);
