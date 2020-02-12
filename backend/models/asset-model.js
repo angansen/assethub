@@ -2556,14 +2556,13 @@ module.exports = class Asset {
                     outFormat: oracledb.OBJECT
                 })
                 .then(res => {
-                    assetsArray = res
-                    console.
-                        // assetsArray.forEach(asset => {
-                        //     asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
-                        // })
-                        this.refineAssets(host, 0, assetsArray.length, assetsArray, "", "", "", user_email).then(assets => {
-                            resolve(assets);
-                        })
+                    assetsArray = res;
+                    // assetsArray.forEach(asset => {
+                    //     asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
+                    // })
+                    this.refineAssets(host, 0, -1, assetsArray, "", "", "", user_email).then(assets => {
+                        resolve(assets);
+                    })
                 })
         })
     }
