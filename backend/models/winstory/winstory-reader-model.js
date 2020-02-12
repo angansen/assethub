@@ -2762,8 +2762,8 @@ module.exports = class Asset {
                     outFormat: oracledb.OBJECT
                 })
                 .then(res => {
-                    assetsArray = res
-                    this.refineAssets(host, 0, -1, assetsArray, '', '', '', user_email).then(assets => {
+                    assetsArray = res;
+                    this.refineAssets(host, 0, assetsArray.length, assetsArray, '', '', '', user_email).then(assets => {
                         resolve(assets);
                     })
                     // console.log('Calling WinsList')
