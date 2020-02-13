@@ -1540,7 +1540,8 @@ module.exports = class Asset {
                                     outFormat: oracledb.OBJECT
                                 }).then(filterdata => {
                                     let filtersasset = [];
-                                    this.filterAssetBySearchString(allwins, filterdata, wordlist, finalList).then(res => {
+                                    //this.filterAssetBySearchString(allwins, filterdata, wordlist, finalList).then(res => {
+                                    this.filterAssetBySearchString(finalList, filterdata, wordlist, filtersasset).then(res => {
                                         this.refineAssets(host, offset, limit, finalList, sortBy, order, "", userEmail).then(assets => {
                                             resolve(assets);
                                         })
