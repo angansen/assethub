@@ -128,9 +128,11 @@ exports.postAssetReviewNote = (review_note, asset_status, assetId) => {
             })
             .then(result => {
                 console.log("posted and state: " + asset.ASSET_STATUS);
+                
                 resolve(result)
             })
             .catch(err => {
+                console.log(" Errror Review asset");
                 reject(err)
             })
     })

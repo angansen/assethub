@@ -47,6 +47,7 @@ exports.addAssetReviewNote = (req, res) => {
                 }
             })
             .catch(err => {
+                console.log("postAssetReviewNote . . . error");
                 res.json(err)
             })
     }
