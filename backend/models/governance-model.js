@@ -113,7 +113,10 @@ formatAssetByStatus = (result, host) => {
 exports.postAssetReviewNote = (review_note, asset_status, assetId) => {
     const connection = getDb();
     review_note = JSON.stringify(review_note);
-    usermodel.preparenotification(assetId,"asset");
+    if(asset_status=='Live'){
+        usermodel.preparenotification(assetId,"asset");
+    }
+    
     let insertReviewNoteSql = `UPDATE ASSET_DETAILS SET ASSET_REVIEW_NOTE = :ASSET_REVIEW_NOTE,
     ASSET_STATUS=:ASSET_STATUS where ASSET_ID=:ASSET_ID`;
     let insertReviewNoteOptions = [review_note, asset_status, assetId]
