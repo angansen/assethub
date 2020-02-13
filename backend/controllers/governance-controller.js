@@ -21,7 +21,6 @@ exports.addAssetReviewNote = (req, res) => {
     const review_note = req.body.review_note;
     const asset_status = req.body.asset_status;
     const assetId = req.body.assetId;
-    console.log("------===========----------===========----------- ");
     console.log(req.body)
     if (!review_note || !asset_status) {
         res.json({ "status": "Enter a review note" })
@@ -33,7 +32,7 @@ exports.addAssetReviewNote = (req, res) => {
                 if (asset_status === 'Live') {
                     console.log("generating notification. . .");
                     // generateNotification(assetId);
-                    res.json({ "status": "The asset has been approved successfully." })
+                    res.json({ "status": "The asset has been approved successfully." });
                 }
                 else if (asset_status === 'Pending Rectification') {
                     // sendEmailForRectification(assetId);

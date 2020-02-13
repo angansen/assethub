@@ -132,7 +132,7 @@ exports.postAssetReviewNote = (review_note, asset_status, assetId) => {
                 resolve(result)
             })
             .catch(err => {
-                resolve(result)
+                resolve({})
             })
     })
 
