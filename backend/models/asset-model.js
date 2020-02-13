@@ -1699,6 +1699,10 @@ module.exports = class Asset {
                             // if (filterids.trim().length > 0 || words.length > 0) {
                             //     finalList = [...assetlist];
                             // }
+                            
+                            if(words.length==0){
+                                allassets=[];
+                            }
                             let wordlist = "";
                             words.map(word => {
                                 wordlist = wordlist + " " + word.ACTIVITY_FILTER

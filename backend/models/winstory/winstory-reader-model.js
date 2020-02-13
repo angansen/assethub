@@ -1523,6 +1523,9 @@ module.exports = class Asset {
                             // if (filterids.trim().length > 0 || words.length > 0) {
                             //     finalList = [...winList];
                             // } 
+                            if(words.length==0){
+                                allwins=[];
+                            }
                             let wordlist = "";
                             words.map(word => {
                                 wordlist = wordlist + " " + word.ACTIVITY_FILTER
