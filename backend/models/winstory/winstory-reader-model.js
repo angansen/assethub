@@ -1501,7 +1501,7 @@ module.exports = class Asset {
                     {
                         outFormat: oracledb.OBJECT
                     },
-                ).then(winList => {
+                ).then(preferedwins => {
                     // console.log(JSON.stringify(assetlist));
                     let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
                     where activity_performed_by='` + userEmail + `' 
@@ -1536,9 +1536,10 @@ module.exports = class Asset {
                                 {
                                     outFormat: oracledb.OBJECT
                                 }).then(filterdata => {
-                                    let filtersasset = [];
+                                    let filterswins = [];
                                     this.filterAssetBySearchString(allwins, filterdata, wordlist, filtersasset).then(res => {
-                                        this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "", userEmail).then(assets => {
+                                        filterswins=[...filterswins,...preferedwins];
+                                        this.refineAssets(host, offset, limit, filterswins, sortBy, order, "", userEmail).then(assets => {
                                             resolve(assets);
                                         })
                                     })

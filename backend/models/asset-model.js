@@ -1674,7 +1674,7 @@ module.exports = class Asset {
                     {
                         outFormat: oracledb.OBJECT
                     },
-                ).then(assetlist => {
+                ).then(preferedassets => {
                     // console.log(JSON.stringify(assetlist));
 
                     let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
@@ -1713,6 +1713,7 @@ module.exports = class Asset {
                                     let filtersasset = [];
 
                                     this.filterAssetBySearchString(allassets, filterdata, wordlist, filtersasset).then(res => {
+                                        filtersasset=[...filtersasset,...preferedassets];
                                         this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "", userEmail).then(assets => {
                                             resolve(assets);
                                         })
@@ -1723,7 +1724,6 @@ module.exports = class Asset {
                     })
                 })
             })
-
         })
 
 
