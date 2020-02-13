@@ -1481,16 +1481,16 @@ module.exports = class Asset {
                 console.log('----------------  FILTER IDS --------------');
                 console.log(JSON.stringify(filterids));
                 let fetchAssetsSql = "";
-                // if (filterids.trim().length > 0) {
-                fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
+                if (filterids.trim().length > 0) {
+                    fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
                 where a.filter_id in('`+ filterids + `') 
                 and a.WINSTORY_ID=b.WINSTORY_ID 
                 and b.winstory_status='Live'`;
-                // } else {
-                //     fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
-                //     where a.WINSTORY_ID=b.WINSTORY_ID 
-                //     and b.winstory_status='Live'`;
-                // }
+                } else {
+                    fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
+                    where a.WINSTORY_ID=b.WINSTORY_ID 
+                    and b.winstory_status='Live'`;
+                }
 
                 // GET THE MAPPED ASSES FOR THE FILTERS
                 // let fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
@@ -1540,9 +1540,8 @@ module.exports = class Asset {
                                     outFormat: oracledb.OBJECT
                                 }).then(filterdata => {
                                     let filtersasset = [];
-                                    //this.filterAssetBySearchString(allwins, filterdata, wordlist, finalList).then(res => {
                                     this.filterAssetBySearchString(finalList, filterdata, wordlist, filtersasset).then(res => {
-                                        this.refineAssets(host, offset, limit, finalList, sortBy, order, "", userEmail).then(assets => {
+                                        this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "", userEmail).then(assets => {
                                             resolve(assets);
                                         })
                                     })
