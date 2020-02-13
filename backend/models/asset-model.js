@@ -1007,7 +1007,7 @@ module.exports = class Asset {
     static deleteSearchHistory(user_email) {
         return new Promise((resolve, reject) => {
             const connection = getDb();
-            connection.execute(`DELETE from asset_search_activity WHERE activity_performed_by=:user_email and activity_type='FREETEXT'`, [user_email],
+            connection.execute(`DELETE from asset_search_activity WHERE activity_performed_by=:user_email`, [user_email],
                 {
                     autoCommit: true,
                     outFormat: oracledb.Object
