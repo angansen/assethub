@@ -132,8 +132,7 @@ exports.postAssetReviewNote = (review_note, asset_status, assetId) => {
                 resolve(result)
             })
             .catch(err => {
-                console.log(" Errror Review asset :: "+JSON.stringify(err));
-                reject(err)
+                resolve(result)
             })
     })
 
