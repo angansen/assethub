@@ -634,7 +634,7 @@ const triggerDeviceNotification = (content) => {
         })
 
         let msg = {
-            title: content.NOTIFICATION_CONTENT_TYPE + " is live now.",
+            title: content.NOTIFICATION_CONTENT_TYPE + " is live now",
             subtitle: content.NOTIFICATION_CONTENT_NAME,
             body: content.NOTIFICATION_CONTENT_NAME,
             payload: {
