@@ -1522,11 +1522,9 @@ module.exports = class Asset {
                             console.log("------------------- Prefered win --------------");
                             console.log(JSON.stringify(words));
                             console.log(JSON.stringify(filterids));
-                            if (filterids.trim().length > 0 || words.length > 0) {
-                                finalList = [...winList];
-                            } else {
-                                finalList = [];
-                            }
+                            // if (filterids.trim().length > 0 || words.length > 0) {
+                            //     finalList = [...winList];
+                            // } 
                             let wordlist = "";
                             words.map(word => {
                                 wordlist = wordlist + " " + word.ACTIVITY_FILTER
@@ -1539,7 +1537,7 @@ module.exports = class Asset {
                                     outFormat: oracledb.OBJECT
                                 }).then(filterdata => {
                                     let filtersasset = [];
-                                    this.filterAssetBySearchString(finalList, filterdata, wordlist, filtersasset).then(res => {
+                                    this.filterAssetBySearchString(allwins, filterdata, wordlist, filtersasset).then(res => {
                                         this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "", userEmail).then(assets => {
                                             resolve(assets);
                                         })

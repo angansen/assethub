@@ -1653,17 +1653,18 @@ module.exports = class Asset {
                     outFormat: oracledb.OBJECT
                 },
             ).then(filterList => {
-                let filterids = filterList.map(filter => filter.ASSET_FILTER_ID).join().replace(/,/g, "','");
+                let filterids = '';
+                if (filterList.length > 0) {
+                    filterids = filterList.map(filter => filter.ASSET_FILTER_ID).join().replace(/,/g, "','");
+                }
                 // console.log(JSON.stringify(filterids));
-                let fetchAssetsSql = "";
-                if (filterids.trim().length > 0) {
-                    fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
+                let fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
                 where a.filter_id in('`+ filterids + `') 
                 and a.asset_id=b.asset_id and b.asset_status='Live'`;
-                } else {
-                    fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
-                where a.asset_id=b.asset_id and b.asset_status='Live'`;
-                }
+                //  else {
+                //     fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
+                // where a.asset_id=b.asset_id and b.asset_status='Live'`;
+                // }
                 // GET THE MAPPED ASSES FOR THE FILTERS
                 // let fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
                 // where a.filter_id in('`+ filterids + `') 
@@ -1695,11 +1696,9 @@ module.exports = class Asset {
                             console.log("------------------- Prefered asset --------------");
                             console.log(JSON.stringify(words));
                             console.log(JSON.stringify(filterids));
-                            if (filterids.trim().length > 0 || words.length > 0) {
-                                finalList = [...assetlist];
-                            } else {
-                                finalList = [];
-                            }
+                            // if (filterids.trim().length > 0 || words.length > 0) {
+                            //     finalList = [...assetlist];
+                            // }
                             let wordlist = "";
                             words.map(word => {
                                 wordlist = wordlist + " " + word.ACTIVITY_FILTER
@@ -1713,7 +1712,7 @@ module.exports = class Asset {
                                 }).then(filterdata => {
                                     let filtersasset = [];
 
-                                    this.filterAssetBySearchString(finalList, filterdata, wordlist, filtersasset).then(res => {
+                                    this.filterAssetBySearchString(allassets, filterdata, wordlist, filtersasset).then(res => {
                                         this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "", userEmail).then(assets => {
                                             resolve(assets);
                                         })
