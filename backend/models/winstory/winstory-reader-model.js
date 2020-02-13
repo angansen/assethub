@@ -1479,17 +1479,15 @@ module.exports = class Asset {
                 let filterids = filterList.map(filter => filter.ASSET_FILTER_ID).join().replace(/,/g, "','");
                 console.log('----------------  FILTER IDS --------------');
                 console.log(JSON.stringify(filterids));
-                let fetchAssetsSql = "";
-                if (filterids.trim().length > 0) {
-                    fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
+                let fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
                 where a.filter_id in('`+ filterids + `') 
                 and a.WINSTORY_ID=b.WINSTORY_ID 
                 and b.winstory_status='Live'`;
-                } else {
-                    fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
-                    where a.WINSTORY_ID=b.WINSTORY_ID 
-                    and b.winstory_status='Live'`;
-                }
+                // } else {
+                //     fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
+                //     where a.WINSTORY_ID=b.WINSTORY_ID 
+                //     and b.winstory_status='Live'`;
+                // }
 
                 // GET THE MAPPED ASSES FOR THE FILTERS
                 // let fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
