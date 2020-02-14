@@ -579,7 +579,7 @@ const createNotification = (notification) => {
 exports.preparenotification = (contentId, contentType) => {
 
     const connection = getDb();
-    if (contentType.includes('asset')) {
+    if (contentType.toLowerCase().includes('asset')) {
         let getassetDetailsSql = `select asset_title from asset_details where asset_id=:0`;
         let option = [contentId];
 
@@ -593,7 +593,7 @@ exports.preparenotification = (contentId, contentType) => {
             }
             createNotification(notification);
         })
-    } else if (contentType.includes('win')) {
+    } else if (contentType.toLowerCase().includes('win')) {
         let getassetDetailsSql = `select winstory_name from asset_winstory_details where winstory_id=:0`;
         let option = [contentId];
 
