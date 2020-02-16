@@ -596,7 +596,7 @@ exports.preparenotification = (contentId, contentType, host) => {
             createNotification(notification);
         })
     } else if (contentType.toLowerCase().includes('win')) {
-        let getassetDetailsSql = `select winstory_name from asset_winstory_details where winstory_id=:0`;
+        let getassetDetailsSql = `select winstory_name,winstory_thumbnail from asset_winstory_details where winstory_id=:0`;
         let option = [contentId];
 
         connection.query(getassetDetailsSql, option, {
@@ -606,7 +606,7 @@ exports.preparenotification = (contentId, contentType, host) => {
                 NOTIFICATION_CONTENT_ID: contentId,
                 NOTIFICATION_CONTENT_NAME: result[0].WINSTORY_NAME,
                 NOTIFICATION_CONTENT_TYPE: contentType,
-                NOTIFICATION_CONTENT_ICON: result[0].ASSET_THUMBNAIL,
+                NOTIFICATION_CONTENT_ICON: result[0].WINSTORY_THUMBNAIL,
                 NOTIFICATION_HOST: host
             }
             createNotification(notification);
