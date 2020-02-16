@@ -561,7 +561,7 @@ const createNotification = (notification) => {
     triggerDeviceNotification(notification);
     const connection = getDb();
     let createNotificationSql = `insert into asset_winstory_notifications (notfication_id,NOTIFICATION_CONTENT_ID,NOTIFICATION_CONTENT_TYPE,NOTIFICATION_CONTENT_NAME,NOTIFICATION_CONTENT_ICON) values (:0,:1,:2,:3,:4)`;
-    let notificationOptions = [notification_id, notification.NOTIFICATION_CONTENT_ID, notification.NOTIFICATION_CONTENT_TYPE, notification.NOTIFICATION_CONTENT_NAME,notification.NOTIFICATION_CONTENT_ICON]
+    let notificationOptions = [notification_id, notification.NOTIFICATION_CONTENT_ID, notification.NOTIFICATION_CONTENT_TYPE, notification.NOTIFICATION_CONTENT_NAME, notification.NOTIFICATION_CONTENT_ICON]
 
     connection.execute(createNotificationSql, notificationOptions, {
         autoCommit: true
@@ -576,7 +576,7 @@ const createNotification = (notification) => {
     })
 }
 
-exports.preparenotification = (contentId, contentType) => {
+exports.preparenotification = (contentId, contentType, host) => {
 
     const connection = getDb();
     if (contentType.toLowerCase().includes('asset')) {
@@ -590,7 +590,8 @@ exports.preparenotification = (contentId, contentType) => {
                 NOTIFICATION_CONTENT_ID: contentId,
                 NOTIFICATION_CONTENT_NAME: result[0].ASSET_TITLE,
                 NOTIFICATION_CONTENT_TYPE: contentType,
-                NOTIFICATION_CONTENT_ICON:result[0].ASSET_THUMBNAIL
+                NOTIFICATION_CONTENT_ICON: result[0].ASSET_THUMBNAIL,
+                NOTIFICATION_HOST: host
             }
             createNotification(notification);
         })
@@ -605,7 +606,8 @@ exports.preparenotification = (contentId, contentType) => {
                 NOTIFICATION_CONTENT_ID: contentId,
                 NOTIFICATION_CONTENT_NAME: result[0].WINSTORY_NAME,
                 NOTIFICATION_CONTENT_TYPE: contentType,
-                NOTIFICATION_CONTENT_ICON:result[0].ASSET_THUMBNAIL
+                NOTIFICATION_CONTENT_ICON: result[0].ASSET_THUMBNAIL,
+                NOTIFICATION_HOST: host
             }
             createNotification(notification);
         })
@@ -679,7 +681,7 @@ function sendToFCM(msg, devicetokens) {
         notification: {
             title: msg.title,
             body: msg.body,
-            image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
+            image: "http://" + msg.NOTIFICATION_HOST + "/" + msg.NOTIFICATION_CONTENT_ICON
 
         },
         data: {

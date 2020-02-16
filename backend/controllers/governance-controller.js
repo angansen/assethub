@@ -21,12 +21,13 @@ exports.addAssetReviewNote = (req, res) => {
     const review_note = req.body.review_note;
     const asset_status = req.body.asset_status;
     const assetId = req.body.assetId;
+    const host=req.headers.host;
     console.log(req.body)
     if (!review_note || !asset_status) {
         res.json({ "status": "Enter a review note" })
     }
     else {
-        Governance.postAssetReviewNote(review_note, asset_status, assetId)
+        Governance.postAssetReviewNote(review_note, asset_status, assetId,host)
             .then(result => {
                 console.log("Review submitted. . .");
                 if (asset_status === 'Live') {
@@ -52,35 +53,6 @@ exports.addAssetReviewNote = (req, res) => {
     }
 }
 
-// const generateNotification = (assetId) => {
-//     console.log("Registering notification step 0");
-//     const connection = getDb();
-//     let getassetdetailsSql = `select asset_title from asset_details where asset_id=:0`;
-//     let getassetdetailsOption = [assetId];
-//     connection.execute(getassetdetailsSql, getassetdetailsOption,
-//         {
-//             outFormat: oracledb.OBJECT,
-//             autoCommit: true
-//         })
-//         .then(asset => {
-//             let notification = {
-//                 NOTIFICATION_CONTENT_ID: assetId,
-//                 NOTIFICATION_CONTENT_TYPE: "asset",
-//                 NOTIFICATION_CONTENT_NAME: asset.ASSET_TITLE
-//             }
-//             let getusersql = `select user_email from asset_user`;
-//             let getuseroption = [];
-//             connection.execute(getusersql, getuseroption,
-//                 {
-//                     outFormat: oracledb.OBJECT,
-//                     autoCommit: true
-//                 })
-//                 .then(userdetails => {
-//                     userController.registernotofication(notification, userdetails.user_email);
-//                 })
-
-//         })
-// }
 const sendEmailForAssetStatusChange = (assetId, status) => {
     let reviewNoteHtml = `<table border=1> 
                             <tr>
