@@ -681,7 +681,7 @@ function sendToFCM(msg, devicetokens) {
         notification: {
             title: msg.title,
             body: msg.body,
-            image: msg.icon
+            image: msg.payload.icon
 
         },
         data: {
@@ -689,7 +689,7 @@ function sendToFCM(msg, devicetokens) {
             notification_id: msg.payload.notification_id,
             type: msg.payload.type,
             title: msg.payload.title,
-            body: msg.payload.body
+            body: msg.payload.body,
         }
     };
     console.log("-------- ANDROID MSG ------------");
