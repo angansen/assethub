@@ -90,7 +90,7 @@ exports.createWinstory = (host, story, res) => {
                 saveWinstoryLogoImage(host, story.WINSTORY_LOGO, newAssetid, res);
             }
 
-            usermodel.preparenotification(newAssetid,"Win");
+            usermodel.preparenotification(newAssetid,"Win",host);
             res.status(200).json({ status: "success", msg: "Winstory creation success." });
         } else {
             res.status(500).json({ status: "failed", msg: "Winstory creation failed." })
@@ -180,7 +180,7 @@ exports.saveWinstory = (host, story, res) => {
             if (story.WINSTORY_LOGO.length > 0) {
                 saveWinstoryLogoImage(host, story.WINSTORY_LOGO, story.WINSTORY_ID, res);
             }
-            usermodel.preparenotification(story.WINSTORY_ID,"Win");
+            usermodel.preparenotification(story.WINSTORY_ID,"Win",host);
             res.status(200).json({ status: "success", msg: "Winstory update success." })
         } else {
             res.status(500).json({ status: "failed", msg: "Winstory updation failed." })
