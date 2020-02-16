@@ -688,6 +688,7 @@ function sendToFCM(msg, devicetokens) {
             body: msg.body
         }
     };
+    console.log("-------- ANDROID MSG ------------");
     console.log(JSON.stringify(msg));
     console.log("-------- ANDROID PAYLOAD ------------");
     console.log(JSON.stringify(message));
@@ -734,8 +735,10 @@ function sendToAPNS(msg, devicetokens) {
         'title': msg.payload.title,
         'body': msg.payload.body
     };
-    console.log("-------- IOS Note --------");
-    console.log(note);
+    console.log("-------- IOS MSG ------------");
+    console.log(JSON.stringify(msg));
+    console.log("-------- IOS PAYLOAD ------------");
+    console.log(JSON.stringify(note));
     apnConnection.pushNotification(note, myDevice)
     apnConnection.on('error', function (error) {
         console.error('APNS: Initialization error', error);
