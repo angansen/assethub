@@ -23,6 +23,7 @@ exports.addAssetReviewNote = (req, res) => {
     const assetId = req.body.assetId;
     const host=req.headers.host;
     console.log(req.body)
+    console.log("Host: "+host);
     if (!review_note || !asset_status) {
         res.json({ "status": "Enter a review note" })
     }
