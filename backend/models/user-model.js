@@ -647,6 +647,7 @@ const triggerDeviceNotification = (content) => {
                 type: content.NOTIFICATION_CONTENT_TYPE,
                 body: content.NOTIFICATION_CONTENT_NAME,
                 title: content.NOTIFICATION_CONTENT_TYPE + " is live now",
+                icon:"http://" + content.NOTIFICATION_HOST + "/" + content.NOTIFICATION_CONTENT_ICON
             }
         }
 
@@ -681,7 +682,7 @@ function sendToFCM(msg, devicetokens) {
         notification: {
             title: msg.title,
             body: msg.body,
-            image: "http://" + msg.NOTIFICATION_HOST + "/" + msg.NOTIFICATION_CONTENT_ICON
+            image: msg.icon
 
         },
         data: {
