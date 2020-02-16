@@ -560,8 +560,8 @@ const createNotification = (notification) => {
     notification.NOTIFICATION_ID = notification_id;
     triggerDeviceNotification(notification);
     const connection = getDb();
-    let createNotificationSql = `insert into asset_winstory_notifications (notfication_id,NOTIFICATION_CONTENT_ID,NOTIFICATION_CONTENT_TYPE,NOTIFICATION_CONTENT_NAME) values (:0,:1,:2,:3)`;
-    let notificationOptions = [notification_id, notification.NOTIFICATION_CONTENT_ID, notification.NOTIFICATION_CONTENT_TYPE, notification.NOTIFICATION_CONTENT_NAME]
+    let createNotificationSql = `insert into asset_winstory_notifications (notfication_id,NOTIFICATION_CONTENT_ID,NOTIFICATION_CONTENT_TYPE,NOTIFICATION_CONTENT_NAME,NOTIFICATION_CONTENT_ICON) values (:0,:1,:2,:3,:4)`;
+    let notificationOptions = [notification_id, notification.NOTIFICATION_CONTENT_ID, notification.NOTIFICATION_CONTENT_TYPE, notification.NOTIFICATION_CONTENT_NAME,notification.NOTIFICATION_CONTENT_ICON]
 
     connection.execute(createNotificationSql, notificationOptions, {
         autoCommit: true
@@ -580,7 +580,7 @@ exports.preparenotification = (contentId, contentType) => {
 
     const connection = getDb();
     if (contentType.toLowerCase().includes('asset')) {
-        let getassetDetailsSql = `select asset_title from asset_details where asset_id=:0`;
+        let getassetDetailsSql = `select asset_title,asset_thumbnail from asset_details where asset_id=:0`;
         let option = [contentId];
 
         connection.query(getassetDetailsSql, option, {
@@ -589,7 +589,8 @@ exports.preparenotification = (contentId, contentType) => {
             let notification = {
                 NOTIFICATION_CONTENT_ID: contentId,
                 NOTIFICATION_CONTENT_NAME: result[0].ASSET_TITLE,
-                NOTIFICATION_CONTENT_TYPE: contentType
+                NOTIFICATION_CONTENT_TYPE: contentType,
+                NOTIFICATION_CONTENT_ICON:result[0].ASSET_THUMBNAIL
             }
             createNotification(notification);
         })
@@ -603,7 +604,8 @@ exports.preparenotification = (contentId, contentType) => {
             let notification = {
                 NOTIFICATION_CONTENT_ID: contentId,
                 NOTIFICATION_CONTENT_NAME: result[0].WINSTORY_NAME,
-                NOTIFICATION_CONTENT_TYPE: contentType
+                NOTIFICATION_CONTENT_TYPE: contentType,
+                NOTIFICATION_CONTENT_ICON:result[0].ASSET_THUMBNAIL
             }
             createNotification(notification);
         })
@@ -673,19 +675,19 @@ function sendToFCM(msg, devicetokens) {
     console.log(JSON.stringify(devicetokens.length));
     var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
         //to: devicetokens,
-        'registration_ids': devicetokens,
-        'notification': {
-            'title': msg.title,
-            'body': msg.body,
-            'image': "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
+        registration_ids: devicetokens,
+        notification: {
+            title: msg.title,
+            body: msg.body,
+            image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
 
         },
-        'data': {
-            'id': msg.id,
-            'notification_id': msg.notification_id,
-            'type': msg.type,
-            'title': msg.title,
-            'body': msg.body
+        data: {
+            id: msg.payload.id,
+            notification_id: msg.payload.notification_id,
+            type: msg.payload.type,
+            title: msg.payload.title,
+            body: msg.payload.body
         }
     };
     console.log("-------- ANDROID MSG ------------");
