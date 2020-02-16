@@ -673,19 +673,19 @@ function sendToFCM(msg, devicetokens) {
     console.log(JSON.stringify(devicetokens.length));
     var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
         //to: devicetokens,
-        registration_ids: devicetokens,
-        notification: {
-            title: msg.title,
-            body: msg.body,
-            image: "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
+        'registration_ids': devicetokens,
+        'notification': {
+            'title': msg.title,
+            'body': msg.body,
+            'image': "http://nac-assethub-dev.oracle.com:8001/DRthumbnail-min(1)3nam1tdjzk75lw0.png"
 
         },
-        data: {
-            id: msg.id,
-            notification_id: msg.notification_id,
-            type: msg.type,
-            title: msg.title,
-            body: msg.body
+        'data': {
+            'id': msg.id,
+            'notification_id': msg.notification_id,
+            'type': msg.type,
+            'title': msg.title,
+            'body': msg.body
         }
     };
     console.log("-------- ANDROID MSG ------------");
