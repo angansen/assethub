@@ -10,6 +10,7 @@ let assetlinkCount = 0;
 let winlinkcount = 0;
 
 exports.userUpdateCount = 0;
+let exclusionFilterList=['14983ddhswcdol','Gdjfdskyuetr472V','170k5dr4xvz','fd5k53p09dl','fd5k53p15c7'];
 
 
 webworker = () => {
@@ -231,17 +232,19 @@ exports.captureSearch = (activity) => {
 
     // console.log("============= FILTER ==============")
     // console.log(JSON.stringify(activity));
-    // console.log("============= FILTER ==============")
+    console.log("============= FILTER ==============")
     activity.activity_id = uniqid.process('a-');
     activity.activitygroupid = uniqid.process('ag-');
 
     if (activity.filters != undefined) {
 
         console.log(JSON.stringify(activity));
+      
 
         activity.filters = activity.filters.split(',');
 
         activity.filters.map(filter => {
+            console.log(filter+" EXIST ::: "+exclusionFilterList.indexOf(filter));
             if (filter.trim().length > 0 && filter.trim().indexOf("14983ddhswcdol") == -1 && filter.trim().indexOf("Gdjfdskyuetr472V") == -1) {
                 try {
                     const connection = getDb();
