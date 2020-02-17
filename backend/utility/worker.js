@@ -10,7 +10,7 @@ let assetlinkCount = 0;
 let winlinkcount = 0;
 
 exports.userUpdateCount = 0;
-let exclusionFilterList=['14983ddhswcdol','Gdjfdskyuetr472V','170k5dr4xvz','fd5k53p09dl','fd5k53p15c7'];
+let exclusionFilterList = ['14983ddhswcdol', 'Gdjfdskyuetr472V', '170k5dr4xvz', 'fd5k53p09dl', 'fd5k53p15c7'];
 
 
 webworker = () => {
@@ -239,13 +239,13 @@ exports.captureSearch = (activity) => {
     if (activity.filters != undefined) {
 
         console.log(JSON.stringify(activity));
-      
+
 
         activity.filters = activity.filters.split(',');
 
         activity.filters.map(filter => {
-            console.log(filter+" EXIST ::: "+exclusionFilterList.indexOf(filter));
-            if (filter.trim().length > 0 && filter.trim().indexOf("14983ddhswcdol") == -1 && filter.trim().indexOf("Gdjfdskyuetr472V") == -1) {
+            console.log(filter + " EXIST ::: " + exclusionFilterList.indexOf(filter));
+            if (filter.trim().length > 0 && exclusionFilterList.indexOf(filter) == -1) {
                 try {
                     const connection = getDb();
                     let captureSearchActivitySql = `insert into ASSET_SEARCH_ACTIVITY (ACTIVITY_ID, ACTIVITY_PERFORMED_BY, ACTIVITY_FILTER, ACTIVITY_GROUP_ID, ACTIVITY_TYPE) values(:0,:1,:2,:3,:4)`;
@@ -358,7 +358,7 @@ exports.updateUserLob = (req, res) => {
 
         });
     } catch (err) {
-        console.log("=> "+JSON.stringify(err));
+        console.log("=> " + JSON.stringify(err));
         if (res != undefined) {
             res.send({ "status": "error triggered" });
         }
