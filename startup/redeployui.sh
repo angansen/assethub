@@ -8,5 +8,5 @@ sudo  rm -Rf build
 echo "build content moved . . ."
 sudo cp -f ssoheader.php html/
 echo "SSOheader file placed . . ."
-sudo systemctl restart httpd
-echo "Apache Service restarted . . ."
+#sudo systemctl restart httpd
+#echo "Apache Service restarted . . ."
