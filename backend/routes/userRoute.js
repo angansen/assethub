@@ -20,6 +20,8 @@ router.get('/ldapcompletelist',worker.triggerWorkers);
 router.get('/ldapupdate',worker.triggerWorkeronce);
 router.get('/getactivitybyuser',userController.fetchActivityByemail);
 router.get('/notification/:email',userController.retriveNotifications);
+router.get('/keywords/:email',userController.fetchAllSearchedKeywordsByUser);
+
 
 
 // PUT

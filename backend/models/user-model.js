@@ -646,7 +646,7 @@ const triggerDeviceNotification = (content) => {
                 type: content.NOTIFICATION_CONTENT_TYPE,
                 body: content.NOTIFICATION_CONTENT_NAME,
                 title: content.NOTIFICATION_CONTENT_TYPE + " is live now",
-                icon:"http://" + content.NOTIFICATION_HOST + "/" + content.NOTIFICATION_CONTENT_ICON
+                icon: "http://" + content.NOTIFICATION_HOST + "/" + content.NOTIFICATION_CONTENT_ICON
             }
         }
 
@@ -810,5 +810,23 @@ const purgeUserRecords2 = () => {
 
     }).catch(err => {
         // console.log("User record truncation  failed at db level request : " + JSON.stringify(err));
+    })
+}
+
+exports.findAllSearchedKeywordsByUser = (params) => {
+    let email = params.email;
+    let fetchKeywordByUserSQL = `select a.activity_filter,a.activity_type,b.filter_name 
+    from asset_search_activity a full outer join asset_filter b 
+    on a.activity_filter=b.filter_id
+    where activity_performed_by=${email}`;
+    return new Promise((resolve, reject) => {
+        connection.query(fetchKeywordByUserSQL, [], {
+            autoCommit: true,
+            outFormat: oracledb.OBJECT
+        }).then(result => {
+            resolve(result);
+        }).catch(err => {
+            reject({"msg":"error while fetching the keywords"});
+        })
     })
 }

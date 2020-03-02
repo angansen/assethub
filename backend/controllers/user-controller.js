@@ -55,16 +55,16 @@ exports.registerPushNotification = (notification, user) => {
     user.createNotification(notification, user);
 }
 
-exports.retriveNotifications=(req,res)=>{
-    user.fetchNotifications(req.params,res);
+exports.retriveNotifications = (req, res) => {
+    user.fetchNotifications(req.params, res);
 }
 
-exports.markNotificationRead=(req,res)=>{
-    user.markNotificationRead(req.params,res);
+exports.markNotificationRead = (req, res) => {
+    user.markNotificationRead(req.params, res);
 }
 
-exports.markNotificationDelete=(req,res)=>{
-    user.markNotificationDelete(req.params,res);
+exports.markNotificationDelete = (req, res) => {
+    user.markNotificationDelete(req.params, res);
 }
 
 exports.getLdapUsersComplete = (req, res) => {
@@ -72,4 +72,10 @@ exports.getLdapUsersComplete = (req, res) => {
         .then(data => {
             res.json(data)
         })
+}
+
+exports.fetchAllSearchedKeywordsByUser = (req, res) => {
+    user.findAllSearchedKeywordsByUser(req.params).then(data => {
+        res.send(data);
+    })
 }
