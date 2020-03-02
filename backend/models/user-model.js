@@ -841,13 +841,13 @@ exports.deleteKeyWordsByUser = (body, params) => {
     console.log(`Body : ${JSON.stringify(body)}`);
     let keywordsList = "'" + body.keywords+"'";
     keywordsList = keywordsList.replace(/,/g, "','");
-    let deleteKeywordbyuserSQL = `delete from asset_search_activity where activity_performed_by='angan.sen@oracle.com' and activity_filter in (` + keywordsList + `)`;
+    let deleteKeywordbyuserSQL = `delete from asset_search_activity where activity_performed_by='`+email+`' and activity_filter in (` + keywordsList + `)`;
     console.log(`Query: ${deleteKeywordbyuserSQL}`);
     return new Promise((resolve, reject) => {
         connection.execute(deleteKeywordbyuserSQL, [], {
             autoCommit: true
         }).then(result => {
-            resolve(result);
+            resolve({"msg":"keywords deleted successfully"});
         }).catch(err => {
             reject({ "msg": "error while fetching the keywords " + err });
         })
