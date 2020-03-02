@@ -817,7 +817,7 @@ exports.findAllSearchedKeywordsByUser = (params) => {
     const connection = getDb();
     let email = params.email;
     console.log(`Email: ${email}`);
-    let fetchKeywordByUserSQL = `select a.activity_filter,a.activity_type,b.filter_name 
+    let fetchKeywordByUserSQL = `select distinct a.activity_filter,a.activity_type,b.filter_name 
     from asset_search_activity a full outer join asset_filter b 
     on a.activity_filter=b.filter_id
     where activity_performed_by='`+email+`'`;
