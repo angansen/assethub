@@ -844,7 +844,7 @@ exports.deleteKeyWordsByUser = (body, params) => {
     let deleteKeywordbyuserSQL = `delete from asset_search_activity where activity_performed_by='angan.sen@oracle.com' and activity_filter in (` + keywordsList + `)`;
     console.log(`Query: ${deleteKeywordbyuserSQL}`);
     return new Promise((resolve, reject) => {
-        connection.query(deleteKeywordbyuserSQL, [], {
+        connection.execute(deleteKeywordbyuserSQL, [], {
             autoCommit: true
         }).then(result => {
             resolve(result);
