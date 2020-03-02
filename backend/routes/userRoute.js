@@ -29,7 +29,7 @@ router.put('/notification/:email/:id',userController.markNotificationRead);
 
 // DELETE
 router.delete('/notification/:email/:id',userController.markNotificationDelete);
-router.delete('keywords/:email',userController.deleteKeywordsByUser);
+router.delete('/keywords/:email',userController.deleteKeywordsByUser);
 
 
 module.exports = router;

@@ -842,7 +842,8 @@ exports.deleteKeyWordsByUser = (body,params) => {
         console.log(`Body : ${JSON.stringify(body)}`);
         let keywordsList=''
         let deleteKeywordbyuserSQL=`delete from asset_search_activity where activity_performed_by='angan.sen@oracle.com' and activity_filter in ('`+keywordsList+`')`;
-
+        console.log(`Query: ${deleteKeywordbyuserSQL}`);
+        resolve({"msg":"Sucess"});
         // connection.execute()
     })
 
