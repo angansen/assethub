@@ -839,7 +839,7 @@ exports.deleteKeyWordsByUser = (body,params) => {
         const connection = getDb();
         let email = params.email;
         console.log(`Email: ${email}`);
-        console.log(`Body : ${body}`);
+        console.log(`Body : ${JSON.stringify(body)}`);
         let keywordsList=''
         let deleteKeywordbyuserSQL=`delete from asset_search_activity where activity_performed_by='angan.sen@oracle.com' and activity_filter in ('`+keywordsList+`')`;
 
