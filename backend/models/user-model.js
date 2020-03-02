@@ -816,13 +816,11 @@ const purgeUserRecords2 = () => {
 exports.findAllSearchedKeywordsByUser = (params) => {
     const connection = getDb();
     let email = params.email;
-    console.log(`Email: ${email}`);
     let fetchKeywordByUserSQL = `select distinct a.activity_filter,a.activity_type,b.filter_name 
     from asset_search_activity a full outer join asset_filter b 
     on a.activity_filter=b.filter_id
-    where activity_performed_by='`+email+`'`;
-    console.log(`Query: ${fetchKeywordByUserSQL}`);
-    let options=[];
+    where activity_performed_by='`+ email + `'`;
+    let options = [];
     return new Promise((resolve, reject) => {
         connection.query(fetchKeywordByUserSQL, options, {
             autoCommit: true,
@@ -830,7 +828,22 @@ exports.findAllSearchedKeywordsByUser = (params) => {
         }).then(result => {
             resolve(result);
         }).catch(err => {
-            reject({"msg":"error while fetching the keywords "+err});
+            reject({ "msg": "error while fetching the keywords " + err });
         })
     })
+}
+
+exports.deleteKeyWordsByUser = (body,params) => {
+
+    return new promise((resolve, reject) => {
+        const connection = getDb();
+        let email = params.email;
+        console.log(`Email: ${email}`);
+        console.log(`Body : ${body}`);
+        let keywordsList=''
+        let deleteKeywordbyuserSQL=`delete from asset_search_activity where activity_performed_by='angan.sen@oracle.com' and activity_filter in ('`+keywordsList+`')`;
+
+        // connection.execute()
+    })
+
 }

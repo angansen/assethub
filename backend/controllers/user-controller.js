@@ -79,3 +79,9 @@ exports.fetchAllSearchedKeywordsByUser = (req, res) => {
         res.send(data);
     })
 }
+
+exports.deleteKeywordsByUser=(req,res)=>{
+    user.deleteKeyWordsByUser(req.body,req.params).then(data =>{
+        res.send(data);
+    })
+}
