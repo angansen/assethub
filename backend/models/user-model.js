@@ -820,9 +820,9 @@ exports.findAllSearchedKeywordsByUser = (params) => {
     let fetchKeywordByUserSQL = `select a.activity_filter,a.activity_type,b.filter_name 
     from asset_search_activity a full outer join asset_filter b 
     on a.activity_filter=b.filter_id
-    where activity_performed_by=${email}`;
+    where activity_performed_by='`+email+`'`;
     console.log(`Query: ${fetchKeywordByUserSQL}`);
-    let options=[email];
+    let options=[];
     return new Promise((resolve, reject) => {
         connection.query(fetchKeywordByUserSQL, options, {
             autoCommit: true,
