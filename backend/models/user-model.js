@@ -828,7 +828,7 @@ exports.findAllSearchedKeywordsByUser = (params) => {
         }).then(result => {
             resolve(result);
         }).catch(err => {
-            reject({"msg":"error while fetching the keywords"});
+            reject({"msg":"error while fetching the keywords "+err});
         })
     })
 }
