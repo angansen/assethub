@@ -834,8 +834,7 @@ exports.findAllSearchedKeywordsByUser = (params) => {
 }
 
 exports.deleteKeyWordsByUser = (body,params) => {
-
-    return new promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         const connection = getDb();
         let email = params.email;
         console.log(`Email: ${email}`);
