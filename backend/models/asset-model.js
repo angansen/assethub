@@ -1540,104 +1540,7 @@ module.exports = class Asset {
         })
     }
 
-    // static fetchPreferedAssets(host, userEmail) {
-    //     const offset = 0
-    //     let limit;
-    //     let order;
-    //     let sortBy;
-    //     const connection = getDb();
-    //     let finalList = [];
-    //     return new Promise((resolve, reject) => {
-
-    //         // GET THE PREFERED FILTERS
-    //         let fetchPreferedFilterSql = "select asset_filter_id from asset_preferences where user_email='" + userEmail + "'";
-    //         connection.query(fetchPreferedFilterSql, {},
-    //             {
-    //                 outFormat: oracledb.OBJECT
-    //             },
-    //         ).then(filterList => {
-    //             let filterids = filterList.map(filter => filter.ASSET_FILTER_ID).join().replace(/,/g, "','");
-    //             console.log(JSON.stringify(filterids));
-    //             let fetchAssetsSql = "";
-    //             if (filterids.trim().length > 0) {
-    //                 fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
-    //             where a.filter_id in('`+ filterids + `') 
-    //             and a.asset_id=b.asset_id and b.asset_status='Live'`;
-    //             } else {
-    //                 fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
-    //             where a.asset_id=b.asset_id and b.asset_status='Live'`;
-    //             }
-    //             // GET THE MAPPED ASSES FOR THE FILTERS
-    //             // let fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
-    //             // where a.filter_id in('`+ filterids + `') 
-    //             // and a.asset_id=b.asset_id and b.asset_status='Live'`;
-    //             console.log("> " + fetchAssetsSql);
-    //             connection.query(fetchAssetsSql, {},
-    //                 {
-    //                     outFormat: oracledb.OBJECT
-    //                 },
-    //             ).then(assetlist => {
-    //                 // console.log(JSON.stringify(assetlist));
-    //                 if (filterids.trim().length > 0) {
-    //                     finalList = [...winList];
-    //                 } else {
-    //                     finalList = [];
-    //                 }
-    //                 let fetchtopwordssql = `select activity_filter, count(*) as frequency from asset_search_activity 
-    //                 where activity_type='FREETEXT' 
-    //                 and activity_performed_by='` + userEmail + `' 
-    //                 group by activity_filter 
-    //                 order by frequency desc 
-    //                 FETCH NEXT 3 ROWS ONLY`
-    //                 connection.query(fetchtopwordssql, {},
-    //                     {
-    //                         outFormat: oracledb.OBJECT
-    //                     },
-    //                 ).then(words => {
-    //                     let fetchallLiveAssets = `select * from asset_details where asset_status='Live'`
-    //                     connection.query(fetchallLiveAssets, {},
-    //                         {
-    //                             outFormat: oracledb.OBJECT
-    //                         },
-    //                     ).then(allassets => {
-    //                         console.log(JSON.stringify(words));
-    //                         let wordlist = words.map(word => word.ACTIVITY_FILTER);
-    //                         let filteredbyword = []
-
-    //                         for (let i = 0; i < allassets.length; i++) {
-
-    //                             let combineContentToMatch = allassets[i].ASSET_ID +
-    //                                 allassets[i].ASSET_TITLE +
-    //                                 allassets[i].ASSET_DESCRIPTION +
-    //                                 allassets[i].ASSET_USERCASE +
-    //                                 allassets[i].ASSET_CUSTOMER +
-    //                                 allassets[i].ASSET_ARCHITECTURE_DESCRIPTION
-
-    //                             combineContentToMatch = combineContentToMatch.toLowerCase();
-    //                             wordlist.forEach(word => {
-    //                                 // console.log(" >>> " + combineContentToMatch.indexOf(word));
-    //                                 console.log("------------------ ASSET MATCH ---------------- " + combineContentToMatch.indexOf(word.toLowerCase()));
-    //                                 if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
-    //                                     finalList.push(allassets[i]);
-    //                                 }
-    //                             })
-    //                         }
-    //                         console.log("Suggested assets : " + finalList.length);
-    //                         this.refineAssets(host, offset, limit, finalList, sortBy, order, "", userEmail).then(assets => {
-    //                             resolve(assets);
-    //                         })
-
-    //                     })
-
-    //                 })
-    //             })
-    //         })
-
-    //     })
-
-
-    // }
-    static fetchPreferedAssets(host, userEmail) {
+    static fetchPreferedAssets(host, userEmail,keywords=[]) {
         const offset = 0
         let limit;
         let order;
@@ -1661,14 +1564,7 @@ module.exports = class Asset {
                 let fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
                 where a.filter_id in('`+ filterids + `') 
                 and a.asset_id=b.asset_id and b.asset_status='Live'`;
-                //  else {
-                //     fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
-                // where a.asset_id=b.asset_id and b.asset_status='Live'`;
-                // }
-                // GET THE MAPPED ASSES FOR THE FILTERS
-                // let fetchAssetsSql = `select b.* from asset_filter_asset_map a, asset_details b 
-                // where a.filter_id in('`+ filterids + `') 
-                // and a.asset_id=b.asset_id and b.asset_status='Live'`;
+
                 console.log("> " + fetchAssetsSql);
                 connection.query(fetchAssetsSql, {},
                     {
@@ -1729,8 +1625,6 @@ module.exports = class Asset {
                 })
             })
         })
-
-
     }
 
 
