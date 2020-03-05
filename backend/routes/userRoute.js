@@ -9,7 +9,7 @@ router.post('/findbyemail/',userController.findUserByEmail);
 router.post('/uploadprofileimage/:platform/:email',userController.uploadProfileImage);
 router.post('/requestdemo/',userController.saveRequestDemo);
 router.post('/captureactivity/:platform/:type/:name/:email',userController.captureuserLogin);
-router.delete('/:email',userController.deleteUser);
+router.post('/updateUserTable',userController.updateUserRepos);
 
 
 
@@ -30,6 +30,7 @@ router.put('/notification/:email/:id',userController.markNotificationRead);
 // DELETE
 router.delete('/notification/:email/:id',userController.markNotificationDelete);
 router.delete('/keywords/:email',userController.deleteKeywordsByUser);
+router.delete('/:email',userController.deleteUser);
 
 
 module.exports = router;

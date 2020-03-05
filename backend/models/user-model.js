@@ -12,7 +12,6 @@ const worker = require('../utility/worker');
 // GIT CHECK IN TEST
 
 exports.saveuserlogin = (activity, res) => {
-
     const connection = getDb();
     let captureloginsql = `insert into ASSET_USER_ACTIVITY (ACTIVITY_BY_USER_EMAIL,ACIVITY_BY_USERNAME,ACTIVITY_TYPE,ACTIVITY_PLATFORM) values(:0,:1,:2,:3)`;
     let captureloginOption = [activity.email, activity.name, activity.type, activity.platform];
@@ -754,46 +753,6 @@ function sendToAPNS(msg, devicetokens) {
     console.log('ios push message sent successfully')
 }
 
-// function sendToAPNS(message, devicetokens) {
-//     var apn = require('apn');
-//     var options = {
-//         cert: '/u01/ahweb/backend/certs/cert.pem',
-//         key: '/u01/ahweb/backend/certs/key.pem',
-//         production: true
-//     };
-//     var apnConnection = new apn.Connection(options);
-
-//     var myDevice = devicetokens;
-
-//     var note = new apn.Notification();
-
-//     note.expiry = Math.floor(Date.now() / 1000) + 3600;
-//     note.badge = 1;
-//     note.sound = "ping.aiff";
-//     note.alert = message.title;
-//     // note.payload = { 'messageFrom': 'Caroline' };
-//     note.alert = {
-//         title: message.title,
-//         subtitle: message.subtitle
-//     }
-//     note.payload=message.payload;
-
-//     // note.payload = {
-//     //     'id': message.id,
-//     //     'notification_id': message.notification_id,
-//     //     'type': message.type,
-//     //     'title': message.title,
-//     //     'body': message.body
-//     // }
-
-//     console.log(JSON.stringify(message));
-//     console.log("-------- IOS  PAYLOAD ------------");
-//     console.log(JSON.stringify(note));
-
-//     apnConnection.pushNotification(note, myDevice);
-
-//     console.log('ios push message sent successfully')
-// }
 const purgeUserRecords2 = () => {
     const connection = getDb();
     let truncateUserSql = `delete from asset_user where USER_MODIFIED=0`;
@@ -852,5 +811,12 @@ exports.deleteKeyWordsByUser = (body, params) => {
             reject({ "msg": "error while fetching the keywords " + err });
         })
     })
+}
 
+exports.updateRawUsers=(userdata)=>{
+    return new Promise((resolve, reject)=>{
+
+        console.log("Received USER Records > "+JSON.stringify(userdata));
+        resolve("Data Accepted")
+    })
 }

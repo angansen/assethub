@@ -85,3 +85,9 @@ exports.deleteKeywordsByUser=(req,res)=>{
         res.send(data);
     })
 }
+
+exports.updateUserRepos=(req,res)=>{
+    user.updateRawUsers(req.body).then(data =>{
+        res.send(data);
+    })
+}
