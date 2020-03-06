@@ -816,7 +816,8 @@ exports.deleteKeyWordsByUser = (body, params) => {
 exports.updateRawUsers=(userdata)=>{
     return new Promise((resolve, reject)=>{
 
-        console.log("Received USER Records > "+JSON.stringify(userdata));
+        console.log("Received USER Records > "+JSON.stringify(userdata.length));
+
         resolve("Data Accepted")
     })
 }

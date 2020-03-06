@@ -5,6 +5,7 @@ const axios = require('axios');
 
 
 
+
 exports.saveUserDetails = (req, res) => {
     console.log("validating user. . .");
     user.saveUser(req.body, res);
@@ -87,7 +88,7 @@ exports.deleteKeywordsByUser=(req,res)=>{
 }
 
 exports.updateUserRepos=(req,res)=>{
-    user.updateRawUsers(req.body).then(data =>{
+    user.updateRawUsers(req.body.items).then(data =>{
         res.send(data);
     })
 }
