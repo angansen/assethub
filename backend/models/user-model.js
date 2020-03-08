@@ -814,95 +814,95 @@ exports.deleteKeyWordsByUser = (body, params) => {
 }
 
 
-// exports.updateRawUsers = (userdata) => {
-
-//     const connection = getDb();
-//     console.log("Received USER Records > " + JSON.stringify(userdata.length));
-//     let count = 0;
-
-//     return new Promise((resolve, reject) => {
-//         connection.execute(`truncate table ASSET_USER_RAW`, [], {
-//             autoCommit: true
-//         }).then(result => {
-
-//             console.log("Truncate: " + JSON.stringify(result));
-
-//             let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:1,:2,:3,:4,:5)`;
-
-//             console.log("Executing . . .");
-//             userdata.map(user => {
-//                 count++;
-//                 let values = [user.mail, user.displayname, user.city, user.orclbeehivephonenumber, user.manager];
-
-//                 // console.log("Options: "+JSON.stringify(values));
-//                 connection.execute(createUserSql, values, {
-//                     autoCommit: true
-//                 }, (err, result) => {
-//                     console.log("Executed . . .");
-//                     if (err || result.rowsAffected == 0) {
-//                         console.log("Error while saving User records :" + err);
-//                         reject("Couldn't process user records");
-
-//                     }
-//                     else {
-//                         console.log(count+" Result is:"+JSON.stringify(result));
-//                     }
-//                 })
-//             })
-//             resolve("Data Accepted "+count);
-//         })
-//     })
-// }
-
 exports.updateRawUsers = (userdata) => {
 
     const connection = getDb();
-    let binddata = [];
     console.log("Received USER Records > " + JSON.stringify(userdata.length));
+    let count = 0;
 
-
-    userdata.map(user => {
-        let value = [];
-        value.push(user.mail);
-        value.push(user.displayname);
-        value.push(user.city);
-        value.push(user.orclbeehivephonenumber);
-        value.push(user.manager);
-
-        binddata.push(value);
-    })
-    console.log("BindData >> " + JSON.stringify(binddata));
     return new Promise((resolve, reject) => {
         connection.execute(`truncate table ASSET_USER_RAW`, [], {
             autoCommit: true
         }).then(result => {
 
+            console.log("Truncate: " + JSON.stringify(result));
+
             let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:1,:2,:3,:4,:5)`;
-            let options = {
-                autoCommit: true,   // autocommit if there are no batch errors
-                batchErrors: true,  // identify invalid records; start a transaction for valid ones
-                bindDefs: [         // describes the data in 'binds'
-                    { type: oracledb.STRING, maxSize: 500 },
-                    { type: oracledb.STRING, maxSize: 500 },
-                    { type: oracledb.STRING, maxSize: 500 },
-                    { type: oracledb.STRING, maxSize: 500 },
-                    { type: oracledb.STRING, maxSize: 500 }
-                ]
-            };
+
             console.log("Executing . . .");
-            connection.execute(createUserSql, binddata, options, (err, result) => {
-                console.log("Executed . . .");
-                if (err || result.rowsAffected == 0) {
-                    console.log("Error while saving User records :" + err);
-                    reject("Couldn't process user records");
+            userdata.map(user => {
+                count++;
+                let values = [user.mail, user.displayname, user.city, user.orclbeehivephonenumber, user.manager];
 
-                }
-                else {
-                    console.log("Result is:", JSON.stringify(result));
-                    resolve("Data Accepted")
-                }
+                // console.log("Options: "+JSON.stringify(values));
+                connection.execute(createUserSql, values, {
+                    autoCommit: true
+                }, (err, result) => {
+                    console.log("Executed . . .");
+                    if (err || result.rowsAffected == 0) {
+                        console.log("Error while saving User records :" + err);
+                        reject("Couldn't process user records");
+
+                    }
+                    else {
+                        console.log(count+" Result is:"+JSON.stringify(result));
+                    }
+                })
             })
-
+            resolve("Data Accepted "+count);
         })
     })
 }
+
+// exports.updateRawUsers = (userdata) => {
+
+//     const connection = getDb();
+//     let binddata = [];
+//     console.log("Received USER Records > " + JSON.stringify(userdata.length));
+
+
+//     userdata.map(user => {
+//         let value = [];
+//         value.push(user.mail);
+//         value.push(user.displayname);
+//         value.push(user.city);
+//         value.push(user.orclbeehivephonenumber);
+//         value.push(user.manager);
+
+//         binddata.push(value);
+//     })
+//     console.log("BindData >> " + JSON.stringify(binddata));
+//     return new Promise((resolve, reject) => {
+//         connection.execute(`truncate table ASSET_USER_RAW`, [], {
+//             autoCommit: true
+//         }).then(result => {
+
+//             let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:1,:2,:3,:4,:5)`;
+//             let options = {
+//                 autoCommit: true,   // autocommit if there are no batch errors
+//                 batchErrors: true,  // identify invalid records; start a transaction for valid ones
+//                 bindDefs: [         // describes the data in 'binds'
+//                     { type: oracledb.STRING, maxSize: 500 },
+//                     { type: oracledb.STRING, maxSize: 500 },
+//                     { type: oracledb.STRING, maxSize: 500 },
+//                     { type: oracledb.STRING, maxSize: 500 },
+//                     { type: oracledb.STRING, maxSize: 500 }
+//                 ]
+//             };
+//             console.log("Executing . . .");
+//             connection.execute(createUserSql, binddata, options, (err, result) => {
+//                 console.log("Executed . . .");
+//                 if (err || result.rowsAffected == 0) {
+//                     console.log("Error while saving User records :" + err);
+//                     reject("Couldn't process user records");
+
+//                 }
+//                 else {
+//                     console.log("Result is:", JSON.stringify(result));
+//                     resolve("Data Accepted")
+//                 }
+//             })
+
+//         })
+//     })
+// }
