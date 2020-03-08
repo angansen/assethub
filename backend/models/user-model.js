@@ -798,26 +798,72 @@ exports.deleteKeyWordsByUser = (body, params) => {
     let email = params.email;
     console.log(`Email: ${email}`);
     console.log(`Body : ${JSON.stringify(body)}`);
-    let keywordsList = "'" + body.keywords+"'";
+    let keywordsList = "'" + body.keywords + "'";
     keywordsList = keywordsList.replace(/,/g, "','");
-    let deleteKeywordbyuserSQL = `delete from asset_search_activity where activity_performed_by='`+email+`' and activity_filter in (` + keywordsList + `)`;
+    let deleteKeywordbyuserSQL = `delete from asset_search_activity where activity_performed_by='` + email + `' and activity_filter in (` + keywordsList + `)`;
     console.log(`Query: ${deleteKeywordbyuserSQL}`);
     return new Promise((resolve, reject) => {
         connection.execute(deleteKeywordbyuserSQL, [], {
             autoCommit: true
         }).then(result => {
-            resolve({"msg":"keywords deleted successfully"});
+            resolve({ "msg": "keywords deleted successfully" });
         }).catch(err => {
             reject({ "msg": "error while fetching the keywords " + err });
         })
     })
 }
 
-exports.updateRawUsers=(userdata)=>{
-    return new Promise((resolve, reject)=>{
+exports.updateRawUsers = (userdata) => {
 
-        console.log("Received USER Records > "+JSON.stringify(userdata.length));
+    const connection = getDb();
+    let binddata = [];
+    console.log("Received USER Records > " + JSON.stringify(userdata.length));
 
-        resolve("Data Accepted")
+
+    userdata.map(user => {
+        let value = [];
+        value.push(user.mail);
+        value.push(user.displayname);
+        value.push(user.city);
+        value.push(user.orclbeehivephonenumber);
+        value.push(user.manager);
+
+        binddata.push(value);
+    })
+    return new Promise((resolve, reject) => {
+        connection.execute(`truncate table ASSET_USER_RAW`, [].{
+            autoCommit: true
+        }).then(result => {
+
+            let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:0,:1,:2,:3,:4)`;
+            let options = {
+                autoCommit: true,   // autocommit if there are no batch errors
+                batchErrors: true,  // identify invalid records; start a transaction for valid ones
+                bindDefs: [         // describes the data in 'binds'
+                    { type: oracledb.STRING, maxSize: 20 },
+                    { type: oracledb.STRING, maxSize: 20 },
+                    { type: oracledb.STRING, maxSize: 20 },
+                    { type: oracledb.STRING, maxSize: 20 },
+                    { type: oracledb.STRING, maxSize: 20 }
+                ]
+            };
+            console.log("Executing . . .");
+            connection.execute(createUserSql, binddata, options, (err, result) => {
+                console.log("Executed . . .");
+                if (err || result.rowsAffected == 0) {
+                    console.log("Error while saving filters :" + err);
+                    reject("Couldn't process user records");
+
+                }
+                else {
+                    console.log("Result is:", JSON.stringify(result));
+                    resolve("Data Accepted")
+                }
+            })
+
+        })
+
+
+
     })
 }
