@@ -92,3 +92,8 @@ exports.updateUserRepos=(req,res)=>{
         res.send(data);
     })
 }
+exports.updateUserLob=(req,res)=>{
+    user.updateUserLob().then(data =>{
+        res.send(data);
+    })
+}

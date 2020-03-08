@@ -13,6 +13,7 @@ router.post('/updateUserTable',userController.updateUserRepos);
 
 
 
+
 //to populate users from LDAP
 router.get('/getprofileimage/:platform/:email',userController.getProfileImage);
 router.get('/ldap',userController.getLdapUsers);
@@ -21,6 +22,7 @@ router.get('/ldapupdate',worker.triggerWorkeronce);
 router.get('/getactivitybyuser',userController.fetchActivityByemail);
 router.get('/notification/:email',userController.retriveNotifications);
 router.get('/keywords/:email',userController.fetchAllSearchedKeywordsByUser);
+router.get('/updateUserLob',userController.updateUserLob);
 
 
 
