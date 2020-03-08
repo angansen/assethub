@@ -835,7 +835,7 @@ exports.updateRawUsers = (userdata) => {
                 let values = [user.mail, user.displayname, user.city, user.orclbeehivephonenumber, user.manager];
 
                 // console.log("Options: "+JSON.stringify(values));
-                connection.execute(createUserSql, values, {
+               await connection.execute(createUserSql, values, {
                     autoCommit: true
                 }, (err, result) => {
                     console.log("Executed . . .");
