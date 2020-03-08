@@ -825,14 +825,14 @@ exports.updateRawUsers = (userdata) => {
         }).then(result => {
 
             let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:1,:2,:3,:4,:5)`;
-            let options = {
-                autoCommit: true,   // autocommit if there are no batch errors
-            };
+
             console.log("Executing . . .");
             userdata.map(user => {
-                let value = [user.mail, user.displayname, user.city, user.orclbeehivephonenumber, user.manager];
+                let values = [user.mail, user.displayname, user.city, user.orclbeehivephonenumber, user.manager];
 
-                connection.execute(createUserSql, value, options, (err, result) => {
+                connection.execute(createUserSql, values, {
+                    autoCommit: true
+                }, (err, result) => {
                     console.log("Executed . . .");
                     if (err || result.rowsAffected == 0) {
                         console.log("Error while saving User records :" + err);
