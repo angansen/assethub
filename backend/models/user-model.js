@@ -836,17 +836,17 @@ exports.updateRawUsers = (userdata) => {
             autoCommit: true
         }).then(result => {
             
-            let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:0,:1,:2,:3,:4)`;
+            let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:1,:2,:3,:4,:5)`;
             let options = {
                 autoCommit: true,   // autocommit if there are no batch errors
-                // batchErrors: true,  // identify invalid records; start a transaction for valid ones
-                // bindDefs: [         // describes the data in 'binds'
-                //     { type: oracledb.STRING, maxSize: 500 },
-                //     { type: oracledb.STRING, maxSize: 500 },
-                //     { type: oracledb.STRING, maxSize: 500 },
-                //     { type: oracledb.STRING, maxSize: 500 },
-                //     { type: oracledb.STRING, maxSize: 500 }
-                // ]
+                batchErrors: true,  // identify invalid records; start a transaction for valid ones
+                bindDefs: [         // describes the data in 'binds'
+                    { type: oracledb.STRING, maxSize: 500 },
+                    { type: oracledb.STRING, maxSize: 500 },
+                    { type: oracledb.STRING, maxSize: 500 },
+                    { type: oracledb.STRING, maxSize: 500 },
+                    { type: oracledb.STRING, maxSize: 500 }
+                ]
             };
             console.log("Executing . . .");
             connection.execute(createUserSql, binddata, options, (err, result) => {
