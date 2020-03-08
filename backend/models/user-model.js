@@ -874,7 +874,7 @@ exports.updateUserLob = () => {
     end loop;
     end loop;
     end`;
-    return new promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         connection.execute(storedProc, [], {
             autoCommit: true
         }).then(result => {

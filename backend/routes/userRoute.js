@@ -22,7 +22,7 @@ router.get('/ldapupdate',worker.triggerWorkeronce);
 router.get('/getactivitybyuser',userController.fetchActivityByemail);
 router.get('/notification/:email',userController.retriveNotifications);
 router.get('/keywords/:email',userController.fetchAllSearchedKeywordsByUser);
-router.get('/updateUserLob',userController.updateUserLob);
+router.get('/updateuserlob',userController.updateUserLob);
 
 
 
