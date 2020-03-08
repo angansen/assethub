@@ -834,7 +834,7 @@ exports.updateRawUsers = (userdata) => {
         connection.execute(`truncate table ASSET_USER_RAW`, [],{
             autoCommit: true
         }).then(result => {
-
+            console.log("BindData >> "+JSON.stringify(binddata));
             let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:0,:1,:2,:3,:4)`;
             let options = {
                 autoCommit: true,   // autocommit if there are no batch errors
