@@ -831,7 +831,7 @@ exports.updateRawUsers = (userdata) => {
         binddata.push(value);
     })
     return new Promise((resolve, reject) => {
-        connection.execute(`truncate table ASSET_USER_RAW`, [].{
+        connection.execute(`truncate table ASSET_USER_RAW`, [],{
             autoCommit: true
         }).then(result => {
 
