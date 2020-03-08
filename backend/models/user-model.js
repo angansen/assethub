@@ -824,6 +824,8 @@ exports.updateRawUsers = (userdata) => {
             autoCommit: true
         }).then(result => {
 
+            console.log("Truncate: "+JSON.stringify(result));
+
             let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:1,:2,:3,:4,:5)`;
 
             console.log("Executing . . .");
