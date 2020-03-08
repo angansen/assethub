@@ -841,11 +841,11 @@ exports.updateRawUsers = (userdata) => {
                 autoCommit: true,   // autocommit if there are no batch errors
                 batchErrors: true,  // identify invalid records; start a transaction for valid ones
                 bindDefs: [         // describes the data in 'binds'
-                    { type: oracledb.STRING, maxSize: 20 },
-                    { type: oracledb.STRING, maxSize: 20 },
-                    { type: oracledb.STRING, maxSize: 20 },
-                    { type: oracledb.STRING, maxSize: 20 },
-                    { type: oracledb.STRING, maxSize: 20 }
+                    { type: oracledb.STRING, maxSize: 500 },
+                    { type: oracledb.STRING, maxSize: 500 },
+                    { type: oracledb.STRING, maxSize: 500 },
+                    { type: oracledb.STRING, maxSize: 500 },
+                    { type: oracledb.STRING, maxSize: 500 }
                 ]
             };
             console.log("Executing . . .");
