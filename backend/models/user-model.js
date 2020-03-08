@@ -830,11 +830,12 @@ exports.updateRawUsers = (userdata) => {
 
         binddata.push(value);
     })
+    console.log("BindData >> "+JSON.stringify(binddata));
     return new Promise((resolve, reject) => {
         connection.execute(`truncate table ASSET_USER_RAW`, [],{
             autoCommit: true
         }).then(result => {
-            console.log("BindData >> "+JSON.stringify(binddata));
+            
             let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:0,:1,:2,:3,:4)`;
             let options = {
                 autoCommit: true,   // autocommit if there are no batch errors
@@ -851,7 +852,7 @@ exports.updateRawUsers = (userdata) => {
             connection.execute(createUserSql, binddata, options, (err, result) => {
                 console.log("Executed . . .");
                 if (err || result.rowsAffected == 0) {
-                    console.log("Error while saving filters :" + err);
+                    console.log("Error while saving User records :" + err);
                     reject("Couldn't process user records");
 
                 }
