@@ -881,7 +881,8 @@ exports.updateUserLob = () => {
             console.log(JSON.stringify(result));
             resolve(result);
         })
-    }
+    })
+}
 
 // exports.updateRawUsers = (userdata) => {
 
