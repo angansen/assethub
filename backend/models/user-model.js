@@ -818,21 +818,23 @@ exports.updateRawUsers = (userdata) => {
 
     const connection = getDb();
     console.log("Received USER Records > " + JSON.stringify(userdata.length));
+    let count = 0;
 
     return new Promise((resolve, reject) => {
         connection.execute(`truncate table ASSET_USER_RAW`, [], {
             autoCommit: true
         }).then(result => {
 
-            console.log("Truncate: "+JSON.stringify(result));
+            console.log("Truncate: " + JSON.stringify(result));
 
             let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:1,:2,:3,:4,:5)`;
 
             console.log("Executing . . .");
             userdata.map(user => {
+                count++;
                 let values = [user.mail, user.displayname, user.city, user.orclbeehivephonenumber, user.manager];
 
-                console.log("Options: "+JSON.stringify(values));
+                // console.log("Options: "+JSON.stringify(values));
                 connection.execute(createUserSql, values, {
                     autoCommit: true
                 }, (err, result) => {
@@ -843,15 +845,11 @@ exports.updateRawUsers = (userdata) => {
 
                     }
                     else {
-                        console.log("Result is:", JSON.stringify(result));
-                        resolve("Data Accepted")
+                        console.log(count+" Result is:"+JSON.stringify(result));
                     }
                 })
-
-                // binddata.push(value);
             })
-
-
+            resolve("Data Accepted "+count);
         })
     })
 }
