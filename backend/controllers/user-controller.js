@@ -97,3 +97,9 @@ exports.updateUserLob=(req,res)=>{
         res.send(data);
     })
 }
+
+exports.deleteUserData=(req,res)=>{
+    user.truncateUserData().then(data=>{
+        res.send(data);
+    })
+}

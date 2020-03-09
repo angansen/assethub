@@ -821,36 +821,30 @@ exports.updateRawUsers = (userdata) => {
     let count = 0;
 
     return new Promise((resolve, reject) => {
-        connection.execute(`truncate table ASSET_USER_RAW`, [], {
-            autoCommit: true
-        }).then(result => {
+        
+        let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:1,:2,:3,:4,:5)`;
 
-            console.log("Truncate: " + JSON.stringify(result));
+        console.log("Executing . . .");
+        userdata.map(user => {
+            count++;
+            let values = [user.mail, user.displayname, user.city, user.orclbeehivephonenumber, user.manager];
 
-            let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:1,:2,:3,:4,:5)`;
+            // console.log("Options: "+JSON.stringify(values));
+            connection.execute(createUserSql, values, {
+                autoCommit: true
+            }, (err, result) => {
+                console.log("Executed . . .");
+                if (err || result.rowsAffected == 0) {
+                    console.log("Error while saving User records :" + err);
+                    reject("Couldn't process user records");
 
-            console.log("Executing . . .");
-            userdata.map(user => {
-                count++;
-                let values = [user.mail, user.displayname, user.city, user.orclbeehivephonenumber, user.manager];
-
-                // console.log("Options: "+JSON.stringify(values));
-                connection.execute(createUserSql, values, {
-                    autoCommit: true
-                }, (err, result) => {
-                    console.log("Executed . . .");
-                    if (err || result.rowsAffected == 0) {
-                        console.log("Error while saving User records :" + err);
-                        reject("Couldn't process user records");
-
-                    }
-                    else {
-                        console.log(count + " Result is:" + JSON.stringify(result));
-                    }
-                })
+                }
+                else {
+                    console.log(count + " Result is:" + JSON.stringify(result));
+                }
             })
-            resolve("Data Accepted " + count);
         })
+        resolve("Data Accepted " + count);
     })
 }
 
@@ -883,6 +877,15 @@ exports.updateUserLob = () => {
         })
     })
 }
+exports.truncateUserData = () => {
+    const connection = getDb();
+    return new Promise((resolve, reject) => {
+        connection.execute(`truncate table ASSET_USER_RAW`, [], {
+            autoCommit: true
+        }).then(result => {
+            resolve("msg": "truncate success");
+        })
+    }
 
 // exports.updateRawUsers = (userdata) => {
 
