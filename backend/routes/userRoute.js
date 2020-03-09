@@ -31,7 +31,7 @@ router.put('/notification/:email/:id',userController.markNotificationRead);
 router.delete('/notification/:email/:id',userController.markNotificationDelete);
 router.delete('/keywords/:email',userController.deleteKeywordsByUser);
 router.delete('/:email',userController.deleteUser);
-router.delete('/truncateuserdata',userController.deleteUserData);
+router.delete('/truncateuserdata',userController.removeAllUserData);
 
 
 module.exports = router;

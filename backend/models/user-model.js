@@ -877,7 +877,7 @@ exports.updateUserLob = () => {
         })
     })
 }
-exports.truncateUserData = () => {
+exports.truncateAllUserData = () => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
         connection.execute(`truncate table ASSET_USER_RAW`, [], {

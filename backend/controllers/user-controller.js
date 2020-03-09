@@ -98,8 +98,8 @@ exports.updateUserLob=(req,res)=>{
     })
 }
 
-exports.deleteUserData=(req,res)=>{
-    user.truncateUserData().then(data=>{
+exports.removeAllUserData=(req,res)=>{
+    user.truncateAllUserData().then(data=>{
         res.send(data);
     })
 }
