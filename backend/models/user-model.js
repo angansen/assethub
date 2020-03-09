@@ -821,7 +821,7 @@ exports.updateRawUsers = (userdata) => {
     let count = 0;
 
     return new Promise((resolve, reject) => {
-        
+
         let createUserSql = `insert into asset_user_raw (MAIL,DISPLAYNAME,CITY,ORCLBEEHIVEPHONENUMBER,MANAGER) values(:1,:2,:3,:4,:5)`;
 
         console.log("Executing . . .");
@@ -883,9 +883,10 @@ exports.truncateUserData = () => {
         connection.execute(`truncate table ASSET_USER_RAW`, [], {
             autoCommit: true
         }).then(result => {
-            resolve({msg: "truncate success"});
+            resolve({ msg: JSON.stringify(result) });
         })
     }
+}
 
 // exports.updateRawUsers = (userdata) => {
 
