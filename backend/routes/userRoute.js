@@ -21,7 +21,7 @@ router.get('/getactivitybyuser',userController.fetchActivityByemail);
 router.get('/notification/:email',userController.retriveNotifications);
 router.get('/keywords/:email',userController.fetchAllSearchedKeywordsByUser);
 router.get('/updateuserlob',userController.updateUserLob);
-
+router.get('/truncateuserdata',userController.removeAllUserData);
 
 // PUT
 router.put('/notification/:email/:id',userController.markNotificationRead);
@@ -31,7 +31,7 @@ router.put('/notification/:email/:id',userController.markNotificationRead);
 router.delete('/notification/:email/:id',userController.markNotificationDelete);
 router.delete('/keywords/:email',userController.deleteKeywordsByUser);
 router.delete('/:email',userController.deleteUser);
-router.delete('/truncateuserdata',userController.removeAllUserData);
+
 
 
 module.exports = router;
