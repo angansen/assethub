@@ -1540,7 +1540,7 @@ module.exports = class Asset {
         })
     }
 
-    static fetchPreferedAssets(host, userEmail,keywords=[]) {
+    static fetchPreferedAssets(host, userEmail, keywords = []) {
         const offset = 0
         let limit;
         let order;
@@ -1595,9 +1595,9 @@ module.exports = class Asset {
                             // if (filterids.trim().length > 0 || words.length > 0) {
                             //     finalList = [...assetlist];
                             // }
-                            
-                            if(words.length==0){
-                                allassets=[];
+
+                            if (words.length == 0) {
+                                allassets = [];
                             }
                             let wordlist = "";
                             words.map(word => {
@@ -1613,7 +1613,7 @@ module.exports = class Asset {
                                     let filtersasset = [];
 
                                     this.filterAssetBySearchString(allassets, filterdata, wordlist, filtersasset).then(res => {
-                                        filtersasset=[...filtersasset,...preferedassets];
+                                        filtersasset = [...filtersasset, ...preferedassets];
                                         this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "", userEmail).then(assets => {
                                             resolve(assets);
                                         })
@@ -2046,6 +2046,19 @@ module.exports = class Asset {
                                 })
                                 .then(res => {
                                     if (res.length > 0) {
+                                        if (res.length == 1) {
+                                            if (res[0].PLATFORM == "m") {
+                                                res.push({
+                                                    PLATFORM: "w",
+                                                    COUNT: 0
+                                                })
+                                            } else if (res[0].PLATFORM == "w") {
+                                                res.push({
+                                                    PLATFORM: "m",
+                                                    COUNT: 0
+                                                })
+                                            }
+                                        }
                                         bannerObj.visit = res;
                                         resolve(bannerObj)
                                     } else {
@@ -2056,7 +2069,7 @@ module.exports = class Asset {
                                         });
 
                                         emptyVisit.push({
-                                            PLATFORM: "m",
+                                            PLATFORM: "w",
                                             COUNT: 0
                                         });
 
