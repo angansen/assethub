@@ -156,7 +156,7 @@ exports.saveProfileImage = (host, image, platform, email, res) => {
             autoCommit: true
         }).then(result => {
             if (result.rowsAffected === 0) {
-                console.log("Could not found user. . .");
+                console.log("Could not found user. . . saveprofileImagefileto");
                 res.status(404).json({ status: "failed", msg: "Could not found user with email " + email });
             } else {
                 console.log("Profile image updated successfully ");
@@ -220,7 +220,7 @@ exports.deleteUser = (email, res) => {
         deleteUserFavoriteAssets(email);
 
         if (result.rowsAffected === 0) {
-            console.log("Could not found user. . .");
+            console.log("Could not found user. . . deleteUser");
             res.status(404).json({ status: "failed", msg: "Could not found user with email " + email });
         } else {
             console.log("User deleted successfully");
@@ -243,7 +243,7 @@ deleteUserPreferences = (email) => {
         autoCommit: true
     }).then(result => {
         if (result.rowsAffected === 0) {
-            console.log("Could not found user. . .");
+            console.log("Could not found user. . . deleteUserPreferences");
             // res.status(404).json({ status: "failed", msg: "Could not found user with email " + email });
         } else {
             console.log("User preferences deleted successfully");
@@ -264,7 +264,7 @@ deleteUserFavoriteAssets = (email) => {
         autoCommit: true
     }).then(result => {
         if (result.rowsAffected === 0) {
-            console.log("Could not found user. . .");
+            console.log("Could not found user. . . deleteUserFavoriteAssets");
             // res.status(404).json({ status: "failed", msg: "Could not found user with email " + email });
         } else {
             console.log("User favorite assets deleted successfully");
