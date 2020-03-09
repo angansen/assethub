@@ -12,8 +12,6 @@ router.post('/captureactivity/:platform/:type/:name/:email',userController.captu
 router.post('/updateUserTable',userController.updateUserRepos);
 
 
-
-
 //to populate users from LDAP
 router.get('/getprofileimage/:platform/:email',userController.getProfileImage);
 router.get('/ldap',userController.getLdapUsers);
@@ -25,9 +23,9 @@ router.get('/keywords/:email',userController.fetchAllSearchedKeywordsByUser);
 router.get('/updateuserlob',userController.updateUserLob);
 
 
-
 // PUT
 router.put('/notification/:email/:id',userController.markNotificationRead);
+
 
 // DELETE
 router.delete('/notification/:email/:id',userController.markNotificationDelete);
