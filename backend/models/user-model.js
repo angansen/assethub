@@ -883,7 +883,7 @@ exports.truncateUserData = () => {
         connection.execute(`truncate table ASSET_USER_RAW`, [], {
             autoCommit: true
         }).then(result => {
-            resolve("msg": "truncate success");
+            resolve({msg: "truncate success"});
         })
     }
 
