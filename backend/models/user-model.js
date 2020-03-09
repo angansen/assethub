@@ -885,7 +885,7 @@ exports.truncateUserData = () => {
         }).then(result => {
             resolve({ msg: JSON.stringify(result) });
         })
-    }
+    })
 }
 
 // exports.updateRawUsers = (userdata) => {
