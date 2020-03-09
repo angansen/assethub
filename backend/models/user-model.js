@@ -850,30 +850,15 @@ exports.updateRawUsers = (userdata) => {
 
 exports.updateUserLob = () => {
     const connection = getDb();
-    let storedProc = `create or replace procedure syncldapuser as 
-    begin
-    delete from asset_user2 where USER_MODIFIED = 0;
-    
-    insert into asset_user2 (user_email,user_name,USER_LOCATION,USER_PHONE,          USER_MANAGER_EMAIL,USER_ROLE,USER_MODIFIED,USER_LOB)
-    select                  MAIL,      DISPLAYNAME,CITY,      orclbeehivephonenumber,lower(replace(substr(manager,4,instr(manager,',',1)-4),'_','.')||'@oracle.com'),          'user',   0,      'others' 
-    from asset_user_raw a,asset_user2 b where a.mail = b.user_email(+)
-    and b.user_email is null;
-    
-    for i in (select * from asset_lob_leader) loop
-    for j in (
-    select user_email,user_manager_email from asset_user2  
-    connect by prior user_email = user_manager_email
-    start with  user_manager_email = i.lob_leader_email) loop
-    update asset_user2 set user_lob = i.lob_leader_lob,user_reporting_lob_leader=i.LOB_LEADER_EMAIL where user_email = j.user_email;
-    end loop;
-    end loop;
-    end`;
     return new Promise((resolve, reject) => {
-        connection.execute(storedProc, [], {
+        connection.execute("BEGIN SYNCLDAPUSER; END;", [], {
             autoCommit: true
         }).then(result => {
             console.log(JSON.stringify(result));
             resolve(result);
+        }).catch(err => {
+            console.log("Error : " + err);
+            reject(err);
         })
     })
 }
