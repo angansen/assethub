@@ -151,7 +151,7 @@ const getSolutionAreasByAssetId = (assetId) => {
 }
 const getSalesPlayByAssetId = (assetId) => {
     const connection = getDb();
-    return connection.query(`select m.filter_id,filter_type,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where  WINSTORY_ID=:WINSTORY_ID and filter_type='Sales Play'`, [assetId],
+    return connection.query(`select m.filter_id,filter_type,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where  WINSTORY_ID=:WINSTORY_ID and filter_type='Sales Initiatives'`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })
@@ -1523,8 +1523,8 @@ module.exports = class Asset {
                             // if (filterids.trim().length > 0 || words.length > 0) {
                             //     finalList = [...winList];
                             // } 
-                            if(words.length==0){
-                                allwins=[];
+                            if (words.length == 0) {
+                                allwins = [];
                             }
                             let wordlist = "";
                             words.map(word => {
@@ -1539,7 +1539,7 @@ module.exports = class Asset {
                                 }).then(filterdata => {
                                     let filterswins = [];
                                     this.filterAssetBySearchString(allwins, filterdata, wordlist, filterswins).then(res => {
-                                        filterswins=[...filterswins,...preferedwins];
+                                        filterswins = [...filterswins, ...preferedwins];
                                         this.refineAssets(host, offset, limit, filterswins, sortBy, order, "", userEmail).then(assets => {
                                             resolve(assets);
                                         })
@@ -1685,7 +1685,7 @@ module.exports = class Asset {
                                                                 })
                                                                 .then(res => {
                                                                     assetTypesArray = res.rows;
-                                                                    connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Play'`, {},
+                                                                    connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Initiatives'`, {},
                                                                         {
                                                                             outFormat: oracledb.OBJECT
                                                                         })
@@ -1912,7 +1912,7 @@ module.exports = class Asset {
                                                 })
                                                 .then(res => {
                                                     assetTypesArray = res.rows;
-                                                    connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Play'`, {},
+                                                    connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Initiatives'`, {},
                                                         {
                                                             outFormat: oracledb.OBJECT
                                                         })
@@ -2443,7 +2443,7 @@ module.exports = class Asset {
                     //                                         outFormat: oracledb.OBJECT
                     //                                     })
                     //                                     .then(res => {
-                    //                                         assetTypesArray = res.rows; connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Play'`, {},
+                    //                                         assetTypesArray = res.rows; connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Initiatives'`, {},
                     //                                             {
                     //                                                 outFormat: oracledb.OBJECT
                     //                                             })
@@ -2805,7 +2805,7 @@ module.exports = class Asset {
                     //                                             })
                     //                                             .then(res => {
                     //                                                 assetTypesArray = res.rows;
-                    //                                                 connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Play'`, {},
+                    //                                                 connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Initiatives'`, {},
                     //                                                     {
                     //                                                         outFormat: oracledb.OBJECT
                     //                                                     })

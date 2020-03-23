@@ -160,7 +160,7 @@ const getAssetTypesByAssetId = (assetId) => {
 }
 const getSalesPlayByAssetId = (assetId) => {
     const connection = getDb();
-    return connection.execute(`select m.filter_id,filter_type,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where  ASSET_ID=:ASSET_ID and filter_type='Sales Play'`, [assetId],
+    return connection.execute(`select m.filter_id,filter_type,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where  ASSET_ID=:ASSET_ID and filter_type='Sales Initiatives'`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })
@@ -1247,7 +1247,7 @@ module.exports = class Asset {
                                                             })
                                                             .then(res => {
                                                                 assetTypesArray = res.rows;
-                                                                connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Play'`, {},
+                                                                connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Initiatives'`, {},
                                                                     {
                                                                         outFormat: oracledb.OBJECT
                                                                     })
@@ -1761,7 +1761,7 @@ module.exports = class Asset {
                                                             })
                                                             .then(res => {
                                                                 assetTypesArray = res.rows;
-                                                                connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Play'`, {},
+                                                                connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Initiatives'`, {},
                                                                     {
                                                                         outFormat: oracledb.OBJECT
                                                                     })
@@ -2330,7 +2330,7 @@ module.exports = class Asset {
                                                         })
                                                         .then(res => {
                                                             assetTypesArray = res.rows;
-                                                            connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Play'`, {},
+                                                            connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Initiatives'`, {},
                                                                 {
                                                                     outFormat: oracledb.OBJECT
                                                                 })
@@ -2566,7 +2566,7 @@ module.exports = class Asset {
                                                                 })
                                                                 .then(res => {
                                                                     industryArray = res.rows;
-                                                                    connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Play'`, {},
+                                                                    connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Initiatives'`, {},
                                                                         {
                                                                             outFormat: oracledb.OBJECT
                                                                         })
