@@ -360,19 +360,23 @@ async function generateMsg(mapCount) {
     let msg = '';
 
     if (mapCount.mappedAsset > 0 && mapCount.newMappedAsset == 0 && mapCount.newMappedWins == 0 && mapCount.mappedWins == 0) {
-        let temp = `${mapCount.mappedAsset} number of Assets already mapped to this filter`;
+        //let temp = `${mapCount.mappedAsset} number of Assets already mapped to this filter`;
+        let temp = `Assets already mapped to this filter`;
         msg = temp;
     }
     if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset > 0 && mapCount.newMappedWins == 0 && mapCount.mappedWins == 0) {
-        let temp = `${mapCount.newMappedAsset} number of Assets mapped to this filter`;
+        // let temp = `${mapCount.newMappedAsset} number of Assets mapped to this filter`;
+        let temp = `Assets mapped to this filter`;
         msg = temp;
     }
     if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset == 0 && mapCount.newMappedWins == 0 && mapCount.mappedWins > 0) {
-        let temp = `${mapCount.mappedAsset} number of Wins already mapped to this filter`;
+        //let temp = `${mapCount.mappedAsset} number of Wins already mapped to this filter`;
+        let temp = `Wins already mapped to this filter`;
         msg = temp;
     }
     if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset > 0 && mapCount.newMappedWins > 0 && mapCount.mappedWins == 0) {
-        let temp = `${mapCount.newMappedAsset} number of Wins mapped to this filter`;
+        //let temp = `${mapCount.newMappedAsset} number of Wins mapped to this filter`;
+        let temp = `Wins mapped to this filter`;
         msg = temp;
     }
     if (mapCount.mappedAsset == 0 && mapCount.newMappedAsset > 0 && mapCount.mappedWins == 0 && mapCount.newMappedWins > 0) {
