@@ -1459,13 +1459,10 @@ module.exports = class Asset {
     }
 
 
-    static fetchPreferedWins(host, userEmail) {
+    static fetchPreferedWins(host, userEmail, sortBy, order) {
         let finalList = [];
         const offset = 0
         let limit;
-        let order;
-        let sortBy;
-
         const connection = getDb();
         return new Promise((resolve, reject) => {
 
@@ -2714,7 +2711,7 @@ module.exports = class Asset {
 
 
 
-    static getWinsByLob(host, lob, user_email) {
+    static getWinsByLob(host, lob, user_email, sortBy, order) {
         let assetsArray = [];
         let likesArray = [];
         let viewsArray = [];
@@ -2762,7 +2759,7 @@ module.exports = class Asset {
                 })
                 .then(res => {
                     assetsArray = res;
-                    this.refineAssets(host, 0, assetsArray.length, assetsArray, '', '', '', user_email).then(assets => {
+                    this.refineAssets(host, 0, assetsArray.length, assetsArray, sortBy, order, '', user_email).then(assets => {
                         resolve(assets);
                     })
                     // console.log('Calling WinsList')

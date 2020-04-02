@@ -572,8 +572,9 @@ exports.getAllAssetsByFilters = (req, res) => {
 
 exports.getAllPreferredWins1 = (req, res) => {
     const user_email = req.params.user_email;
-
-    winstoryreader.fetchPreferedWins(req.headers.host, user_email)
+    let order = req.header('order');
+    let sortBy = req.header('sortBy');
+    winstoryreader.fetchPreferedWins(req.headers.host, user_email, sortBy, order)
         .then(list => {
             res.send(list);
         })
@@ -732,7 +733,8 @@ exports.getAllAssetsByLob = (req, res) => {
 
 exports.getAllWinsByLob = (req, res) => {
     const user_email = req.header('user_email');//req.params.user_email;//req.params.user_email
-    console.log('LOB filter with >> ' + user_email);
+    let order = req.header('order');
+    let sortBy = req.header('sortBy');
     const connection = getDb();
     connection.execute(`Select USER_LOB from ASSET_USER where USER_EMAIL=:USER_EMAIL`, [user_email],
         {
@@ -742,7 +744,8 @@ exports.getAllWinsByLob = (req, res) => {
         .then(user_lob => {
             console.log(user_lob.rows[0])
             if (user_lob.rows[0]) {
-                winstoryreader.getWinsByLob(req.headers.host, user_lob.rows[0].USER_LOB, user_email).then(result => {
+                let sortBy = req.header('sortBy');
+                winstoryreader.getWinsByLob(req.headers.host, user_lob.rows[0].USER_LOB, user_email, sortBy, order).then(result => {
                     res.json(result)
                 })
             }
