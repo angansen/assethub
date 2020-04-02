@@ -584,8 +584,9 @@ exports.getAllAssetsByFilters = (req, res) => {
 }
 exports.getAllPreferredAssets1 = (req, res) => {
     const user_email = req.params.user_email;
-
-    Asset.fetchPreferedAssets(req.headers.host, user_email)
+    let order = req.header('order');
+    let sortBy = req.header('sortBy');
+    Asset.fetchPreferedAssets(req.headers.host, user_email, sortBy, order)
         .then(list => {
             res.send(list);
         })
@@ -718,8 +719,10 @@ exports.getAllFavAssets = (req, res) => {
 exports.getAllAssetsByLob = (req, res) => {
     const lob = req.params.lob
     const user_email = req.header("user_email")
+    let order = req.header('order');
+    let sortBy = req.header('sortBy');
     console.log("Host >>> " + req.headers.host);
-    Asset.getAssetsByLob(lob, req.headers.host, user_email).then(result => {
+    Asset.getAssetsByLob(lob, req.headers.host, user_email, sortBy, order).then(result => {
         res.json(result)
     })
 }
