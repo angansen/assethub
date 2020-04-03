@@ -2407,7 +2407,7 @@ module.exports = class Asset {
                 .then(res => {
                     assetsArray = res
                     console.log('Wins user_email: ' + user_email)
-                    this.refineAssets(host, 0, -1, assetsArray, '', '', '', user_email).then(assets => {
+                    this.refineAssets(host, 0, -1, assetsArray, "createdDate", "desc", '', user_email).then(assets => {
                         resolve(assets);
                     })
                     // connection.query(`select Count(*) comment_count,WINSTORY_ID from ASSET_WINSTORY_COMMENTS group by WINSTORY_ID`, [],
