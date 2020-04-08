@@ -1064,6 +1064,9 @@ module.exports = class Asset {
         //console.log(JSON.stringify(filters));
         return new Promise((resolve, reject) => {
             if (filters.length > 0 && filters != "") {
+                console.log(filters);
+                let finalFilters = filters.replace('fd5k53p09dl,', '');
+                console.log(finalFilters);
                 let filterString = "'" + filters.toString().replace(/,/g, "','") + "'";
                 const connection = getDb();
                 let fetchfilterDetailssql = `select filter_name,filter_type,filter_id from asset_filter where filter_id in(` + filterString + `)`;
