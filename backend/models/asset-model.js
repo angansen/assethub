@@ -1472,7 +1472,7 @@ module.exports = class Asset {
         let filterTypeMap = {};
         let queryString = "";
         let reducedFilter = data.filter(filter => {
-            if (filter.FILTER_ID.indexOf("14983ddhswcdol") == -1 && filter.FILTER_ID.indexOf("Gdjfdskyuetr472V") == -1) {
+            if (filter.FILTER_ID.indexOf("14983ddhswcdol") == -1 && filter.FILTER_ID.indexOf("Gdjfdskyuetr472V") == -1 && filter.FILTER_ID.indexOf("fd5k53p09dl") == -1 && filter.FILTER_ID.indexOf("170k5dr4xvz") == -1) {
                 return filter;
             }
         })
