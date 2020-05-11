@@ -942,35 +942,49 @@ module.exports = class Asset {
         let action;
         let sql;
         let options;
-        //console.log('uploadCommentByAssetId');
+        console.log(assetid)
         return new Promise((resolve, reject) => {
+            const connection = getDb();
+
             if (!commentId) {
-                action = "inserted"
+                action = "inserted";
                 sql = `INSERT into ASSET_COMMENTS values(:COMMENT_ID,:COMMENT_COMMENT,:COMMENTBY,:COMMENTON,:ASSET_ID,:COMMENT_USERNAME)`;
                 options = [uniqid(), comment, commentBy, new Date(), assetid, commentByUserName]
             }
             else {
                 //console.log("in comment update section")
-                action = "updated"
+                action = "updated";
                 sql = `UPDATE ASSET_COMMENTS 
-                SET COMMENT_COMMENT=:COMMENT_COMMENT
-                 WHERE  COMMENT_ID=:COMMENT_ID`;
+                    SET COMMENT_COMMENT=:COMMENT_COMMENT
+                     WHERE  COMMENT_ID=:COMMENT_ID`;
                 options = [comment, commentId]
             }
-            const connection = getDb();
+
             connection.execute(sql, options,
                 {
                     outFormat: oracledb.Object,
                     autoCommit: true
                 })
                 .then(res => {
-                    emailnotification.triggerEmailNotificationforFeedback(reqdata);
+                    connection.query("select asset_owner from asset_details where asset_id='" + assetid + "'", {}, {
+                        outFormat: oracledb.Object
+                    }).then(data => {
+
+                        console.log(" --- > " + JSON.stringify(data));
+                        reqdata.asset_owner=data[0].ASSET_OWNER;
+
+                        emailnotification.triggerEmailNotificationforFeedback(reqdata);
+                    })
                     resolve({ status: "comment " + action + " successfully" });
                 })
                 .catch(err => {
                     console.log(err)
                 })
         })
+            .catch(err => {
+                console.log(err)
+            })
+
     }
 
 

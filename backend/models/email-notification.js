@@ -75,21 +75,23 @@ exports.triggerEmailNotificationforSEAssistance = (request) => {
 exports.triggerEmailNotificationforFeedback = (request) => {
     console.log(JSON.stringify(request));
     var body = `Hi,
-    <br/><br/>There is a Feedback on asset ${request.asset_name} by user ${request.commentByUserName}.
+    <br/><br/>There is a Feedback on asset ${request.assetId} by user ${request.commentByUserName}.
     <br/><br/> Provided below are the details:
     <br/>Asset ID: ${request.assetId} 
     <br/>Feedback Provided By: ${request.commentBy}
     <br/>Feedback: ${request.comment}
     <br/><br/>Please note: This is a system generated message. Please do not respond to this mail.`
-    //console.log(body);
+
+    let reqbody={
+        "from_email": request.commentBy,
+        "to_email": request.asset_owner,
+        "body1": body,
+        "body_html": body,
+        "subject": `Feedback on asset ${request.assetId} with asset ID ${request.assetId}`
+    }
+    console.log(" RE BODY : -> "+JSON.stringify(reqbody));
     return new Promise((resolve, reject) => {
-        axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', {
-            "from_email": request.commentBy,
-            "to_email": request.asset_owner,
-            "body1": body,
-            "body_html": body,
-            "subject": `Feedback on asset ${request.asset_name} with asset ID ${request.assetId}`
-        }).then(res => {
+        axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', reqbody).then(res => {
             console.log('Feedback email Sent');
             resolve('Feedback email Sent');
         })
@@ -100,23 +102,25 @@ exports.notificationForWinStoryComment = (request) => {
     console.log(JSON.stringify(request));
     //WINSTORY_CUSTOMER_NAME, WINSTORY_FISCAL_QUARTER
     var body = `Hi,
-    <br/><br/>There is a comment on the win ${request.winstory_name} by user ${request.commentByUserName}.
+    <br/><br/>There is a comment on the win ${request.winstoryId} by user ${request.commentByUserName}.
     <br/><br/> Provided below are the details:
     <br/>Customer Name : ${request.winstory_customer_name} 
     <br/>Win Fiscal Quarter: ${request.winstory_fiscal_quarter}
     <br/>Commented By: ${request.commentBy} 
     <br/>Comment: ${request.comment} 
     <br/><br/>Please note: This is a system generated message. Please do not respond to this mail.`
-    //console.log(body);
+
+    let reqbody = {
+        "from_email": request.commentBy,
+        "to_email": 'NACLOUDWINS_US@ORACLE.COM',
+        "body1": body,
+        "body_html": body,
+        "subject": `Comment on win id ${request.winstoryId}`
+    }
+    console.log(JSON.stringify(reqbody));
     return new Promise((resolve, reject) => {
-        axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', {
-            "from_email": request.commentBy,
-            "to_email": 'NACLOUDWINS_US@ORACLE.COM',
-            "body1": body,
-            "body_html": body,
-            "subject": `Comment on win ${request.winstory_name}`
-        }).then(res => {
-            console.log('Winstory comment email Sent');
+        axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', reqbody).then(res => {
+            console.log('Winstory comment email Sent ');
             resolve('Winstory comment email Sent');
         })
     });

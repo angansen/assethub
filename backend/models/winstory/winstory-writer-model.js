@@ -517,7 +517,7 @@ exports.updateViewForWinstory = (winstoryId, viewed_by_email, viewed_by_username
     })
 }
 
-exports.uploadCommentByWinStory = (reqdata, assetid, comment, commentBy, commentId, commentByUserName) => {
+exports.uploadCommentByWinStory = (reqdata, winstoryId, comment, commentBy, commentId, commentByUserName) => {
     let action;
     let sql;
     let options;
@@ -525,7 +525,7 @@ exports.uploadCommentByWinStory = (reqdata, assetid, comment, commentBy, comment
         if (!commentId) {
             action = "inserted"
             sql = `INSERT into ASSET_WINSTORY_COMMENTS values(:COMMENT_ID,:COMMENT_COMMENT,:COMMENTBY,:COMMENTON,:WINSTORY_ID,:COMMENT_USERNAME)`;
-            options = [uniqid(), comment, commentBy, new Date(), assetid, commentByUserName]
+            options = [uniqid(), comment, commentBy, new Date(), winstoryId, commentByUserName]
         }
         else {
             //console.log("in comment update section")
