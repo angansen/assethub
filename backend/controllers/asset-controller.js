@@ -28,8 +28,6 @@ const getOwnerEmails = (assetId) => {
     })
 }
 
-
-
 const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, assetCreatedEmailOptions, status) => {
     let asset_reviewer_name, asset_name, asset_description, asset_details
     return new Promise((resolve, reject) => {
@@ -97,12 +95,10 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
 exports.postAsset = (req, res) => {
     const assetId = null;
     // console.log(req.body);
-
-    const title = req.body.title
+    const title = req.body.title;
     // console.log(title);
     const description = req.body.description;
     // console.log(description);
-
     const userCase = req.body.userCase;
     const customer = req.body.customer;
     const createdBy = req.body.createdBy;
@@ -452,26 +448,62 @@ exports.postAssetImage = (req, res) => {
         res.json("working")
     }
 }
-
-
-exports.getAllAssets = (req, res) => {
-    const { offset, limit } = req.body;
-    console.log(offset, limit)
-    Asset.fetchAssets(req.headers.host, offset, limit).then(result => {
-        res.json(result);
-    });
+exports.postAssetDoc = (req, res) => {
+    console.log(req.params.assetId)
+    if (req.files) {
+        console.log("FILE :" + req.files.file)
+        console.log(req.header);
+        console.log(req.body.fileDesc)
+        console.log(req.header('type'))
+        const type = req.header('type');
+        const assetId = req.params.assetId
+        const uploadFiles = req.files.file;
+        var data = {
+            assetId: req.params.assetId,
+            LINK_DESCRIPTION: req.header('LINK_DESCRIPTION'),
+            LINK_DESCRIPTION_DATA: req.header('LINK_DESCRIPTION_DATA'),
+            LINK_REPOS_TYPE: req.header('LINK_REPOS_TYPE'),
+            LINK_URL_TYPE: req.header('LINK_URL_TYPE')
+        }
+        let imageDescription = req.header('desc');
+        if (!imageDescription) {
+            imageDescription = '';
+        }
+        console.log(imageDescription)
+        if (Object.keys(req.files.file).length == 0) {
+            res.status(400).send('No files were uploaded.');
+            return;
+        } if (type === 'document') {
+            Asset.uploadDoc(req.headers.host, data, uploadFiles)
+                .then(result => {
+                    res.json(result)
+                })
+        }
+    }
+    else {
+        console.log("FILE:" + req.files)
+        res.json("working")
+    }
 }
 
-exports.getAllAssetsBySearchString = (req, res) => {
-    const { offset, limit, searchString } = req.body;
-    console.log(searchString)
-    console.log(offset, limit)
-    Asset.fetchAssets(req.headers.host, offset, limit, searchString).then(result => {
-        res.json(result);
-    });
-}
+// exports.getAllAssets = (req, res) => {
+//     const { offset, limit } = req.body;
+//     console.log(offset, limit)
+//     Asset.fetchAssets(req.headers.host, offset, limit).then(result => {
+//         res.json(result);
+//     });
+// }
 
-exports.getAllAssetsByFilters2 = (req, res) => {
+// exports.getAllAssetsBySearchString = (req, res) => {
+//     const { offset, limit, searchString } = req.body;
+//     console.log(searchString)
+//     console.log(offset, limit)
+//     Asset.fetchAssets(req.headers.host, offset, limit, searchString).then(result => {
+//         res.json(result);
+//     });
+// }
+
+exports.getAllAssetsByFilters = (req, res) => {
     // var obj = {};
     // obj.filters = [];
     let offset = req.header('offset');
@@ -514,75 +546,75 @@ exports.getAllAssetsByFilters2 = (req, res) => {
         ).then(result => {
             limit = result.rows[0].TOTAL;
             console.log("new Limit" + limit)
-            Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, '', email).then(result => {
+            Asset.fetchAssets(host, offset, limit, filters, searchString, sortBy, order, '', email).then(result => {
                 res.json(result);
             })
         })
 
     }
     else {
-        Asset.fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, '', email).then(result => {
+        Asset.fetchAssets(host, offset, limit, filters, searchString, sortBy, order, '', email).then(result => {
             res.json(result);
         })
     }
 
 }
 
-exports.getAllAssetsByFilters = (req, res) => {
+// exports.getAllAssetsByFilters = (req, res) => {
 
-    // var obj = {};
-    // obj.filters = [];
-    let offset = req.header('offset');
-    let limit = req.header('limit');
-    let filters = req.header('filters');
-    let searchString = req.header('searchString')
-    let order = req.header('order');
-    let sortBy = req.header('sortBy');
-    let email = req.header('user_email');
+//     // var obj = {};
+//     // obj.filters = [];
+//     let offset = req.header('offset');
+//     let limit = req.header('limit');
+//     let filters = req.header('filters');
+//     let searchString = req.header('searchString')
+//     let order = req.header('order');
+//     let sortBy = req.header('sortBy');
+//     let email = req.header('user_email');
 
-    let activity = {
-        filters: filters,
-        email: email,
-        searchtext: searchString
-    }
+//     let activity = {
+//         filters: filters,
+//         email: email,
+//         searchtext: searchString
+//     }
 
-    console.log("============= Asset Controller Activity ==============")
-    // console.log(JSON.stringify(activity));
-    // console.log("================== Activity ==========================")
+//     console.log("============= Asset Controller Activity ==============")
+//     // console.log(JSON.stringify(activity));
+//     // console.log("================== Activity ==========================")
 
-    try {
-        worker.captureSearch(activity);
-    } catch (err) {
-        console.log("search activity log error");
-    }
+//     try {
+//         worker.captureSearch(activity);
+//     } catch (err) {
+//         console.log("search activity log error");
+//     }
 
-    console.log("Host:- " + req.headers.host);
+//     console.log("Host:- " + req.headers.host);
 
-    searchString = searchString == undefined ? "" : searchString;
-    filters = filters == undefined ? [] : filters;
+//     searchString = searchString == undefined ? "" : searchString;
+//     filters = filters == undefined ? [] : filters;
 
-    let host = req.headers.host;
-    if (limit === '-1') {
-        const connection = getDb();
-        connection.execute(`SELECT count(*) total from ASSET_DETAILS where asset_status='Live'`, {},
-            {
-                outFormat: oracledb.OBJECT
-            },
-        ).then(result => {
-            limit = result.rows[0].TOTAL;
-            Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order, email).then(result => {
-                res.json(result);
-            })
-        })
+//     let host = req.headers.host;
+//     if (limit === '-1') {
+//         const connection = getDb();
+//         connection.execute(`SELECT count(*) total from ASSET_DETAILS where asset_status='Live'`, {},
+//             {
+//                 outFormat: oracledb.OBJECT
+//             },
+//         ).then(result => {
+//             limit = result.rows[0].TOTAL;
+//             Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order, email).then(result => {
+//                 res.json(result);
+//             })
+//         })
 
-    }
-    else {
-        Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order, email).then(result => {
-            res.json(result);
-        })
-    }
-}
-exports.getAllPreferredAssets1 = (req, res) => {
+//     }
+//     else {
+//         Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order, email).then(result => {
+//             res.json(result);
+//         })
+//     }
+// }
+exports.getAllPreferredAssets = (req, res) => {
     const user_email = req.params.user_email;
     let order = req.header('order');
     let sortBy = req.header('sortBy');
@@ -592,54 +624,54 @@ exports.getAllPreferredAssets1 = (req, res) => {
         })
 }
 
-exports.getAllPreferredAssets = (req, res) => {
-    const offset = 0
-    let limit;
-    let filters = []
-    let userPreferencesArr = []
-    let searchString;
-    let order;
-    let sortBy;
-    const user_email = req.params.user_email;
-    let action = 'preferenceApi'
-    console.log(user_email)
+// exports.getAllPreferredAssets = (req, res) => {
+//     const offset = 0
+//     let limit;
+//     let filters = []
+//     let userPreferencesArr = []
+//     let searchString;
+//     let order;
+//     let sortBy;
+//     const user_email = req.params.user_email;
+//     let action = 'preferenceApi'
+//     console.log(user_email)
 
-    const connection = getDb();
-    connection.execute(`Select ASSET_FILTER_ID from ASSET_PREFERENCES where USER_EMAIL=:USER_EMAIL`, [user_email],
-        {
-            outFormat: oracledb.OBJECT
-        },
-    )
-        .then(result => {
-            console.log("ROWS:", result.rows)
-            if (result.rows.length === 0) {
-                res.json({ "ASSETS": [] })
-            }
-            else {
+//     const connection = getDb();
+//     connection.execute(`Select ASSET_FILTER_ID from ASSET_PREFERENCES where USER_EMAIL=:USER_EMAIL`, [user_email],
+//         {
+//             outFormat: oracledb.OBJECT
+//         },
+//     )
+//         .then(result => {
+//             console.log("ROWS:", result.rows)
+//             if (result.rows.length === 0) {
+//                 res.json({ "ASSETS": [] })
+//             }
+//             else {
 
-                result.rows.forEach(a => {
+//                 result.rows.forEach(a => {
 
-                    let preferenceId = Object.values(a)
-                    userPreferencesArr.push(preferenceId[0]);
-                })
-                filters.push(userPreferencesArr.join(','))
-                console.log("userPreferencesArr", filters)
+//                     let preferenceId = Object.values(a)
+//                     userPreferencesArr.push(preferenceId[0]);
+//                 })
+//                 filters.push(userPreferencesArr.join(','))
+//                 console.log("userPreferencesArr", filters)
 
-                connection.execute(`SELECT count(*) total from ASSET_DETAILS`, {},
-                    {
-                        outFormat: oracledb.OBJECT
-                    },
-                ).then(result => {
-                    limit = result.rows[0].TOTAL;
-                    console.log("new Limit" + limit)
-                    Asset.fetchAssets(req.headers.host, offset, limit, filters, searchString, sortBy, order, action).then(result => {
-                        res.json(result);
-                    })
-                })
-            }
-        })
+//                 connection.execute(`SELECT count(*) total from ASSET_DETAILS`, {},
+//                     {
+//                         outFormat: oracledb.OBJECT
+//                     },
+//                 ).then(result => {
+//                     limit = result.rows[0].TOTAL;
+//                     console.log("new Limit" + limit)
+//                     Asset.fetchAssets(req.headers.host, offset, limit, filters, searchString, sortBy, order, action).then(result => {
+//                         res.json(result);
+//                     })
+//                 })
+//             }
+//         })
 
-}
+// }
 
 exports.getAssetById = (req, res) => {
     const user_email = req.header("user_email")

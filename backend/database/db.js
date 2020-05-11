@@ -62,16 +62,17 @@ async function getpoolconnection() {
 
 	let dbconnparam = {
 		// *** DEV DB CRED ***
-		user: "assethub",
-		password: "AssetHub#19_",
-		connectString: "db1.sb6.ah.oraclevcn.com:1521/pah1.sb6.ah.oraclevcn.com",
-		
+		// user: "assethub",
+		// password: "AssetHub#19_",
+		// connectString: "db1.sb6.ah.oraclevcn.com:1521/pah1.sb6.ah.oraclevcn.com",
+
 
 
 		//// *** PROD DB CRED ***
-		// user: "assethub",
-		// password: "AssetHub#19_",
-		// connectString: "db1.sb5.ahvcn.oraclevcn.com:1521/ah01_iad2gm.sb5.ahvcn.oraclevcn.com",
+		user: "assethub",
+		password: "AssetHub#19_",
+		//connectString: "db1.sb5.ahvcn.oraclevcn.com:1521/ah01_iad2gm.sb5.ahvcn.oraclevcn.com",
+		connectString: "db1.sb3.ahvcn.oraclevcn.com:1521/pah1.sb3.ahvcn.oraclevcn.com",
 		_enableStats: true,
 		poolMax: 150,
 		poolMin: 20,
@@ -91,7 +92,7 @@ async function getpoolconnection() {
 					return;
 				}
 				pooldb = pool;
-				
+
 				resolve("Pool db connection created");
 			}
 		);
@@ -115,7 +116,7 @@ const getpooldb = () => {
 		return new Promise((resolve, reject) => {
 			// console.log("Open connection > " + pooldb.connectionsOpen+" / "+pooldb.connectionsInUse);
 			pooldb.getConnection().then(result => {
-				
+
 				_db = result;
 				// console.log("got connection");	
 				resolve(_db);

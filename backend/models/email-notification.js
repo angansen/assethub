@@ -30,7 +30,7 @@ exports.triggerEmailNotificationforRequestDemo = (request) => {
     return new Promise((resolve, reject) => {
         axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', {
             "from_email": request.email,
-            "to_email": `qualification-dispatch_in_grp@oracle.com,${request.asset_owner},${request.email}`,
+            "to_email": `veronica.t.taing@oracle.com,samdani.shaik@oracle.com,qualification-dispatch_in_grp@oracle.com,${request.asset_owner},${request.email}`,
             "body1": body,
             "body_html": body,
             "subject": `Request for demo on asset ${request.asset_name} with asset ID ${request.assetid}`
@@ -62,7 +62,7 @@ exports.triggerEmailNotificationforSEAssistance = (request) => {
     return new Promise((resolve, reject) => {
         axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', {
             "from_email": request.email,
-            "to_email": `qualification-dispatch_in_grp@oracle.com,${request.WINSTORY_CREATED_BY},${request.email}`,
+            "to_email": `veronica.t.taing@oracle.com,samdani.shaik@oracle.com,qualification-dispatch_in_grp@oracle.com,${request.WINSTORY_CREATED_BY},${request.email}`,
             "body1": body,
             "body_html": body,
             "subject": `Request for SE Assistance on win ${request.winstory_name} with Win ID ${request.winstoryid}`

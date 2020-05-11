@@ -5,7 +5,7 @@ oracledb.fetchAsString = [oracledb.CLOB];
 const path = require('path');
 let base64 = require('base-64');
 let fs = require('fs');
-const usermodel=require('../user-model');
+const usermodel = require('../user-model');
 
 const emailnotification = require('../email-notification');
 
@@ -71,7 +71,7 @@ exports.createWinstory = (host, story, res) => {
         story.WINSTORY_CONSULTING_Q2,
         story.WINSTORY_CONSULTING_Q3,
         story.WINSTORY_CONSULTING_Q4
-        
+
     ];
 
     connection.execute(insertwinstorysql, insertwinstoryOption, {
@@ -90,7 +90,7 @@ exports.createWinstory = (host, story, res) => {
                 saveWinstoryLogoImage(host, story.WINSTORY_LOGO, newAssetid, res);
             }
 
-            usermodel.preparenotification(newAssetid,"Win",host);
+            usermodel.preparenotification(newAssetid, "Win", host);
             res.status(200).json({ status: "success", msg: "Winstory creation success." });
         } else {
             res.status(500).json({ status: "failed", msg: "Winstory creation failed." })
@@ -180,7 +180,7 @@ exports.saveWinstory = (host, story, res) => {
             if (story.WINSTORY_LOGO.length > 0) {
                 saveWinstoryLogoImage(host, story.WINSTORY_LOGO, story.WINSTORY_ID, res);
             }
-            usermodel.preparenotification(story.WINSTORY_ID,"Win",host);
+            usermodel.preparenotification(story.WINSTORY_ID, "Win", host);
             res.status(200).json({ status: "success", msg: "Winstory update success." })
         } else {
             res.status(500).json({ status: "failed", msg: "Winstory updation failed." })
@@ -258,6 +258,8 @@ mapFilterToWinstory = (filters, winstoryid, res) => {
         });
     }
 }
+
+
 
 
 
@@ -343,6 +345,41 @@ saveLinksByWinstoryId = (winstoryid, links) => {
 
         });
     }
+}
+
+uploadDoc = (winstoryid, doc) => {
+    return new Promise((resolve, reject) => {
+        const connection = getDb();
+        let fname = doc.name.split('.')[0];
+        fname = fname.replace(/ /g, '');
+
+        const ftype = doc.name.split('.')[1];
+        const uniqueId = uniqid();
+        const finalFname = fname + uniqueId.concat('.', ftype);
+        const baseresoursePath = path.join(__dirname, '../../../..', 'mnt/ahfs/', winstoryid);
+        fs.exists(baseresoursePath, (exist) => {
+            if (exist != true) {
+                fs.mkdir(baseresoursePath);
+            }
+        })
+
+        const uploadPath = path.join(__dirname, '../../../..', 'mnt/ahfs/', winstoryid, finalFname);
+        var content = `${finalFname}`
+        doc.mv(uploadPath, function (err) {
+            if (err) {
+                return res.status(500).send(err);
+            }
+        })
+        connection.update(`insert into ASSET_WINSTORY_LINKS (LINK_URL,LINK_ACTIVE,LINK_DESCRIPTION,WINSTORY_ID) 
+        value(?,?,?,?)`, [uploadPath, 1, doc.description, winstoryid],
+            {
+                outFormat: oracledb.Object,
+                autoCommit: true
+            }).then(res => {
+                console.log("video inserted Successfully")
+                resolve({ "msg": "Document saved successfully" });
+            })
+    })
 }
 
 saveWinstoryLogoImage = (host, image, winstoryid, res) => {

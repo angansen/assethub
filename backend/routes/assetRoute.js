@@ -6,6 +6,7 @@ router.post('/', assetController.postAsset);
 router.post('/testPost', assetController.postAssetTest);
 
 router.post('/uploadImages/:assetId', assetController.postAssetImage)
+router.post('/uploadDoc/:assetId', assetController.postAssetDoc);
 //router.post('/likeasset/:action/:assetId/:useremail',assetController.likeUnlikeAsset)
 
 //Social APIs
@@ -31,18 +32,17 @@ router.post('/editAsset', assetController.postEditAsset);
 router.post('/editAssetTest', assetController.postEditAssetTest);
 
 
-router.get('/allAsDsets', assetController.getAllAssets);
+// router.get('/allAsDsets', assetController.getAllAssets);
 router.get('/banner', assetController.getBannerDetails);
 router.get('/myAssets', assetController.getUserAssets);
 
 
 router.get('/helpandsupport', assetController.getHelpAndSupport);
 router.post('/helpandsupport', assetController.saveHelpAndSupport);
-
-router.get('/allAssetsBySearchString', assetController.getAllAssetsBySearchString);
-router.get('/allAssetsFilters2', assetController.getAllAssetsByFilters);
-router.get('/allAssetsFilters', assetController.getAllAssetsByFilters2);
-router.get('/allPrefferedAssets/:user_email', assetController.getAllPreferredAssets1);
+// router.get('/allAssetsBySearchString', assetController.getAllAssetsBySearchString);
+// router.get('/allAssetsFilters2', assetController.getAllAssetsByFilters);
+router.get('/allAssetsFilters', assetController.getAllAssetsByFilters);
+router.get('/allPrefferedAssets/:user_email', assetController.getAllPreferredAssets);
 router.get('/allFilters', assetController.getAllFilters);
 router.post('/socialData', assetController.getSocialData);
 router.get('/favourites', assetController.getAllFavAssets);

@@ -1076,7 +1076,7 @@ module.exports = class Asset {
                     {
                         outFormat: oracledb.OBJECT
                     }).then(data => {
-                        this.convertsql2(data).then(query => {
+                        this.convertsql(data).then(query => {
                             const connection = getDb();
                             connection.query(query, {},
                                 {
@@ -1380,9 +1380,10 @@ module.exports = class Asset {
         })
     }
 
-    // CREATE QUERY STRING BASED ON SELECTED FILTERS
-    static convertsql2(data) {
-        console.log("----------  Converting 2 SQL WIN -------------");
+
+    // FILTER BASED ON SIMPLE LOGICAL AND 
+    static convertsql(data) {
+        console.log("----------  Converting SQL WIN -------------");
 
         let filterTypeMap = {};
         let queryString = "";
@@ -1405,10 +1406,10 @@ module.exports = class Asset {
                     }
                 });
                 Object.keys(filterTypeMap).forEach(filterType => {
-                    queryString = queryString.length > 0 ? queryString + ") union (" + filterTypeMap[filterType] : filterTypeMap[filterType];
+                    queryString = queryString.length > 0 ? queryString + " INTERSECT " + filterTypeMap[filterType] : filterTypeMap[filterType];
                 })
 
-                queryString = "select b.* from  ((" + queryString + ")) a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
+                queryString = "select b.* from  (" + queryString + ") a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
 
             } else {
                 queryString = "select b.* from  (select distinct WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where c.filter_id=d.filter_id and  d.filter_type='Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
@@ -1421,45 +1422,87 @@ module.exports = class Asset {
         })
     }
 
-    // CREATE QUERY STRING BASED ON SELECTED FILTERS
-    static convertsql(data) {
-        console.log("----------  Converting SQL WIN -------------");
-        // console.log(JSON.stringify(data));
 
-        let filterTypeMap = {};
-        let queryString = "";
+    // CREATE QUERY STRING BASED ON SELECTED FILTERS AND/OR LOGIC
+    // static convertsql(data) {
+    //     console.log("----------  Converting 2 SQL WIN -------------");
 
-        let reducedFilter = data.filter(filter => filter.FILTER_TYPE != "Asset Type");
+    //     let filterTypeMap = {};
+    //     let queryString = "";
 
-        data = reducedFilter;
+    //     let reducedFilter = data.filter(filter => {
+    //         if (filter.FILTER_ID.indexOf("14983ddhswcdol") == -1 && filter.FILTER_ID.indexOf("Gdjfdskyuetr472V") == -1) {
+    //             return filter;
+    //         }
+    //     })
 
-        return new Promise((resolve, reject) => {
-            // CREATE SQL queries   
-            if (data.length > 0) {
-                data.forEach(val => {
-                    if (val.FILTER_TYPE != "Asset Type") {
-                        let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select c.WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where ";
-                        filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "'";
-                    }
-                });
+    //     data = reducedFilter;
+
+    //     return new Promise((resolve, reject) => {
+    //         // CREATE SQL queries   
+    //         if (data.length > 0) {
+    //             data.forEach(val => {
+    //                 if (val.FILTER_TYPE != "Asset Type") {
+    //                     let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " INTERSECT select c.WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where " : "select c.WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where ";
+    //                     filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "' and c.filter_id=d.filter_id and  d.filter_type!='Asset Type'";
+    //                 }
+    //             });
+    //             Object.keys(filterTypeMap).forEach(filterType => {
+    //                 queryString = queryString.length > 0 ? queryString + ") union (" + filterTypeMap[filterType] : filterTypeMap[filterType];
+    //             })
+
+    //             queryString = "select b.* from  ((" + queryString + ")) a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
+
+    //         } else {
+    //             queryString = "select b.* from  (select distinct WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where c.filter_id=d.filter_id and  d.filter_type='Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
+
+    //         }
+
+    //         console.log(queryString);
+    //         // RETURN THE GENERATED QUERY 
+    //         resolve(queryString);
+    //     })
+    // }
+
+    // // CREATE QUERY STRING BASED ON SELECTED FILTERS
+    // static convertsql(data) {
+    //     console.log("----------  Converting SQL WIN -------------");
+    //     // console.log(JSON.stringify(data));
+
+    //     let filterTypeMap = {};
+    //     let queryString = "";
+
+    //     let reducedFilter = data.filter(filter => filter.FILTER_TYPE != "Asset Type");
+
+    //     data = reducedFilter;
+
+    //     return new Promise((resolve, reject) => {
+    //         // CREATE SQL queries   
+    //         if (data.length > 0) {
+    //             data.forEach(val => {
+    //                 if (val.FILTER_TYPE != "Asset Type") {
+    //                     let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " and " : "select c.WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where ";
+    //                     filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "'";
+    //                 }
+    //             });
 
 
-                Object.keys(filterTypeMap).forEach(filterType => {
-                    queryString = queryString.length > 0 ? queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type' union " + filterTypeMap[filterType] : filterTypeMap[filterType];
-                })
+    //             Object.keys(filterTypeMap).forEach(filterType => {
+    //                 queryString = queryString.length > 0 ? queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type' union " + filterTypeMap[filterType] : filterTypeMap[filterType];
+    //             })
 
-                queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
+    //             queryString = "select b.* from  (" + queryString + " and c.filter_id=d.filter_id and  d.filter_type!='Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
 
-            } else {
-                queryString = "select b.* from  (select distinct WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where c.filter_id=d.filter_id and  d.filter_type='Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
+    //         } else {
+    //             queryString = "select b.* from  (select distinct WINSTORY_ID from ASSET_WINSTORY_FILTER_WINSTORY_MAP c,asset_filter d where c.filter_id=d.filter_id and  d.filter_type='Asset Type') a,ASSET_WINSTORY_DETAILS b where a.WINSTORY_ID=b.WINSTORY_ID and b.WINSTORY_STATUS='Live'";
 
-            }
+    //         }
 
-            console.log(queryString);
-            // RETURN THE GENERATED QUERY 
-            resolve(queryString);
-        })
-    }
+    //         console.log(queryString);
+    //         // RETURN THE GENERATED QUERY 
+    //         resolve(queryString);
+    //     })
+    // }
 
 
     static fetchPreferedWins(host, userEmail, sortBy, order) {
