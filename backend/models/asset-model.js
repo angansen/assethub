@@ -344,24 +344,24 @@ module.exports = class Asset {
                                 console.log('1st update done(Asset details updated)')
                             })
                     }, function secondAction() {
-                        if (oj.length > 0) {
-                            // console.log(JSON.stringify(oj));
-                            // return connection.execute(`delete from ASSET_LINKS  WHERE ASSET_ID=:ASSET_ID`, [self.assetId]
-                            //     , {
-                            //         autoCommit: true
-                            //     }
-                            // ).then(res => {
-                            //  console.log("Old linked clear");
-                            return connection.executeMany(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID,LINK_ACTIVE) values(
+                        if (oj.length >= 0) {
+                            console.log(JSON.stringify(oj));
+                            return connection.execute(`delete from ASSET_LINKS  WHERE ASSET_ID=:ASSET_ID and LINK_REPOS_TYPE!='DOCUMENT'`, [self.assetId]
+                                , {
+                                    autoCommit: true
+                                }
+                            ).then(res => {
+                                console.log("Old linked clear");
+                                return connection.executeMany(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID,LINK_ACTIVE) values(
                                     :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:ASSET_ID,'true')`,
-                                oj, {
-                                autoCommit: true
-                            }).then(linkres => {
-                                console.log("2nd update Links batch succesfully executed : " + JSON.stringify(linkres));
-                            }).catch(err => {
-                                console.log("Links batch insert failed");
+                                    oj, {
+                                    autoCommit: true
+                                }).then(linkres => {
+                                    console.log("2nd update Links batch succesfully executed : " + JSON.stringify(linkres));
+                                }).catch(err => {
+                                    console.log("Links batch insert failed");
+                                })
                             })
-                            //})
                         }
                         else {
                             return connection.query(`SELECT * from asset_links`, {})
@@ -452,9 +452,9 @@ module.exports = class Asset {
                             })
                     }
                     , function secondAction() {
-                        if (oj.length > 0) {
-                            // console.log(JSON.stringify(oj));
-                            return connection.execute(`delete from ASSET_LINKS  WHERE ASSET_ID=:ASSET_ID`, [self.assetId]
+                        if (oj.length >= 0) {
+                            console.log(JSON.stringify(oj));
+                            return connection.execute(`delete from ASSET_LINKS  WHERE ASSET_ID=:ASSET_ID and LINK_REPOS_TYPE!='DOCUMENT'`, [self.assetId]
                                 , {
                                     autoCommit: true
                                 }
@@ -574,7 +574,7 @@ module.exports = class Asset {
         ASSET_ARCHITECTURE_DESCRIPTION=:ASSET_ARCHITECTURE_DESCRIPTION,
         ASSET_TYPE=:ASSET_TYPE
              WHERE ASSET_ID=:ASSET_ID`,
-                            [self.title, self.description, self.usercase, self.customer, self.createdBy.toLowerCase(),
+                            [self.title, self.description, self.description, self.usercase, self.customer, self.createdBy.toLowerCase(),
                             self.scrmId, self.oppId, new Date(), self.modifiedBy, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), 'Pending Review', self.asset_architecture_description, self.asset_type, self.assetId],
                             {
                                 outFormat: oracledb.Object
@@ -583,7 +583,7 @@ module.exports = class Asset {
                             })
                     }
                     , function secondAction() {
-                        if (oj.length > 0) {
+                        if (oj.length >= 0) {
                             //console.log("statement:", oj)
                             return connection.execute(`delete from ASSET_LINKS  WHERE ASSET_ID=:ASSET_ID`, [self.assetId]
                                 , {
@@ -971,7 +971,7 @@ module.exports = class Asset {
                     }).then(data => {
 
                         console.log(" --- > " + JSON.stringify(data));
-                        reqdata.asset_owner=data[0].ASSET_OWNER;
+                        reqdata.asset_owner = data[0].ASSET_OWNER;
 
                         emailnotification.triggerEmailNotificationforFeedback(reqdata);
                     })
@@ -1528,13 +1528,12 @@ module.exports = class Asset {
                                                                                                                 let allObj = {};
                                                                                                                 allObj.TOTALCOUNT = allAssets.length;
 
-                                                                                                                console.log(offset + ' ----- ' + limit + "Asset Count before slice :::: " + allAssets.length);
-                                                                                                                tAssets = allAssets.slice(offset, limit);
-
+                                                                                                            
+                                                                                                                
                                                                                                                 console.log("Asset Count after slice :::: " + tAssets.length);
-                                                                                                                dynamicSort(tAssets, sortBy, order)
-
-
+                                                                                                                dynamicSort(allAssets, sortBy, order);
+                                                                                                                tAssets = allAssets.slice(offset, limit);
+                                                                                                                console.log(offset + ' ----- ' + limit + "Asset Count before slice :::: " + allAssets.length);
                                                                                                                 allObj.ASSETS = tAssets;
                                                                                                                 console.log("Asset Count :::: " + tAssets.length);
                                                                                                                 resolve(allObj);
@@ -2278,7 +2277,7 @@ module.exports = class Asset {
     }
 
 
-    static getFilters(user_email, host) {
+    static getFilters(user_email, host, platform) {
         // console.log("fetching filters >" + user_email);
         let typeArr = [];
         let filteredArr = [];
@@ -2352,7 +2351,15 @@ module.exports = class Asset {
                                         })
                                         .then(result => {
                                             winstorycountArr = result;
-                                            connection.query(`select * from asset_filter where FILTER_STATUS='1'`, [],
+                                            let getFilterSQL;
+                                            if (platform == "w") {
+                                                getFilterSQL = `select * from asset_filter where FILTER_STATUS in('1','-1')`;
+
+                                            } else {
+                                                getFilterSQL = `select * from asset_filter where FILTER_STATUS in('1')`;
+                                            }
+
+                                            connection.query(getFilterSQL, [],
                                                 {
                                                     outFormat: oracledb.OBJECT
                                                 })

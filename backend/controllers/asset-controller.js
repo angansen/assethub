@@ -34,7 +34,7 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
         const connection = getDb();
         assetCreatedEmailOptions.push(assetId)
         console.log("asset :> " + assetId);
-
+        let asset_reviewer_email;
         connection.query(assetCreatedEmailSql, assetCreatedEmailOptions,
             {
                 outFormat: oracledb.OBJECT
@@ -444,8 +444,8 @@ exports.postAssetImage = (req, res) => {
         }
     }
     else {
-        console.log("FILE:" + req.files)
-        res.json("working")
+        console.log("FILE error :" + req.files)
+        res.json("working");
     }
 }
 exports.postAssetDoc = (req, res) => {
@@ -474,6 +474,8 @@ exports.postAssetDoc = (req, res) => {
             res.status(400).send('No files were uploaded.');
             return;
         } if (type === 'document') {
+            console.log("Doc file size : " + uploadFiles.length);
+            console.log("Doc file name : " + uploadFiles.name);
             Asset.uploadDoc(req.headers.host, data, uploadFiles)
                 .then(result => {
                     res.json(result)
@@ -482,7 +484,7 @@ exports.postAssetDoc = (req, res) => {
     }
     else {
         console.log("FILE:" + req.files)
-        res.json("working")
+        res.json("working");
     }
 }
 
@@ -733,10 +735,18 @@ exports.getBannerDetails = (req, res) => {
 
 
 exports.getAllFilters = (req, res) => {
+    console.log("PLATFORM >>> " + req.header("platform"));
     const user_email = req.header("user_email")
-    Asset.getFilters(user_email, req.headers.host).then(result => {
-        res.json(result);
-    })
+    if (req.header("platform") != undefined && req.header("platform") == "w") {
+        Asset.getFilters(user_email, req.headers.host, "w").then(result => {
+            res.json(result);
+        })
+    } else {
+        Asset.getFilters(user_email, req.headers.host, "m").then(result => {
+            res.json(result);
+        })
+    }
+
 }
 
 
