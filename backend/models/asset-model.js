@@ -1250,7 +1250,7 @@ module.exports = class Asset {
         return new Promise((resolve, reject) => {
             if (filters.length > 0 && filters != "") {
                 console.log(filters);
-                let finalFilters = filters.replace('170k5dr4xvz,', '');
+                let finalFilters = filters;//filters.replace('170k5dr4xvz,', '');
                 console.log(finalFilters);
                 let filterString = "'" + finalFilters.toString().replace(/,/g, "','") + "'";
 
@@ -1631,13 +1631,13 @@ module.exports = class Asset {
         console.log("----------  Converting SQL ASSET -------------");
         let filterTypeMap = {};
         let queryString = "";
-        let reducedFilter = data.filter(filter => {
-            if (filter.FILTER_ID.indexOf("14983ddhswcdol") == -1 && filter.FILTER_ID.indexOf("Gdjfdskyuetr472V") == -1 && filter.FILTER_ID.indexOf("fd5k53p09dl") == -1 && filter.FILTER_ID.indexOf("170k5dr4xvz") == -1) {
-                return filter;
-            }
-        })
+        // let reducedFilter = data.filter(filter => {
+        //     if (filter.FILTER_ID.indexOf("14983ddhswcdol") == -1 && filter.FILTER_ID.indexOf("Gdjfdskyuetr472V") == -1 && filter.FILTER_ID.indexOf("fd5k53p09dl") == -1 ) {//&& filter.FILTER_ID.indexOf("170k5dr4xvz") == -1
+        //         return filter;
+        //     }
+        // })
 
-        data = reducedFilter;
+        // data = reducedFilter;
         console.log(JSON.stringify(data));
 
         return new Promise((resolve, reject) => {
