@@ -726,7 +726,14 @@ exports.deleteMySearchHistory = (req, res) => {
         res.json(result);
     })
 }
-
+exports.deleteDocsByIds = (req, res) => {
+    // const user_email = req.header("user_email")
+    Asset.deleteDocsById(req.header("linkids")).then(result => {
+        res.json(result);
+    }).catch(err => {
+        res.status(500).json(err);
+    })
+}
 exports.getBannerDetails = (req, res) => {
     Asset.getBannerCounts().then(result => {
         res.json(result);

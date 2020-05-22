@@ -1193,6 +1193,62 @@ module.exports = class Asset {
         })
     }
 
+    //delete all Docs for an asset by id
+    static deleteDocsById(linkids) {
+        return new Promise((resolve, reject) => {
+            const connection = getDb();
+            let ids = "'" + linkids.replace(/,/g, "','") + "'";
+
+            let selectquery = `select * from ASSET_LINKS where LINK_ID in(` + ids + `)`;
+            let deletequery = `delete from ASSET_LINKS where LINK_ID in(` + ids + `)`;
+            console.log("select Q > > " + selectquery);
+            console.log("delete Q > > " + deletequery);
+
+            connection.query(selectquery, [], {
+                outFormat: oracledb.Object
+            }).then(data => {
+                console.log(">>> " + JSON.stringify(data) + "/n/n");
+
+                connection.execute(deletequery, [], {
+                    autoCommit: true,
+                    outFormat: oracledb.Object
+                }).then(datdelresp => {
+                    console.log("Deletion > "+JSON.stringify(datdelresp));
+                    data.forEach(link => {
+                        console.log(link.LINK_REPOS_TYPE + " - " + link.LINK_ID);
+                        if (link.LINK_REPOS_TYPE == "DOCUMENT") {
+                            console.log("FILE: " + link.LINK_URL);
+                            let fileurl = path.join("/mnt/ahfs" + link.LINK_URL.split("8001")[1]);
+                            console.log(fileurl + " -> FIle URL EXIST #  " + fs.existsSync(fileurl));
+                            try {
+                                fs.unlinkSync(fileurl);
+                                console.log("File deleted ");
+                            } catch (err) {
+                                console.log(err.message);
+                            }
+
+
+                        }
+                    });
+                    resolve({"msg":"links removed successfully"});
+                })
+
+
+            }).catch(err => {
+                console.log("Error : " + err);
+                reject({"msg":"couldn't remove links'"})
+            })
+            // connection.execute(`DELETE from ASSET_LINKS WHERE ASSET_ID=:ASSET_ID`, [assetId],
+            //     {
+            //         autoCommit: true,
+            //         outFormat: oracledb.Object
+            //     })
+            //     .then(res => {
+            //         resolve('Links Deleted Successfully')
+            //     })
+        })
+    }
+
 
     static filterAssetBySearchString(data, filterdata, searchString, filtersasset) {
         searchString = searchString.trim().toLowerCase();
@@ -1528,8 +1584,8 @@ module.exports = class Asset {
                                                                                                                 let allObj = {};
                                                                                                                 allObj.TOTALCOUNT = allAssets.length;
 
-                                                                                                            
-                                                                                                                
+
+
                                                                                                                 console.log("Asset Count after slice :::: " + tAssets.length);
                                                                                                                 dynamicSort(allAssets, sortBy, order);
                                                                                                                 tAssets = allAssets.slice(offset, limit);
