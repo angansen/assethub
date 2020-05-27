@@ -778,6 +778,7 @@ module.exports = class Asset {
                 const ftype = thumbnail.name.split('.')[1];
                 const uniqueId = uniqid();
                 const finalFname = fname + uniqueId.concat('.', ftype);
+                finalFname=finalFname.replace(/[^a-zA-Z0-9]/g, '');
                 //console.log(finalFname)
                 const uploadPath = path.join('/', 'mnt/ahfs/assets', assetId, finalFname);
                 var content = 'assets/' + assetId + '/' + `${finalFname}`
