@@ -1530,6 +1530,7 @@ module.exports = class Asset {
                                                                                                                     allAssetsObj.ASSET_TYPE = assetTypes;
                                                                                                                     allAssetsObj.SALES_PLAY = salesPlays;
                                                                                                                     allAssetsObj.INDUSTRY = industry;
+                                                                                                                    allAssetsObj.ASSET_THUMBNAIL=allAssetsObj.ASSET_THUMBNAIL==null?'http://' + host + '/no_image.png':allAssetsObj.ASSET_THUMBNAIL;
 
                                                                                                                     linkType = links.map(a => a.LINK_REPOS_TYPE)
                                                                                                                     linkType = [...new Set(linkType)]
@@ -2156,7 +2157,8 @@ module.exports = class Asset {
                                     lobj = {}
                                 })
                                 assetObj.LINKS = linkObjArr;
-                                assetObj.ASSET_THUMBNAIL = 'http://' + host + '/' + assetObj.ASSET_THUMBNAIL;
+                                // assetObj.ASSET_THUMBNAIL = 'http://' + host + '/' + assetObj.ASSET_THUMBNAIL;
+                                assetObj.ASSET_THUMBNAIL=assetObj.ASSET_THUMBNAIL!=null&&assetObj.ASSET_THUMBNAIL.trim().length>0?'http://' + host + '/' + assetObj.ASSET_THUMBNAIL:'http://' + host + '/no_image.png';
                                 getImagesById(assetId)
                                     .then(res => {
                                         //  //console.log(res)
@@ -2918,7 +2920,9 @@ module.exports = class Asset {
                     });
                     assetsArray = res
                     assetsArray.forEach(asset => {
-                        asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
+                        // asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
+                        console.log("THUMNNAIL >>>>>>>>>>>> "+asset.ASSET_THUMBNAIL)
+                        asset.ASSET_THUMBNAIL=asset.ASSET_THUMBNAIL!=null&&asset.ASSET_THUMBNAIL.trim().length>0?'http://' + host + '/' + asset.ASSET_THUMBNAIL:'http://' + host + '/no_image.png';
                     })
                     connection.query(`select Count(*) comment_count,asset_id from 
                     asset_comments group by asset_id`, [],
