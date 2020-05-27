@@ -270,7 +270,10 @@ module.exports = class Asset {
         this.asset_type = assetType
     }
 
+
     save() {
+
+        let assetState='Pending Review';
 
         return new Promise((resolve, reject) => {
             var assetid = this.assetId;
@@ -337,7 +340,7 @@ module.exports = class Asset {
         ASSET_ARCHITECTURE_DESCRIPTION=:ASSET_ARCHITECTURE_DESCRIPTION,
         ASSET_TYPE=:ASSET_TYPE WHERE ASSET_ID=:ASSET_ID`,
                             [self.title, self.description, self.usercase, self.customer, self.createdBy.toLowerCase(),
-                            self.scrmId, self.oppId, new Date(), self.modifiedBy, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), 'Pending Review', self.asset_architecture_description, self.asset_type, self.assetId],
+                            self.scrmId, self.oppId, new Date(), self.modifiedBy, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), assetState, self.asset_architecture_description, self.asset_type, self.assetId],
                             {
                                 outFormat: oracledb.Object
                             }).then(res => {
@@ -441,7 +444,7 @@ module.exports = class Asset {
                 :ASSET_USERCASE,:ASSET_CUSTOMER,:ASSET_CREATEDBY,:CREATED_DATE,:ASSET_SCRM_ID,:ASSET_OPP_ID,
                 :ASSET_THUMBNAIL,:ASSET_MODIFIED_DATE,:ASSET_MODIFIED_BY,:ASSET_VIDEO_URL,:ASSET_EXPIRY_DATE,:ASSET_VIDEO_LINK,:ASSET_LOCATION,:ASSET_OWNER,:ASSET_STATUS,:ASSET_ARCHITECTURE_DESCRIPTION,:ASSET_TYPE)`,
                             [assetid, self.title, self.description, self.usercase, self.customer, self.createdBy.toLowerCase(),
-                                self.createdDate, self.scrmId, self.oppId, self.thumbnail, self.modifiedDate, self.modifiedBy, self.ASSET_VIDEO_URL, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), 'Pending Review', self.asset_architecture_description, self.asset_type],
+                                self.createdDate, self.scrmId, self.oppId, self.thumbnail, self.modifiedDate, self.modifiedBy, self.ASSET_VIDEO_URL, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), assetState, self.asset_architecture_description, self.asset_type],
                             {
                                 outFormat: oracledb.Object
                             }).then(res => {
