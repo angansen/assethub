@@ -765,7 +765,6 @@ module.exports = class Asset {
     }
 
 
-
     static uploadThumbnail(assetId, thumbnail) {
         return new Promise((resolve, reject) => {
             console.log("inside thumnnail function")
@@ -776,9 +775,9 @@ module.exports = class Asset {
                 fname = fname.replace(/ /g, '');
 
                 const ftype = thumbnail.name.split('.')[1];
+                fname=fname.replace(/[^a-zA-Z0-9]/g, '');
                 const uniqueId = uniqid();
                 const finalFname = fname + uniqueId.concat('.', ftype);
-                finalFname=finalFname.replace(/[^a-zA-Z0-9]/g, '');
                 //console.log(finalFname)
                 const uploadPath = path.join('/', 'mnt/ahfs/assets', assetId, finalFname);
                 var content = 'assets/' + assetId + '/' + `${finalFname}`
@@ -841,6 +840,82 @@ module.exports = class Asset {
             }
         })
     }
+
+    // static uploadThumbnail(assetId, thumbnail) {
+    //     return new Promise((resolve, reject) => {
+    //         console.log("inside thumnnail function")
+    //         try {
+
+    //             const connection = getDb();
+    //             let fname = thumbnail.name.split('.')[0];
+    //             fname = fname.replace(/ /g, '');
+
+    //             const ftype = thumbnail.name.split('.')[1];
+    //             const uniqueId = uniqid();
+    //             const finalFname = fname + uniqueId.concat('.', ftype);
+    //             // finalFname=finalFname;
+    //             //console.log(finalFname)
+    //             const uploadPath = path.join('/', 'mnt/ahfs/assets', assetId, finalFname);
+    //             var content = 'assets/' + assetId + '/' + `${finalFname}`
+    //             //console.log(content)
+    //             // thumbnail.mv(uploadPath, function (err) {
+    //             //     if (err) {
+    //             //         return res.status(500).send(err);
+    //             //     }
+    //             // })
+
+    //             try {
+    //                 console.log("---------  FOLDER CREATION for thumbnail ----------")
+    //                 const baseresoursePath = path.join('/', 'mnt/ahfs/assets', assetId);
+    //                 console.log("projected path " + baseresoursePath);
+
+    //                 fs.open(baseresoursePath, 'r', (err) => {
+    //                     if (err) {
+    //                         if (err.code === 'ENOENT') {
+    //                             console.log('folder does not exist');
+
+    //                             if (!fs.existsSync(baseresoursePath)) {
+    //                                 fs.mkdirSync(baseresoursePath);
+    //                                 console.log("Calling file create " + uploadPath);
+    //                                 thumbnail.mv(uploadPath, function (err) {
+    //                                     if (err) {
+    //                                         return res.status(500).send(err);
+    //                                     }
+    //                                 })
+    //                             }
+
+    //                         }
+    //                     } else {
+    //                         console.log("Calling file create " + uploadPath);
+    //                         thumbnail.mv(uploadPath, function (err) {
+    //                             if (err) {
+    //                                 return res.status(500).send(err);
+    //                             }
+    //                         })
+    //                     }
+    //                 });
+
+    //             } catch (err) {
+    //                 console.log("Folder creation failed " + err.message);
+    //             }
+
+
+    //             connection.update(`UPDATE ASSET_DETAILS set 
+    //         ASSET_THUMBNAIL=:ASSET_THUMBNAIL
+    //          WHERE ASSET_ID=:ASSET_ID`, [content, assetId],
+    //                 {
+    //                     autoCommit: true
+    //                 }
+    //             ).then(res => {
+    //                 //console.log("thumbnail inserted Successfully")
+    //                 //console.log(res)
+    //                 resolve("working");
+    //             })
+    //         } catch (error) {
+    //             reject({ msg: "Thumnail saving error" });
+    //         }
+    //     })
+    // }
 
     static uploadVideo(assetId, video) {
         return new Promise((resolve, reject) => {

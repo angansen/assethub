@@ -67,15 +67,15 @@ async function getpoolconnection() {
 		// connectString: "db1.sb6.ah.oraclevcn.com:1521/pah1.sb6.ah.oraclevcn.com",
 
 		// *** STAGING DB CRED ***
-		user: "assethub",
-		password: "AssetHub#19_",
-		connectString: "db1.sb3.ahvcn.oraclevcn.com:1521/pah1.sb3.ahvcn.oraclevcn.com",
+		// user: "assethub",
+		// password: "AssetHub#19_",
+		// connectString: "db1.sb3.ahvcn.oraclevcn.com:1521/pah1.sb3.ahvcn.oraclevcn.com",
 
 
 		//// *** PROD DB CRED ***
-		// user: "assethub",
-		// password: "AssetHub#19_",
-		// connectString: "db1.sb5.ahvcn.oraclevcn.com:1521/ah01_iad2gm.sb5.ahvcn.oraclevcn.com",
+		user: "assethub",
+		password: "AssetHub#19_",
+		connectString: "db1.sb5.ahvcn.oraclevcn.com:1521/ah01_iad2gm.sb5.ahvcn.oraclevcn.com",
 		// _enableStats: true,
 		poolMax: 150,
 		poolMin: 20,
