@@ -271,9 +271,9 @@ module.exports = class Asset {
     }
 
 
-    save() {
+    save(type) {
 
-        let assetState='Pending Review';
+        let assetState = type;
 
         return new Promise((resolve, reject) => {
             var assetid = this.assetId;
@@ -1216,7 +1216,7 @@ module.exports = class Asset {
                     autoCommit: true,
                     outFormat: oracledb.Object
                 }).then(datdelresp => {
-                    console.log("Deletion > "+JSON.stringify(datdelresp));
+                    console.log("Deletion > " + JSON.stringify(datdelresp));
                     data.forEach(link => {
                         console.log(link.LINK_REPOS_TYPE + " - " + link.LINK_ID);
                         if (link.LINK_REPOS_TYPE == "DOCUMENT") {
@@ -1233,13 +1233,13 @@ module.exports = class Asset {
 
                         }
                     });
-                    resolve({"msg":"links removed successfully"});
+                    resolve({ "msg": "links removed successfully" });
                 })
 
 
             }).catch(err => {
                 console.log("Error : " + err);
-                reject({"msg":"couldn't remove links'"})
+                reject({ "msg": "couldn't remove links'" })
             })
             // connection.execute(`DELETE from ASSET_LINKS WHERE ASSET_ID=:ASSET_ID`, [assetId],
             //     {
@@ -2903,7 +2903,7 @@ module.exports = class Asset {
         let filteredAssetsArray = [];
         let statusObj = {};
         let finalArr = [];
-        let allStatusList = ['Pending Review', 'Live', 'Pending Rectification', 'Reject'];
+        let allStatusList = ['Saved','Pending Review', 'Live', 'Pending Rectification', 'Reject'];
         let tempStatusArr = [];
         return new Promise((resolve, reject) => {
             const connection = getDb();

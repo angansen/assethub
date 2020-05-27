@@ -93,6 +93,19 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
 
 
 exports.postAsset = (req, res) => {
+    let type = req.header('type');
+    // type= type==undefined||type==null||type.trim().length==0?"Saved":"Pending Review";
+
+    
+    if(type==undefined||type==null||type.trim().length==0||type.trim()=='save'){
+        type='Saved';
+    }else if(type.trim()=='submit'){
+        type='Pending Review';
+    }else{
+        type='Saved';
+    }
+    console.log("STATE ASSET :::: "+type);
+
     const assetId = null;
     // console.log(req.body);
     const title = req.body.title;
@@ -139,7 +152,7 @@ exports.postAsset = (req, res) => {
         oppId, thumbnail, modifiedDate,
         modifiedBy, filters, links, expiryDate, video_link, location, owner, asset_architecture_description);
 
-    asset.save().then(result => {
+    asset.save(type).then(result => {
         let creationResult = result
         res.json(creationResult);
         sendEmailOnAssetCreation(result.Asset_ID, owner, assetCreatedEmailSql, assetCreatedEmailOptions, 'create')
@@ -214,6 +227,17 @@ exports.postEditAsset = (req, res) => {
         (  select regexp_substr(asset_owner,'[^,]+', 1, level) from (select asset_owner from asset_details where asset_id=:0)
         connect by regexp_substr(asset_owner, '[^,]+', 1, level) is not null) and user_location is not null) `;
     let assetCreatedEmailOptions = [];
+    let type = req.header('type');
+
+   
+    if(type==undefined||type==null||type.trim().length==0||type.trim()=='save'){
+        type='Saved';
+    }else if(type.trim()=='submit'){
+        type='Pending Review';
+    }else{
+        type='Saved';
+    }
+    console.log("STATE ASSET :::: "+type);
     const assetId = req.body.assetId;
     const title = req.body.title
     // console.log(title);
@@ -250,7 +274,7 @@ exports.postEditAsset = (req, res) => {
         createdBy, createdDate, scrmId,
         oppId, thumbnail, modifiedDate,
         modifiedBy, filters, links, expiryDate, video_link, location, owner, asset_architecture_description);
-    asset.save().then(result => {
+    asset.save(type).then(result => {
         let updationResult = result
         res.json(updationResult);
         sendEmailOnAssetCreation(assetId, owner, assetCreatedEmailSql, assetCreatedEmailOptions, 'update').then(result => {

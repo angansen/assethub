@@ -20,11 +20,8 @@ exports.fetchAssets = (user_email, host) => {
                 else {
                     resolve({ msg: "User does not exist" })
                 }
-                if (role !== 'reviewer' && role !== 'admin') {
-                    resolve("User does not have sufficient priviledges.")
-                }
-                else {
-                    let fetchPendingReviewAssetsSql = `select 
+
+                let fetchPendingReviewAssetsSql = `select 
                     ASSET_ID,
                     ASSET_TITLE,
                     ASSET_DESCRIPTION,
@@ -45,23 +42,23 @@ exports.fetchAssets = (user_email, host) => {
                     ASSET_STATUS,
                     ASSET_REVIEW_NOTE
                     from asset_details d,asset_user u where d.asset_status in ('Live','Pending Review','Reject','Pending Rectification')
-                    and u.USER_EMAIL=:USER_EMAIL`;
-                    if (role == 'reviewer') {
-                        fetchPendingReviewAssetsSql += ` and d.asset_location = u.user_location`;
-                    }
-
-                    let fetchPendingReviewAssetsOptions = [user_email];
-                    connection.query(fetchPendingReviewAssetsSql, fetchPendingReviewAssetsOptions,
-                        {
-                            outFormat: oracledb.OBJECT
-                        }).then(result => {
-                            result.forEach(element => {
-                                element.ASSET_REVIEW_NOTE = JSON.parse(element.ASSET_REVIEW_NOTE)
-                            });
-                            resolve(formatAssetByStatus(result, host));
-                        })
-
+                    and u.USER_EMAIL=:USER_EMAIL order by d.asset_modified_date desc`;
+                if (role == 'reviewer') {
+                    fetchPendingReviewAssetsSql += ` and d.asset_location = u.user_location`;
                 }
+
+                let fetchPendingReviewAssetsOptions = [user_email];
+                connection.query(fetchPendingReviewAssetsSql, fetchPendingReviewAssetsOptions,
+                    {
+                        outFormat: oracledb.OBJECT
+                    }).then(result => {
+                        result.forEach(element => {
+                            element.ASSET_REVIEW_NOTE = JSON.parse(element.ASSET_REVIEW_NOTE)
+                        });
+                        resolve(formatAssetByStatus(result, host));
+                    })
+
+
 
             }).catch(err => {
                 reject(err + "Something went Wrong.We'll be back soon")
@@ -110,13 +107,13 @@ formatAssetByStatus = (result, host) => {
 }
 
 
-exports.postAssetReviewNote = (review_note, asset_status, assetId,host) => {
+exports.postAssetReviewNote = (review_note, asset_status, assetId, host) => {
     const connection = getDb();
     review_note = JSON.stringify(review_note);
-    if(asset_status=='Live'){
-        usermodel.preparenotification(assetId,"Asset",host);
+    if (asset_status == 'Live') {
+        usermodel.preparenotification(assetId, "Asset", host);
     }
-    
+
     let insertReviewNoteSql = `UPDATE ASSET_DETAILS SET ASSET_REVIEW_NOTE = :ASSET_REVIEW_NOTE,
     ASSET_STATUS=:ASSET_STATUS where ASSET_ID=:ASSET_ID`;
     let insertReviewNoteOptions = [review_note, asset_status, assetId]
@@ -128,7 +125,7 @@ exports.postAssetReviewNote = (review_note, asset_status, assetId,host) => {
             })
             .then(result => {
                 console.log("posted and state: " + asset.ASSET_STATUS);
-                
+
                 resolve(result)
             })
             .catch(err => {
