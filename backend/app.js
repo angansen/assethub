@@ -21,11 +21,9 @@ var winstoryrouter = require('./routes/winstoryRoute');
 var userrouter = require('./routes/userRoute');
 var governancerouter = require('./routes/governanceRoute');
 var adminrouter = require('./routes/adminRoute');
-
+let port=8001;
 
 var app = express();
-
-
 // // view engine setup
 // app.use(bodyParser.json());
 app.use(bodyParser.json({ limit: '100mb', extended: true }))
@@ -56,7 +54,7 @@ Dbconnect.Dbconnect().then(res => {
   console.log(res);
   try {
     const connection = getDb();
-    connection.execute(`SELECT count(username) FROM dba_users`, {},
+    connection.query(`SELECT count(username) FROM dba_users`, {},
       {
         outFormat: oracledb.OBJECT
       },
@@ -64,7 +62,7 @@ Dbconnect.Dbconnect().then(res => {
       console.log("DB intiated : " + resp);
     })
   } catch (error) {
-    console.log("Connection probbing is done. . .");
+    console.log("Connection probbing is done. . . "+JSON.stringify(error));
   }
 
 })

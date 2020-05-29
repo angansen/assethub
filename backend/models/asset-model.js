@@ -8,6 +8,8 @@ const path = require('path');
 const emailnotification = require('./email-notification');
 let stringSimilarity = require('string-similarity');
 const fs = require('fs');
+const cluster = require('express-cluster');
+
 
 const generateFileName = (sampleFile, assetId, filesArray, imageDescription) => {
     let imgObject = {};
@@ -1378,6 +1380,7 @@ module.exports = class Asset {
             resolve(true);
         })
     }
+
 
 
     static fetchAssets(host, offset, limit, filters, searchString, sortBy, order, action, email) {

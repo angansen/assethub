@@ -1,6 +1,6 @@
 const assetController = require('../controllers/asset-controller')
-var express = require('express');
-var router = express.Router();
+let express = require('express');
+let router = express.Router();
 /* GET home page. */
 // router.get('/allAsDsets', assetController.getAllAssets);
 router.get('/banner', assetController.getBannerDetails);
