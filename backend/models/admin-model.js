@@ -102,7 +102,10 @@ exports.editFilterbyId = (filter, host) => {
     const connection = getDb();
     return new Promise((resolve, reject) => {
         console.log('old_filter_type' in filter);
+        console.log("===========   FILTER UPDATE ================")
         if (filter.old_filter_type) {
+           
+            console.log("Updating parent Filter");
             connection.execute(`UPDATE ASSET_FILTER SET FILTER_TYPE=:FILTER_TYPE WHERE FILTER_TYPE=:OLD_FILTER_TYPE`, [filter.filter_type, filter.old_filter_type],
                 {
                     outFormat: oracledb.Object,
@@ -120,6 +123,7 @@ exports.editFilterbyId = (filter, host) => {
                 })
         }
         if (filter.child_filter.length > 0) {
+            console.log("Updating Child Filter");
             filter.child_filter.forEach(item => {
                 connection.execute(`UPDATE ASSET_FILTER SET FILTER_NAME=:FILTER_NAME,FILTER_TYPE=:FILTER_TYPE,FILTER_TYPE_L2=:FILTER_TYPE_L2 WHERE FILTER_ID=:FILTER_ID`, [item.filter_name, filter.filter_type, filter.filter_type_l2, item.filter_id],
                     {
