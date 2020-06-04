@@ -1113,9 +1113,9 @@ exports.deviceToken = (data) => {
     let sql;
     let options;
     console.log('User Information');
-    console.log(data.user_email)
-    console.log(data.device_token)
-    console.log(data.device_type)
+    console.log(data.user_email);
+    console.log(data.device_token);
+    console.log(data.device_type);
     return new Promise((resolve, reject) => {
         connection.execute(`Select count(*) "device_count" from ASSET_DEVICETOKEN where  USER_EMAIL=:USER_EMAIL and DEVICE_TYPE=:DEVICE_TYPE`, [data.user_email, data.device_type],
             {
