@@ -64,6 +64,7 @@ exports.addNewFilter = (filter, host) => {
                 let newFilterId = uniqid.process();
                 let sql = '';
                 let options = '';
+                filter.filter_type_image=filter.filter_type_image.split('8001/')[1];
                 if (filter.existingFilter == 1) {
                     sql = `INSERT into ASSET_FILTER(FILTER_ID,FILTER_NAME,FILTER_TYPE,FILTER_TYPE_IMAGE,FILTER_TYPE_L2,FILTER_STATUS)  values(:0,:1,:2,:3,:4,:5)`;
                     options = [newFilterId, item.filter_name, filter.filter_type, filter.filter_type_image, item.filter_type_l2, 1]

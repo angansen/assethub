@@ -752,7 +752,7 @@ exports.SEAssistance = (request, res) => {
         } else {
             console.log("Demo request is captured. . .");
             emailnotification.triggerEmailNotificationforSEAssistance(request);
-            res.json({ status: "success", msg: "SE Assistance request saved and email notification sent successfully" })
+            res.json({ status: "success", msg: "Assistance request saved and email notification sent successfully" })
         }
 
     }).catch(err => {
