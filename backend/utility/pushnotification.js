@@ -3,7 +3,7 @@ var app = express();
 var apn = require('apn');
 
 var FCM = require('fcm-node');
-var serverKey = 'AIzaSyAR7soGZPPOkDROmH0zXOPlp_rIEVmRomg'; //put your server key here
+var serverKey = 'AAAA_L4fGNk:APA91bGSnRdkLSad4c5vtdf3m1BSQWTb2UKKrVDA-6pvT9wcJd3SFFW3tVcqDSWqhYl52_XAbIf7Fbbm_k52PIPxuAepgVGGaCfTmEuypNbhaZLrYtIhoN6KcIVGckCnRH80pqr9zmXd'; //put your server key here
 var fcm = new FCM(serverKey);
 
 const port = process.env.PORT || 7188;
