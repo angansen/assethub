@@ -11,10 +11,13 @@ const emailnotification = require('./email-notification');
 const worker = require('../utility/worker');
 // GIT CHECK IN TEST
 
-exports.saveuserlogin = (activity, res) => {
+exports.saveuserActivity = (activity, res) => {
     const connection = getDb();
-    let captureloginsql = `insert into ASSET_USER_ACTIVITY (ACTIVITY_BY_USER_EMAIL,ACIVITY_BY_USERNAME,ACTIVITY_TYPE,ACTIVITY_PLATFORM) values(:0,:1,:2,:3)`;
-    let captureloginOption = [activity.email, activity.name, activity.type, activity.platform];
+    let contentid=activity.type=="share"?activity.contentid:"";
+    let contenttype=activity.type=="share"?activity.contenttype:"";
+    
+    let captureloginsql = `insert into ASSET_USER_ACTIVITY (ACTIVITY_BY_USER_EMAIL,ACIVITY_BY_USERNAME,ACTIVITY_TYPE,ACTIVITY_PLATFORM,ACTIVITY_CONTENT_ID,ACTIVITY_CONTENT_TYPE) values(:0,:1,:2,:3,)`;
+    let captureloginOption = [activity.email, activity.name, activity.type, activity.platform,contentid,contenttype];
 
     connection.execute(captureloginsql, captureloginOption, {
         outFormat: oracledb.Object,

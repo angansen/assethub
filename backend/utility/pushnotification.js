@@ -1,4 +1,5 @@
 var express = require('express');
+const getDb = require('../database/db').getDb;
 var app = express();
 var apn = require('apn');
 
@@ -26,18 +27,29 @@ app.get('/sendpushios', function (req, res) {
   };
   var apnConnection = new apn.Connection(options);
 
-  var myDevice = new apn.Device("c2de1ee2022587d8d14b33bc8cedbac8e2e6e0ffde6105514cc13410a4c68123");
+  const connection = getDb();
 
-  var note = new apn.Notification();
+  try {
+    connection.query("select * from asset_devicetoken where user_email is not null and device_token is not null", {}, {
+      outFormat: oracledb.OBJECT
+    }).then(devicelist => {
+      console.log(" list : "+JSON.stringify(devicelist));
+    })
+  } catch (error) {
 
-  note.expiry = Math.floor(Date.now() / 1000) + 3600;
-  note.badge = 3;
-  note.sound = "ping.aiff";
-  // note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
-  // note.payload = { 'messageFrom': 'Caroline' };
-  note.alert = "Hello";
-  note.payload = { 'messageFrom': 'Amit' };
-  apnConnection.pushNotification(note, myDevice);
+  }
+  // var myDevice = new apn.Device("c2de1ee2022587d8d14b33bc8cedbac8e2e6e0ffde6105514cc13410a4c68123");
+
+  // var note = new apn.Notification();
+
+  // note.expiry = Math.floor(Date.now() / 1000) + 3600;
+  // note.badge = 3;
+  // note.sound = "ping.aiff";
+  // // note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
+  // // note.payload = { 'messageFrom': 'Caroline' };
+  // note.alert = "Hello";
+  // note.payload = { 'messageFrom': 'Amit' };
+  // apnConnection.pushNotification(note, myDevice);
 
   return res.json({ success: "true" });
   // res.send("Go to Hellllllllllllll----------------"+new Date().getTime());
