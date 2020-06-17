@@ -11,13 +11,14 @@ const emailnotification = require('./email-notification');
 const worker = require('../utility/worker');
 // GIT CHECK IN TEST
 
-exports.saveuserActivity = (activity, res) => {
+exports.saveuserActivity = (req, res) => {
     const connection = getDb();
+    let activity=req.params;
     console.log("------ SHARE ------");
     console.log(activity.type);
-    console.log(activity.contentid+" ::: " +activity.contenttype);
-    let contentid=activity.type=="share"?activity.contentid:"";
-    let contenttype=activity.type=="share"?activity.contenttype:"";
+    console.log(req.headers.contentid+" ::: " +req.headers.contenttype);
+    let contentid=activity.type=="share"?req.headers.contentid:"";
+    let contenttype=activity.type=="share"?req.headers.contenttype:"";
     
     let captureloginsql = `insert into ASSET_USER_ACTIVITY (ACTIVITY_BY_USER_EMAIL,ACIVITY_BY_USERNAME,ACTIVITY_TYPE,ACTIVITY_PLATFORM,ACTIVITY_CONTENT_ID,ACTIVITY_CONTENT_TYPE) values(:0,:1,:2,:3,:4,:5)`;
     let captureloginOption = [activity.email, activity.name, activity.type, activity.platform,contentid,contenttype];

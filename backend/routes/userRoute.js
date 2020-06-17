@@ -8,7 +8,7 @@ router.post('/save/',userController.saveUserDetails);
 router.post('/findbyemail/',userController.findUserByEmail);
 router.post('/uploadprofileimage/:platform/:email',userController.uploadProfileImage);
 router.post('/requestdemo/',userController.saveRequestDemo);
-router.post('/captureactivity/:platform/:type/:name/:email/:contentid/:contenttype',userController.captureuserActivity);
+router.post('/captureactivity/:platform/:type/:name/:email',userController.captureuserActivity);
 router.post('/updateUserTable',userController.updateUserRepos);
 
 

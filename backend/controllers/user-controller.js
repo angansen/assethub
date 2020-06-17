@@ -44,7 +44,7 @@ exports.getLdapUsers = (req, res) => {
 }
 
 exports.captureuserActivity = (req, res) => {
-    user.saveuserActivity(req.params, res);
+    user.saveuserActivity(req, res);
 }
 
 exports.fetchActivityByemail = (req, res) => {
