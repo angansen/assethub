@@ -133,6 +133,14 @@ const getCommentsById = (assetId) => {
         })
 }
 
+const getSharecountByAssetId = (assetId) => {
+    const connection = getDb();
+    return connection.query(`select count(*) as count from ASSET_USER_activity where activity_content_id=:0`,
+        [assetId],
+        {
+            outFormat: oracledb.OBJECT
+        })
+}
 
 const getAssetFilterMapByIdandType = (assetId) => {
     const connection = getDb();
@@ -2256,19 +2264,25 @@ module.exports = class Asset {
     static getSocialDataByAssetId(assetId, userId) {
         let assetSocialObj = {}
         return new Promise((resolve, reject) => {
-            getCommentsById(assetId)
-                .then(comments => {
-                    assetSocialObj.COMMENTS = comments;
-                    getLikesByAssetId(assetId)
-                        .then(likes => {
-                            assetSocialObj.LIKES = likes
-                            getLikesByAssetIdAndUserId(assetId, userId)
-                                .then(userLike => {
-                                    assetSocialObj.USER_LIKE = userLike;
-                                    resolve(assetSocialObj)
+            getSharecountByAssetId(assetId)
+                .then((sharecount => {
+                    console.log("SHARE ::: "+JSON.stringify(sharecount));
+                    assetSocialObj.sharecount = sharecount[0].COUNT;
+                    getCommentsById(assetId)
+                        .then(comments => {
+                            assetSocialObj.COMMENTS = comments;
+                            getLikesByAssetId(assetId)
+                                .then(likes => {
+                                    assetSocialObj.LIKES = likes
+                                    getLikesByAssetIdAndUserId(assetId, userId)
+                                        .then(userLike => {
+                                            assetSocialObj.USER_LIKE = userLike;
+                                            resolve(assetSocialObj)
+                                        })
                                 })
                         })
-                })
+                }))
+
         })
     }
     static winstoryimperativeList() {

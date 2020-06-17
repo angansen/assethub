@@ -626,19 +626,24 @@ exports.uploadLikeByWinStory = (assetid, likeBy, like_by_username, action) => {
 exports.getSocialDataByWinStoryID = (host, assetId, userId) => {
     let assetSocialObj = {}
     return new Promise((resolve, reject) => {
-        getCommentsById(host, assetId)
-            .then(comments => {
-                assetSocialObj.COMMENTS = comments;
-                getLikesByAssetId(assetId)
-                    .then(likes => {
-                        assetSocialObj.LIKES = likes
-                        getLikesByAssetIdAndUserId(assetId, userId)
-                            .then(userLike => {
-                                assetSocialObj.USER_LIKE = userLike;
-                                resolve(assetSocialObj)
-                            })
-                    })
-            })
+        getSharecountByAssetId(assetId)
+        .then(sharecount => {
+            assetSocialObj.sharecount = sharecount[0].COUNT;
+            getCommentsById(host, assetId)
+                .then(comments => {
+                    assetSocialObj.COMMENTS = comments;
+                    getLikesByAssetId(assetId)
+                        .then(likes => {
+                            assetSocialObj.LIKES = likes
+                            getLikesByAssetIdAndUserId(assetId, userId)
+                                .then(userLike => {
+                                    assetSocialObj.USER_LIKE = userLike;
+                                    resolve(assetSocialObj)
+                                })
+                        })
+                })
+        })
+
     })
 }
 const getCommentsById = (host, assetId) => {
@@ -674,6 +679,16 @@ const getLikesByAssetId = (assetId) => {
             outFormat: oracledb.OBJECT
         })
 }
+
+const getSharecountByAssetId = (assetId) => {
+    const connection = getDb();
+    return connection.query(`select count(*) as count from ASSET_USER_activity where activity_content_id=:0`,
+        [assetId],
+        {
+            outFormat: oracledb.OBJECT
+        })
+}
+
 
 
 const getLikesByAssetIdAndUserId = (assetId, userId) => {

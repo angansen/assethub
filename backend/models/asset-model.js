@@ -172,6 +172,15 @@ const getCommentsById = (assetId, host) => {
         })
 }
 
+const getSharecountByAssetId = (assetId) => {
+    const connection = getDb();
+    return connection.query(`select count(*) as count from ASSET_USER_activity where activity_content_id=:0`,
+        [assetId],
+        {
+            outFormat: oracledb.OBJECT
+        })
+}
+
 
 const getAssetFilterMapByIdandType = (assetId) => {
     const connection = getDb();
@@ -777,7 +786,7 @@ module.exports = class Asset {
                 fname = fname.replace(/ /g, '');
 
                 const ftype = thumbnail.name.split('.')[1];
-                fname=fname.replace(/[^a-zA-Z0-9]/g, '');
+                fname = fname.replace(/[^a-zA-Z0-9]/g, '');
                 const uniqueId = uniqid();
                 const finalFname = fname + uniqueId.concat('.', ftype);
                 //console.log(finalFname)
@@ -1609,7 +1618,7 @@ module.exports = class Asset {
                                                                                                                     allAssetsObj.ASSET_TYPE = assetTypes;
                                                                                                                     allAssetsObj.SALES_PLAY = salesPlays;
                                                                                                                     allAssetsObj.INDUSTRY = industry;
-                                                                                                                    allAssetsObj.ASSET_THUMBNAIL=allAssetsObj.ASSET_THUMBNAIL==null?'http://' + host + '/no_image.png':allAssetsObj.ASSET_THUMBNAIL;
+                                                                                                                    allAssetsObj.ASSET_THUMBNAIL = allAssetsObj.ASSET_THUMBNAIL == null ? 'http://' + host + '/no_image.png' : allAssetsObj.ASSET_THUMBNAIL;
 
                                                                                                                     linkType = links.map(a => a.LINK_REPOS_TYPE)
                                                                                                                     linkType = [...new Set(linkType)]
@@ -2237,7 +2246,7 @@ module.exports = class Asset {
                                 })
                                 assetObj.LINKS = linkObjArr;
                                 // assetObj.ASSET_THUMBNAIL = 'http://' + host + '/' + assetObj.ASSET_THUMBNAIL;
-                                assetObj.ASSET_THUMBNAIL=assetObj.ASSET_THUMBNAIL!=null&&assetObj.ASSET_THUMBNAIL.trim().length>0?'http://' + host + '/' + assetObj.ASSET_THUMBNAIL:'http://' + host + '/no_image.png';
+                                assetObj.ASSET_THUMBNAIL = assetObj.ASSET_THUMBNAIL != null && assetObj.ASSET_THUMBNAIL.trim().length > 0 ? 'http://' + host + '/' + assetObj.ASSET_THUMBNAIL : 'http://' + host + '/no_image.png';
                                 getImagesById(assetId)
                                     .then(res => {
                                         //  //console.log(res)
@@ -2400,19 +2409,24 @@ module.exports = class Asset {
     static getSocialDataByAssetId(host, assetId, userId) {
         let assetSocialObj = {}
         return new Promise((resolve, reject) => {
-            getCommentsById(assetId, host)
-                .then(comments => {
-                    assetSocialObj.COMMENTS = comments;
-                    getLikesByAssetId(host, assetId)
-                        .then(likes => {
-                            assetSocialObj.LIKES = likes
-                            getLikesByAssetIdAndUserId(assetId, userId)
-                                .then(userLike => {
-                                    assetSocialObj.USER_LIKE = userLike;
-                                    resolve(assetSocialObj)
+            getSharecountByAssetId(assetId)
+                .then(sharecount => {
+                    assetSocialObj.sharecount=sharecount[0].COUNT;
+                    getCommentsById(assetId, host)
+                        .then(comments => {
+                            assetSocialObj.COMMENTS = comments;
+                            getLikesByAssetId(host, assetId)
+                                .then(likes => {
+                                    assetSocialObj.LIKES = likes
+                                    getLikesByAssetIdAndUserId(assetId, userId)
+                                        .then(userLike => {
+                                            assetSocialObj.USER_LIKE = userLike;
+                                            resolve(assetSocialObj)
+                                        })
                                 })
                         })
                 })
+
         })
     }
 
@@ -2984,7 +2998,7 @@ module.exports = class Asset {
         let filteredAssetsArray = [];
         let statusObj = {};
         let finalArr = [];
-        let allStatusList = ['Saved','Pending Review', 'Live', 'Pending Rectification', 'Reject'];
+        let allStatusList = ['Saved', 'Pending Review', 'Live', 'Pending Rectification', 'Reject'];
         let tempStatusArr = [];
         return new Promise((resolve, reject) => {
             const connection = getDb();
@@ -3000,8 +3014,8 @@ module.exports = class Asset {
                     assetsArray = res
                     assetsArray.forEach(asset => {
                         // asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
-                        console.log("THUMNNAIL >>>>>>>>>>>> "+asset.ASSET_THUMBNAIL)
-                        asset.ASSET_THUMBNAIL=asset.ASSET_THUMBNAIL!=null&&asset.ASSET_THUMBNAIL.trim().length>0?'http://' + host + '/' + asset.ASSET_THUMBNAIL:'http://' + host + '/no_image.png';
+                        console.log("THUMNNAIL >>>>>>>>>>>> " + asset.ASSET_THUMBNAIL)
+                        asset.ASSET_THUMBNAIL = asset.ASSET_THUMBNAIL != null && asset.ASSET_THUMBNAIL.trim().length > 0 ? 'http://' + host + '/' + asset.ASSET_THUMBNAIL : 'http://' + host + '/no_image.png';
                     })
                     connection.query(`select Count(*) comment_count,asset_id from 
                     asset_comments group by asset_id`, [],

@@ -33,10 +33,10 @@ app.get('/sendpushios', function (req, res) {
     connection.query("select * from asset_devicetoken where user_email is not null and device_token is not null", {}, {
       outFormat: oracledb.OBJECT
     }).then(devicelist => {
-      console.log(" list : "+JSON.stringify(devicelist));
+      console.log(" list : " + JSON.stringify(devicelist));
     })
   } catch (error) {
-
+    return res.status(500).json({ success: "false" });
   }
   // var myDevice = new apn.Device("c2de1ee2022587d8d14b33bc8cedbac8e2e6e0ffde6105514cc13410a4c68123");
 
@@ -54,6 +54,35 @@ app.get('/sendpushios', function (req, res) {
   return res.json({ success: "true" });
   // res.send("Go to Hellllllllllllll----------------"+new Date().getTime());
 });
+
+exports.sendIOSPushNotification = (notification) => {
+  const connection = getDb();
+
+  try {
+    connection.query("select * from asset_devicetoken where user_email is not null and device_token is not null", {}, {
+      outFormat: oracledb.OBJECT
+    }).then(devicelist => {
+      console.log(" list : " + JSON.stringify(devicelist));
+    })
+  } catch (error) {
+    console.log("Error " + JSON.stringify(error));
+  }
+}
+
+
+exports.sendAndroidPushNotification = (notification) => {
+  const connection = getDb();
+
+  try {
+    connection.query("select * from asset_devicetoken where user_email is not null and device_token is not null", {}, {
+      outFormat: oracledb.OBJECT
+    }).then(devicelist => {
+      console.log(" list : " + JSON.stringify(devicelist));
+    })
+  } catch (error) {
+    console.log("Error " + JSON.stringify(error));
+  }
+}
 
 app.get('/sendpushandroid', function (req, res) {
 
