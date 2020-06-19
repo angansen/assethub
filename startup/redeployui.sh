@@ -12,5 +12,4 @@ mv build.zip build.bkp.zip
 echo "back up zip created"
 sudo cp -f ssoheader.php html/
 echo "SSOheader file placed . . ."
-#sudo systemctl restart httpd
-#echo "Apache Service restarted . . ."
+
