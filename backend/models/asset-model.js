@@ -1466,8 +1466,8 @@ module.exports = class Asset {
     static refineAssets(host, offset, limit, assetsArray, sortBy, order, action, email) {
 
         // REMOVE DUPLICATE ENTRIES
-        console.log("*****************************************refineAssets fun start*******************************************")
-        console.log(assetsArray.length)
+        // console.log("*****************************************refineAssets fun start*******************************************")
+        // console.log(assetsArray.length)
         let assetidtracker = {};
         let uniqueassetarray = assetsArray.filter(asset => {
             if (!assetidtracker[asset.ASSET_ID]) {
@@ -1477,7 +1477,7 @@ module.exports = class Asset {
         })
         assetsArray = uniqueassetarray;
 
-        console.log('****uniqueassetarray Length:***** ' + assetsArray.length)
+        // console.log('****uniqueassetarray Length:***** ' + assetsArray.length)
         let allAssetsObj = {};
         let tAssets = [];
         let allAssets = [];
@@ -1592,101 +1592,118 @@ module.exports = class Asset {
                                                                                                         outFormat: oracledb.OBJECT
                                                                                                     })
                                                                                                     .then(res => {
-                                                                                                        //console.log("LIKES",res)
-                                                                                                        likesArray = res.rows;
-                                                                                                        connection.execute(`SELECT count(*) view_count,asset_id from ASSET_VIEWS group by asset_id`, [],
+                                                                                                        connection.execute(`SELECT count(*) like_count,asset_id from ASSET_LIKES group by asset_id`, [],
                                                                                                             {
                                                                                                                 outFormat: oracledb.OBJECT
                                                                                                             })
                                                                                                             .then(res => {
-                                                                                                                viewsArray = res.rows;
-                                                                                                                assetsArray.forEach(asset => {
-                                                                                                                    const id = asset.ASSET_ID;
-                                                                                                                    allAssetsObj = asset
-                                                                                                                    allAssetsObj.LINKS = [];
-                                                                                                                    var links = linksArray.filter(link => link.ASSET_ID === id)
-                                                                                                                    ////console.log('links:',links)
-                                                                                                                    solutionAreas = solutionAreasArray.filter(s => s.ASSET_ID === id)
-                                                                                                                    assetTypes = assetTypesArray.filter(s => s.ASSET_ID === id)
-                                                                                                                    salesPlays = salesPlaysArray.filter(s => s.ASSET_ID === id)
-                                                                                                                    industry = industryArray.filter(s => s.ASSET_ID === id);
-                                                                                                                    grouptype = groupTypeArray.filter(s => s.ASSET_ID === id);
-                                                                                                                    let promote = promotedArray.filter(s => s.ASSET_ID === id);
-                                                                                                                    allAssetsObj.GROUP_TYPE = grouptype;
-                                                                                                                    allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
-                                                                                                                    allAssetsObj.SOLUTION_AREAS = solutionAreas;
-                                                                                                                    allAssetsObj.ASSET_TYPE = assetTypes;
-                                                                                                                    allAssetsObj.SALES_PLAY = salesPlays;
-                                                                                                                    allAssetsObj.INDUSTRY = industry;
-                                                                                                                    allAssetsObj.ASSET_THUMBNAIL = allAssetsObj.ASSET_THUMBNAIL == null ? 'http://' + host + '/no_image.png' : allAssetsObj.ASSET_THUMBNAIL;
-
-                                                                                                                    linkType = links.map(a => a.LINK_REPOS_TYPE)
-                                                                                                                    linkType = [...new Set(linkType)]
-                                                                                                                    ////console.log(linkType)
-                                                                                                                    linkType.forEach(type => {
-                                                                                                                        var links2 = linksArray.filter(link => link.LINK_REPOS_TYPE === type && link.ASSET_ID === id)
-                                                                                                                        lobj.TYPE = type;
-                                                                                                                        lobj.arr = links2;
-                                                                                                                        lobj2 = lobj
-                                                                                                                        linkObjArr.push(lobj2);
-                                                                                                                        lobj = {}
+                                                                                                                likesArray = res.rows;
+                                                                                                                connection.execute(`SELECT count(*) view_count,asset_id from ASSET_VIEWS group by asset_id`, [],
+                                                                                                                    {
+                                                                                                                        outFormat: oracledb.OBJECT
                                                                                                                     })
-                                                                                                                    allAssetsObj.LINKS = linkObjArr;
+                                                                                                                    .then(res => {
+                                                                                                                        viewsArray = res.rows;
+                                                                                                                        connection.query(`select count(*) as count,activity_content_id from ASSET_USER_activity where activity_type='share' group by activity_content_id`, [],
+                                                                                                                            {
+                                                                                                                                outFormat: oracledb.OBJECT
+                                                                                                                            })
+                                                                                                                            .then(sharecountarr => {
+                                                                                                                                // console.log(" -- > "+JSON.stringify(sharecountarr));
+                                                                                                                                assetsArray.forEach(asset => {
+                                                                                                                                    const id = asset.ASSET_ID;
+                                                                                                                                    allAssetsObj = asset
+                                                                                                                                    allAssetsObj.LINKS = [];
+                                                                                                                                    var links = linksArray.filter(link => link.ASSET_ID === id)
+                                                                                                                                    ////console.log('links:',links)
+                                                                                                                                    solutionAreas = solutionAreasArray.filter(s => s.ASSET_ID === id)
+                                                                                                                                    assetTypes = assetTypesArray.filter(s => s.ASSET_ID === id)
+                                                                                                                                    salesPlays = salesPlaysArray.filter(s => s.ASSET_ID === id)
+                                                                                                                                    industry = industryArray.filter(s => s.ASSET_ID === id);
+                                                                                                                                    grouptype = groupTypeArray.filter(s => s.ASSET_ID === id);
+                                                                                                                                    let promote = promotedArray.filter(s => s.ASSET_ID === id);
+                                                                                                                                    let sharecount = sharecountarr.filter(s => s.ACTIVITY_CONTENT_ID === id);
+                                                                                                                                    // console.log("-------------- SHARE COUNT  ----------------");
 
-                                                                                                                    linkObjArr = [];
-                                                                                                                    ////console.log(lobj2,"obj2")
-                                                                                                                    var images = imagesArray.filter(image => image.ASSET_ID === id);
-                                                                                                                    images.forEach(image => {
-                                                                                                                        image.IMAGEURL = 'http://' + host + '/' + image.IMAGEURL;
-                                                                                                                    });
-                                                                                                                    allAssetsObj.IMAGES = images;
-                                                                                                                    var comments = commentsArray.filter(c => c.ASSET_ID === id);
+                                                                                                                                    // console.log(" -- > "+JSON.stringify(sharecount));
+                                                                                                                                    allAssetsObj.sharecount = sharecount.length > 0 ? sharecount[0].COUNT : 0;
+                                                                                                                                    allAssetsObj.GROUP_TYPE = grouptype;
+                                                                                                                                    allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
+                                                                                                                                    allAssetsObj.SOLUTION_AREAS = solutionAreas;
+                                                                                                                                    allAssetsObj.ASSET_TYPE = assetTypes;
+                                                                                                                                    allAssetsObj.SALES_PLAY = salesPlays;
+                                                                                                                                    allAssetsObj.INDUSTRY = industry;
+                                                                                                                                    allAssetsObj.ASSET_THUMBNAIL = allAssetsObj.ASSET_THUMBNAIL == null ? 'http://' + host + '/no_image.png' : allAssetsObj.ASSET_THUMBNAIL;
 
-                                                                                                                    var ratings = ratingsArray.filter(r => r.ASSET_ID === id)
-                                                                                                                    var likes = likesArray.filter(l => l.ASSET_ID === id)
-                                                                                                                    var views = viewsArray.filter(v => v.ASSET_ID === id)
-                                                                                                                    //console.log(...views);
-                                                                                                                    if (comments[0]) {
-                                                                                                                        delete comments[0].ASSET_ID;
+                                                                                                                                    linkType = links.map(a => a.LINK_REPOS_TYPE)
+                                                                                                                                    linkType = [...new Set(linkType)]
+                                                                                                                                    ////console.log(linkType)
+                                                                                                                                    linkType.forEach(type => {
+                                                                                                                                        var links2 = linksArray.filter(link => link.LINK_REPOS_TYPE === type && link.ASSET_ID === id)
+                                                                                                                                        lobj.TYPE = type;
+                                                                                                                                        lobj.arr = links2;
+                                                                                                                                        lobj2 = lobj
+                                                                                                                                        linkObjArr.push(lobj2);
+                                                                                                                                        lobj = {}
+                                                                                                                                    })
+                                                                                                                                    allAssetsObj.LINKS = linkObjArr;
 
-                                                                                                                    }
-                                                                                                                    if (!comments.length) {
-                                                                                                                        comments.push({ COMMENT_COUNT: 0 });
-                                                                                                                    }
-                                                                                                                    if (!ratings.length) {
-                                                                                                                        ratings.push({ AVG_RATING: 0, ASSET_ID: id })
-                                                                                                                    }
-                                                                                                                    if (!likes.length) {
-                                                                                                                        likes.push({ LIKE_COUNT: 0, ASSET_ID: id })
-                                                                                                                    }
-                                                                                                                    if (!views.length) {
-                                                                                                                        views.push({ VIEW_COUNT: 0, ASSET_ID: id })
-                                                                                                                    }
+                                                                                                                                    linkObjArr = [];
+                                                                                                                                    ////console.log(lobj2,"obj2")
+                                                                                                                                    var images = imagesArray.filter(image => image.ASSET_ID === id);
+                                                                                                                                    images.forEach(image => {
+                                                                                                                                        image.IMAGEURL = 'http://' + host + '/' + image.IMAGEURL;
+                                                                                                                                    });
+                                                                                                                                    allAssetsObj.IMAGES = images;
+                                                                                                                                    var comments = commentsArray.filter(c => c.ASSET_ID === id);
 
-                                                                                                                    allAssetsObj.COMMENTS = comments[0];
-                                                                                                                    allAssetsObj.RATINGS = ratings[0];
-                                                                                                                    allAssetsObj.LIKES = likes[0];
-                                                                                                                    allAssetsObj.VIEWS = views[0];
+                                                                                                                                    var ratings = ratingsArray.filter(r => r.ASSET_ID === id)
+                                                                                                                                    var likes = likesArray.filter(l => l.ASSET_ID === id)
+                                                                                                                                    var views = viewsArray.filter(v => v.ASSET_ID === id)
+                                                                                                                                    //console.log(...views);
+                                                                                                                                    if (comments[0]) {
+                                                                                                                                        delete comments[0].ASSET_ID;
 
-                                                                                                                    if (!(sortBy == 'views' && allAssetsObj.VIEWS.VIEW_COUNT == 0)) {
-                                                                                                                        allAssets.push(allAssetsObj)
-                                                                                                                    }
-                                                                                                                })
+                                                                                                                                    }
+                                                                                                                                    if (!comments.length) {
+                                                                                                                                        comments.push({ COMMENT_COUNT: 0 });
+                                                                                                                                    }
+                                                                                                                                    if (!ratings.length) {
+                                                                                                                                        ratings.push({ AVG_RATING: 0, ASSET_ID: id })
+                                                                                                                                    }
+                                                                                                                                    if (!likes.length) {
+                                                                                                                                        likes.push({ LIKE_COUNT: 0, ASSET_ID: id })
+                                                                                                                                    }
+                                                                                                                                    if (!views.length) {
+                                                                                                                                        views.push({ VIEW_COUNT: 0, ASSET_ID: id })
+                                                                                                                                    }
 
-                                                                                                                let allObj = {};
-                                                                                                                allObj.TOTALCOUNT = allAssets.length;
+                                                                                                                                    allAssetsObj.COMMENTS = comments[0];
+                                                                                                                                    allAssetsObj.RATINGS = ratings[0];
+                                                                                                                                    allAssetsObj.LIKES = likes[0];
+                                                                                                                                    allAssetsObj.VIEWS = views[0];
+
+                                                                                                                                    if (!(sortBy == 'views' && allAssetsObj.VIEWS.VIEW_COUNT == 0)) {
+                                                                                                                                        allAssets.push(allAssetsObj)
+                                                                                                                                    }
+                                                                                                                                })
+
+                                                                                                                                let allObj = {};
+                                                                                                                                allObj.TOTALCOUNT = allAssets.length;
 
 
 
-                                                                                                                console.log("Asset Count after slice :::: " + tAssets.length);
-                                                                                                                dynamicSort(allAssets, sortBy, order);
-                                                                                                                tAssets = allAssets.slice(offset, limit);
-                                                                                                                console.log(offset + ' ----- ' + limit + "Asset Count before slice :::: " + allAssets.length);
-                                                                                                                allObj.ASSETS = tAssets;
-                                                                                                                console.log("Asset Count :::: " + tAssets.length);
-                                                                                                                resolve(allObj);
-                                                                                                                //}
+                                                                                                                                // console.log("Asset Count after slice :::: " + tAssets.length);
+                                                                                                                                dynamicSort(allAssets, sortBy, order);
+                                                                                                                                tAssets = allAssets.slice(offset, limit);
+                                                                                                                                console.log(offset + ' ----- ' + limit + "Asset Count before slice :::: " + allAssets.length);
+                                                                                                                                allObj.ASSETS = tAssets;
+                                                                                                                                console.log("Asset Count :::: " + tAssets.length);
+                                                                                                                                resolve(allObj);
+                                                                                                                                //}
 
+                                                                                                                            })
+                                                                                                                    })
                                                                                                             })
                                                                                                     })
                                                                                             })
@@ -2411,7 +2428,7 @@ module.exports = class Asset {
         return new Promise((resolve, reject) => {
             getSharecountByAssetId(assetId)
                 .then(sharecount => {
-                    assetSocialObj.sharecount=sharecount[0].COUNT;
+                    assetSocialObj.sharecount = sharecount[0].COUNT;
                     getCommentsById(assetId, host)
                         .then(comments => {
                             assetSocialObj.COMMENTS = comments;
