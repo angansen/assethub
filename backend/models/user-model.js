@@ -728,7 +728,7 @@ function sendToAPNS(msg, devicetokens) {
         key: '/u01/ahweb/backend/certs/key.pem',
         production: false
     };
-    var apnConnection = new apn.Provider(options);
+    var apnConnection = new apn.Connection(options);
     let myDevice = devicetokens;
     var note = new apn.Notification();
     note.expiry = Math.floor(Date.now() / 1000) + 3600;
