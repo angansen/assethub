@@ -726,9 +726,9 @@ function sendToAPNS(msg, devicetokens) {
     var options = {
         cert: '/u01/ahweb/backend/certs/cert.pem',
         key: '/u01/ahweb/backend/certs/key.pem',
-        production: false
+        production: true
     };
-    var apnConnection = new apn.Connection(options);
+    var apnConnection = new apn.Provider(options);
     let myDevice = devicetokens;
     var note = new apn.Notification();
     note.expiry = Math.floor(Date.now() / 1000) + 3600;
@@ -749,7 +749,11 @@ function sendToAPNS(msg, devicetokens) {
     console.log(JSON.stringify(msg));
     console.log("-------- IOS PAYLOAD ------------");
     console.log(JSON.stringify(note));
-    apnConnection.pushNotification(note, myDevice)
+    apnConnection.send(note, myDevice)
+    .then(res =>{
+        console.log("Sent: "+res.sent.length);
+        console.log("Failed: "+res.failed.length);
+    });
     apnConnection.on('error', function (error) {
         console.error('APNS: Initialization error', error);
     });
