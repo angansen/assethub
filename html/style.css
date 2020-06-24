@@ -27,55 +27,55 @@
 
 .icon-Share:before {
   content: "\e941";
-  color: #727374;
+  /* color: #727374; */
 }
 .icon-Governance:before {
   content: "\e939";
-  color: #606161;
+  /* color: #606161; */
 }
 .icon-Live-Assets:before {
   content: "\e93a";
-  color: #727373;
+  /* color: #727373; */
 }
 .icon-Most-Searched-Keywords:before {
   content: "\e93b";
-  color: #727373;
+  /* color: #727373; */
 }
 .icon-My-Assets:before {
   content: "\e93c";
-  color: #727373;
+  /* color: #727373; */
 }
 .icon-Rejected:before {
   content: "\e93d";
-  color: #606161;
+  /* color: #606161; */
 }
 .icon-Require-Rectification:before {
   content: "\e93e";
-  color: #606161;
+  /* color: #606161; */
 }
 .icon-Retired:before {
   content: "\e93f";
-  color: #727373;
+  /* color: #727373; */
 }
 .icon-Saved:before {
   content: "\e940";
-  color: #606161;
+  /* color: #606161; */
 }
 .icon-Top-Requested-Assets:before {
   content: "\e942";
-  color: #606161;
+  /* color: #606161; */
 }
 .icon-Top-Viewed-Assets:before {
   content: "\e943";
-  color: #727373;
+  /* color: #727373; */
 }
 .icon-Under-Review:before {
   content: "\e944";
-  color: #727373;
+  /* color: #727373; */
 }
 .icon-Visitors:before {
   content: "\e945";
-  color: #727373;
+  /* color: #727373; */
 }
 .icon-Notification-01:before {
   content: "\e938";
@@ -94,7 +94,7 @@
 }
 .icon-Customer:before {
   content: "\e931";
-  color: #f29111;
+  /* color: #f29111; */
 }
 .icon-Radio-Button:before {
   content: "\e932";

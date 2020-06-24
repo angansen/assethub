@@ -1,0 +1,253 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.eot?yw0i9w');
+  src:  url('fonts/icomoon.eot?yw0i9w#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?yw0i9w') format('truetype'),
+    url('fonts/icomoon.woff?yw0i9w') format('woff'),
+    url('fonts/icomoon.svg?yw0i9w#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-Share:before {
+  content: "\e941";
+  /* color: #727374; */
+}
+.icon-Governance:before {
+  content: "\e939";
+  /* color: #606161; */
+}
+.icon-Live-Assets:before {
+  content: "\e93a";
+  /* color: #727373; */
+}
+.icon-Most-Searched-Keywords:before {
+  content: "\e93b";
+  /* color: #727373; */
+}
+.icon-My-Assets:before {
+  content: "\e93c";
+  /* color: #727373; */
+}
+.icon-Rejected:before {
+  content: "\e93d";
+  /* color: #606161; */
+}
+.icon-Require-Rectification:before {
+  content: "\e93e";
+  /* color: #606161; */
+}
+.icon-Retired:before {
+  content: "\e93f";
+  /* color: #727373; */
+}
+.icon-Saved:before {
+  content: "\e940";
+  /* color: #606161; */
+}
+.icon-Top-Requested-Assets:before {
+  content: "\e942";
+  /* color: #606161; */
+}
+.icon-Top-Viewed-Assets:before {
+  content: "\e943";
+  /* color: #727373; */
+}
+.icon-Under-Review:before {
+  content: "\e944";
+  /* color: #727373; */
+}
+.icon-Visitors:before {
+  content: "\e945";
+  /* color: #727373; */
+}
+.icon-Notification-01:before {
+  content: "\e938";
+}
+.icon-Microphone-01:before {
+  content: "\e937";
+}
+.icon-Error:before {
+  content: "\e936";
+}
+.icon-Help-Support:before {
+  content: "\e935";
+}
+.icon-Dollar:before {
+  content: "\e930";
+}
+.icon-Customer:before {
+  content: "\e931";
+  color: #f29111;
+}
+.icon-Radio-Button:before {
+  content: "\e932";
+}
+.icon-Selected-Radio-Button:before {
+  content: "\e933";
+}
+.icon-Time:before {
+  content: "\e934";
+}
+.icon-Email:before {
+  content: "\e929";
+}
+.icon-Follow:before {
+  content: "\e92a";
+}
+.icon-Location:before {
+  content: "\e92b";
+}
+.icon-Info:before {
+  content: "\e92c";
+}
+.icon-Phone_Number:before {
+  content: "\e92d";
+}
+.icon-Dropdown_up:before {
+  content: "\e925";
+}
+.icon-Dropdown:before {
+  content: "\e926";
+}
+.icon-Edit:before {
+  content: "\e927";
+}
+.icon-Manage-Account:before {
+  content: "\e928";
+}
+.icon-Reports:before {
+  content: "\e924";
+}
+.icon-Camers:before {
+  content: "\e923";
+}
+.icon-User_Preferences:before {
+  content: "\e919";
+}
+.icon-Tick:before {
+  content: "\e916";
+}
+.icon-Double_Tick:before {
+  content: "\e918";
+}
+.icon-Intro-2:before {
+  content: "\e90c";
+}
+.icon-Filter:before {
+  content: "\e90d";
+}
+.icon-Group-382:before {
+  content: "\e90b";
+}
+.icon-Play:before {
+  content: "\e917";
+}
+.icon-Comment-Outline:before {
+  content: "\e905";
+  color: #f29111;
+}
+.icon-Favourite-Outline:before {
+  content: "\e909";
+  color: #f29111;
+}
+.icon-Audience:before {
+  content: "\e900";
+}
+.icon-Back:before {
+  content: "\e901";
+}
+.icon-Checkbox_01:before {
+  content: "\e902";
+}
+.icon-Checkbox:before {
+  content: "\e903";
+}
+.icon-Close:before {
+  content: "\e904";
+}
+.icon-Comment-01:before {
+  content: "\e906";
+}
+.icon-Communications:before {
+  content: "\e907";
+}
+.icon-Download:before {
+  content: "\e908";
+}
+.icon-Favourite:before {
+  content: "\e90a";
+}
+.icon-Finance:before {
+  content: "\e90e";
+}
+.icon-Hamburger:before {
+  content: "\e90f";
+}
+.icon-Healthcare:before {
+  content: "\e910";
+}
+.icon-Home:before {
+  content: "\e911";
+}
+.icon-Industry:before {
+  content: "\e912";
+}
+.icon-Media:before {
+  content: "\e913";
+}
+.icon-Next:before {
+  content: "\e914";
+}
+.icon-Owner:before {
+  content: "\e915";
+}
+.icon-Repository_Link:before {
+  content: "\e91a";
+}
+.icon-Retail:before {
+  content: "\e91b";
+}
+.icon-Search:before {
+  content: "\e91c";
+}
+.icon-Send-01:before {
+  content: "\e91d";
+}
+.icon-sign-Out:before {
+  content: "\e91e";
+}
+.icon-Solution-Area:before {
+  content: "\e91f";
+}
+.icon-View:before {
+  content: "\e920";
+}
+.icon-Zoom-in:before {
+  content: "\e921";
+}
+.icon-Intro-1:before {
+  content: "\e922";
+}
+.icon-User-Interest:before {
+  content: "\e92e";
+}
+.icon-TravelAutomotive:before {
+  content: "\e92f";
+}

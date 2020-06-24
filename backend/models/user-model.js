@@ -656,13 +656,25 @@ const triggerDeviceNotification = (content) => {
             }
         }
 
-        console.log("- - - - - - IOS - - - - - - ");
-        console.log(iosDevices);
-        sendToAPNS(msg, iosDevices);
+        
+        try {
+            console.log("- - - - - - IOS - - - - - - ");
+            console.log(JSON.stringify(iosDevices));
+            sendToAPNS(msg, iosDevices);
+        } catch (error) {
+            console.error(error);
+        }
+        
+        try {
+            console.log("- - - - -  ANDROID - - - - - - ");
+            console.log(JSON.stringify(androidDevices));
+            sendToFCM(msg, androidDevices);
+        } catch (error) {
+            console.error(error);
+        }
 
-        console.log("- - - - -  ANDROID - - - - - - ");
-        console.log(JSON.stringify(androidDevices));
-        sendToFCM(msg, androidDevices);
+
+       
     })
 
 
@@ -702,13 +714,13 @@ function sendToFCM(msg, devicetokens) {
     console.log(JSON.stringify(msg));
     console.log("-------- ANDROID PAYLOAD ------------");
     console.log(JSON.stringify(message));
-    fcm.send(message, function (err, response) {
-        if (err) {
-            console.log(err)
-        } else {
-            console.log("Successfully sent android push message with response: ", response);
-        }
-    });
+    // fcm.send(message, function (err, response) {
+    //     if (err) {
+    //         console.log(err)
+    //     } else {
+    //         console.log("Successfully sent android push message with response: ", response);
+    //     }
+    // });
 }
 
 /********
@@ -732,6 +744,7 @@ function sendToAPNS(msg, devicetokens) {
     let myDevice = devicetokens;
     var note = new apn.Notification();
     note.expiry = Math.floor(Date.now() / 1000) + 3600;
+    note.topic = "com.oraclecorp.internal.assethub";
     note.badge = 0;
     note.sound = "ping.aiff";
     note.alert = {
@@ -749,11 +762,14 @@ function sendToAPNS(msg, devicetokens) {
     console.log(JSON.stringify(msg));
     console.log("-------- IOS PAYLOAD ------------");
     console.log(JSON.stringify(note));
-    apnConnection.send(note, myDevice)
-    .then(res =>{
-        console.log("Sent: "+res.sent.length);
-        console.log("Failed: "+res.failed.length);
-    });
+    // apnConnection.send(note, myDevice)
+    // .then(res =>{
+    //     console.log("IOS Sent: "+JSON.stringify(res.sent));
+    //     console.log("IOS Failed: "+JSON.stringify(res.failed));
+    // })
+    // .catch(error=>{
+    //     console.error(JSON.stringify(error));
+    // });
     apnConnection.on('error', function (error) {
         console.error('APNS: Initialization error', error);
     });
