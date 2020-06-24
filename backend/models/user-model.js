@@ -714,13 +714,13 @@ function sendToFCM(msg, devicetokens) {
     console.log(JSON.stringify(msg));
     console.log("-------- ANDROID PAYLOAD ------------");
     console.log(JSON.stringify(message));
-    // fcm.send(message, function (err, response) {
-    //     if (err) {
-    //         console.log(err)
-    //     } else {
-    //         console.log("Successfully sent android push message with response: ", response);
-    //     }
-    // });
+    fcm.send(message, function (err, response) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log("Successfully sent android push message with response: ", response);
+        }
+    });
 }
 
 /********
@@ -762,14 +762,14 @@ function sendToAPNS(msg, devicetokens) {
     console.log(JSON.stringify(msg));
     console.log("-------- IOS PAYLOAD ------------");
     console.log(JSON.stringify(note));
-    // apnConnection.send(note, myDevice)
-    // .then(res =>{
-    //     console.log("IOS Sent: "+JSON.stringify(res.sent));
-    //     console.log("IOS Failed: "+JSON.stringify(res.failed));
-    // })
-    // .catch(error=>{
-    //     console.error(JSON.stringify(error));
-    // });
+    apnConnection.send(note, myDevice)
+    .then(res =>{
+        console.log("IOS Sent: "+JSON.stringify(res.sent));
+        console.log("IOS Failed: "+JSON.stringify(res.failed));
+    })
+    .catch(error=>{
+        console.error(JSON.stringify(error));
+    });
     apnConnection.on('error', function (error) {
         console.error('APNS: Initialization error', error);
     });
