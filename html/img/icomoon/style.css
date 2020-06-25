@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?yw0i9w');
-  src:  url('fonts/icomoon.eot?yw0i9w#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?yw0i9w') format('truetype'),
-    url('fonts/icomoon.woff?yw0i9w') format('woff'),
-    url('fonts/icomoon.svg?yw0i9w#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?cu7v16');
+  src:  url('fonts/icomoon.eot?cu7v16#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?cu7v16') format('truetype'),
+    url('fonts/icomoon.woff?cu7v16') format('woff'),
+    url('fonts/icomoon.svg?cu7v16#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -13,7 +13,7 @@
 [class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'icomoon' !important;
-  speak: none;
+  speak: never;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -25,6 +25,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-My-Wins:before {
+  content: "\e946";
+  /* color: #fff; */
+}
+.icon-My-Wins1:before {
+  content: "\e947";
+  color: #f29111;
+}
 .icon-Share:before {
   content: "\e941";
   /* color: #727374; */
@@ -55,27 +63,27 @@
 }
 .icon-Retired:before {
   content: "\e93f";
-  /* color: #727373; */
+  color: #727373;
 }
 .icon-Saved:before {
   content: "\e940";
-  /* color: #606161; */
+  color: #606161;
 }
 .icon-Top-Requested-Assets:before {
   content: "\e942";
-  /* color: #606161; */
+  color: #606161;
 }
 .icon-Top-Viewed-Assets:before {
   content: "\e943";
-  /* color: #727373; */
+  color: #727373;
 }
 .icon-Under-Review:before {
   content: "\e944";
-  /* color: #727373; */
+  color: #727373;
 }
 .icon-Visitors:before {
   content: "\e945";
-  /* color: #727373; */
+  color: #727373;
 }
 .icon-Notification-01:before {
   content: "\e938";
