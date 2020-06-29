@@ -1,4 +1,5 @@
 cd ..
+rm build_bkp_old.zip
 echo "taking backup of old build . . ."
 sudo zip -r build_bkp_old.zip html/*
 sudo rm -Rf build html/*
@@ -7,7 +8,7 @@ echo "zip inflated . . ."
 sudo mv -f build/* html/
 sudo  rm -Rf build
 echo "build content moved . . ."
-rm build.bkp.zip
+rm build_bkp_latest.zip
 echo "bkp zip deleted . . ."
 mv build.zip build_bkp_latest.zip
 echo "moving new build to backup zip. . ."
