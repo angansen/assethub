@@ -2340,7 +2340,7 @@ module.exports = class Asset {
         let finalFilterObj = {}
         return new Promise((resolve, reject) => {
             const connection = getDb();
-            connection.query(`select * from ASSET_WINSTORY_SOLUTION_USECASE`, [],
+            connection.query(`select * from ASSET_WINSTORY_SOLUTION_USECASE order by solution_usecase_order`, [],
                 {
                     outFormat: oracledb.OBJECT
                 })
