@@ -1,4 +1,5 @@
 const Asset = require('../models/asset-model');
+const banner = require('../models/banner-model');
 const getDb = require('../database/db').getDb;
 const oracledb = require('oracledb');
 const axios = require('axios');
@@ -96,15 +97,15 @@ exports.postAsset = (req, res) => {
     let type = req.header('type');
     // type= type==undefined||type==null||type.trim().length==0?"Saved":"Pending Review";
 
-    
-    if(type==undefined||type==null||type.trim().length==0||type.trim()=='save'){
-        type='Saved';
-    }else if(type.trim()=='submit'){
-        type='Pending Review';
-    }else{
-        type='Saved';
+
+    if (type == undefined || type == null || type.trim().length == 0 || type.trim() == 'save') {
+        type = 'Saved';
+    } else if (type.trim() == 'submit') {
+        type = 'Pending Review';
+    } else {
+        type = 'Saved';
     }
-    console.log("STATE ASSET :::: "+type);
+    console.log("STATE ASSET :::: " + type);
 
     const assetId = null;
     // console.log(req.body);
@@ -229,15 +230,15 @@ exports.postEditAsset = (req, res) => {
     let assetCreatedEmailOptions = [];
     let type = req.header('type');
 
-   
-    if(type==undefined||type==null||type.trim().length==0||type.trim()=='save'){
-        type='Saved';
-    }else if(type.trim()=='submit'){
-        type='Pending Review';
-    }else{
-        type='Saved';
+
+    if (type == undefined || type == null || type.trim().length == 0 || type.trim() == 'save') {
+        type = 'Saved';
+    } else if (type.trim() == 'submit') {
+        type = 'Pending Review';
+    } else {
+        type = 'Saved';
     }
-    console.log("STATE ASSET :::: "+type);
+    console.log("STATE ASSET :::: " + type);
     const assetId = req.body.assetId;
     const title = req.body.title
     // console.log(title);
@@ -480,7 +481,6 @@ exports.postAssetDoc = (req, res) => {
         console.log(req.body.fileDesc)
         console.log(req.header('type'))
         const type = req.header('type');
-        const assetId = req.params.assetId
         const uploadFiles = req.files.file;
         var data = {
             assetId: req.params.assetId,
@@ -510,6 +510,17 @@ exports.postAssetDoc = (req, res) => {
         console.log("FILE:" + req.files)
         res.json("working");
     }
+}
+
+exports.uploadBanner = (req, res) => {
+    console.log("In uploading banner funtion . . .");
+    banner.uploadBannerDoc(req).then(result => {
+        res.send(result);
+    }).catch(result=>{
+        console.log(JSON.stringify(result));
+        res.status(500).json({msg:"Error while uploading banner Image # No filed found"});
+    })
+
 }
 
 // exports.getAllAssets = (req, res) => {
@@ -759,8 +770,12 @@ exports.deleteDocsByIds = (req, res) => {
     })
 }
 exports.getBannerDetails = (req, res) => {
-    Asset.getBannerCounts().then(result => {
-        res.json(result);
+    Asset.getBannerCounts().then(bannerCounts => {
+        banner.getBannerLinks().then(data=>{
+            bannerCounts.bannerlinks=data;
+            res.send(bannerCounts);
+        })
+        // res.json(result);
     })
 }
 

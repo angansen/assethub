@@ -1,4 +1,5 @@
 const user = require('../models/user-model');
+const banner=require('../models/banner-model');
 const getDb = require('../database/db').getDb;
 const oracledb = require('oracledb');
 const axios = require('axios');

@@ -23,8 +23,6 @@ router.post('/', assetController.postAsset);
 router.post('/testPost', assetController.postAssetTest);
 router.post('/uploadImages/:assetId', assetController.postAssetImage)
 router.post('/uploadDoc/:assetId', assetController.postAssetDoc);
-//router.post('/likeasset/:action/:assetId/:useremail',assetController.likeUnlikeAsset)
-//Social APIs
 router.post('/uploadComment/', assetController.postAssetComment)
 router.post('/uploadLike/', assetController.postAssetLike)
 router.post('/addToFav/', assetController.postAssetLike2)
@@ -35,6 +33,7 @@ router.post('/editAsset', assetController.postEditAsset);
 router.post('/editAssetTest', assetController.postEditAssetTest);
 router.post('/helpandsupport', assetController.saveHelpAndSupport);
 router.post('/socialData', assetController.getSocialData);
+router.post('/bannerimageupload/:id',assetController.uploadBanner);
 
 
 router.delete('/deleteImages/:imageId', assetController.deleteUploadedImage)
