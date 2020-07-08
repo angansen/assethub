@@ -2,7 +2,15 @@ const getDb = require('../database/db').getDb;
 const oracledb = require('oracledb');
 const path = require('path');
 const fs = require('fs');
-
+const fileNames = ["",
+    "NAC_Consumption_Infographic.pdf",
+    "NAC_Buyer_Infographic.pdf",
+    "NAC_Consulting_Win_lives.pdf",
+    "Top_10_Accounts_by_LOB.pptx",
+    "Customer_Ready.pdf",
+    "Reference_Information.pdf",
+    "Resource_Information.pdf"
+]
 
 
 exports.getBannerLinks = () => {
@@ -22,26 +30,29 @@ exports.getBannerLinks = () => {
 }
 
 exports.uploadBannerDoc = (req) => {
+
     return new Promise((resolve, reject) => {
-        console.log("---> " + JSON.stringify(req.files.file.name));
         if (req.files) {
             let file = req.files.file;
             let bannerContentId = req.params.id;
-            console.log("Id: " + bannerContentId);
-            console.log("File length: " + file.size);
-            const connection = getDb();
-            let fname = file.name.replace(/ /g, '');
+            console.log("Id:    ---> " + bannerContentId);
+            console.log("Name   ---> " + JSON.stringify(fileNames[bannerContentId]));
+            console.log("Length ---> " + file.size);
+
+            // let fname = file.name.replace(/ /g, '');
             // fname = fname.replace(/ /g, '');
             // const ftype = file.name.split('.')[1];
             // const uniqueId = uniqid();
-            const finalFname = bannerContentId+"."+file.name.split('.')[1];// + uniqueId.concat('.', ftype);
+            const finalFname = fileNames[bannerContentId]//bannerContentId + "." + file.name.split('.')[1];// + uniqueId.concat('.', ftype);
             const uploadPath = path.join('/', 'mnt/ahfs/guide', finalFname);
             var content = 'http://' + req.headers.host + '/' + 'guide/' + finalFname;
-            console.log(finalFname);
+            console.log(uploadPath);
+
+            console.log("---------  Banner Content Path ----------")
+            const baseresoursePath = path.join('/', 'mnt/ahfs/guide');
+            console.log("projected path " + baseresoursePath);
+
             try {
-                console.log("---------  Banner Content Path ----------")
-                const baseresoursePath = path.join('/', 'mnt/ahfs/guide');
-                console.log("projected path " + baseresoursePath);
 
                 fs.open(baseresoursePath, 'r', (err) => {
                     if (err) {
@@ -53,6 +64,7 @@ exports.uploadBannerDoc = (req) => {
                                 console.log("Calling file create " + uploadPath);
                                 file.mv(uploadPath, function (err) {
                                     if (err) {
+                                        console.log(JSON.stringify(err));
                                         return res.status(500).send(err);
                                     }
                                 })
@@ -63,6 +75,7 @@ exports.uploadBannerDoc = (req) => {
                         console.log("Calling file create " + uploadPath);
                         file.mv(uploadPath, function (err) {
                             if (err) {
+                                console.log(JSON.stringify(err));
                                 return res.status(500).send(err);
                             }
                         })
@@ -73,6 +86,7 @@ exports.uploadBannerDoc = (req) => {
                 console.log("Folder creation failed " + err.message);
             }
             try {
+                const connection = getDb();
                 connection.update(`update asset_banner set banner_url=:url,BANNER_MODIFIEDON=:updatedon where banner_id=:bannerContentId`, [content, new Date(), bannerContentId],
                     {
                         outFormat: oracledb.Object,
@@ -86,10 +100,12 @@ exports.uploadBannerDoc = (req) => {
                         reject({ msg: "error uploading banner image # " + err.message });
                     })
             } catch (error) {
+                console.log(JSON.stringify(error));
                 reject({ msg: "error uploading banner image # " + error });
             }
 
         } else {
+            console.log("No file available");
             reject({ msg: "Upload content failed" });
         }
     })
