@@ -3,13 +3,13 @@ const oracledb = require('oracledb');
 const path = require('path');
 const fs = require('fs');
 const fileNames = ["",
-    "NAC_Consumption_Infographic.pdf",
-    "NAC_Buyer_Infographic.pdf",
-    "NAC_Consulting_Win_lives.pdf",
-    "Top_10_Accounts_by_LOB.pptx",
-    "Customer_Ready.pdf",
-    "Reference_Information.pdf",
-    "Resource_Information.pdf"
+    "NAC_Consumption_Infographic",
+    "NAC_Buyer_Infographic",
+    "NAC_Consulting_Win_lives",
+    "Top_10_Accounts_by_LOB",
+    "Customer_Ready",
+    "Reference_Information",
+    "Resource_Information"
 ]
 
 
@@ -41,9 +41,9 @@ exports.uploadBannerDoc = (req) => {
 
             // let fname = file.name.replace(/ /g, '');
             // fname = fname.replace(/ /g, '');
-            // const ftype = file.name.split('.')[1];
+            const ftype = file.name.split('.')[1];
             // const uniqueId = uniqid();
-            const finalFname = fileNames[bannerContentId]//bannerContentId + "." + file.name.split('.')[1];// + uniqueId.concat('.', ftype);
+            const finalFname = fileNames[bannerContentId]+"."+ftype;//bannerContentId + "." + file.name.split('.')[1];// + uniqueId.concat('.', ftype);
             const uploadPath = path.join('/', 'mnt/ahfs/guide', finalFname);
             var content = 'http://' + req.headers.host + '/' + 'guide/' + finalFname;
             console.log(uploadPath);
