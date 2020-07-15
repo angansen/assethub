@@ -40,7 +40,10 @@ exports.createWinstory = (host, story, res) => {
         WINSTORY_CONSULTING_Q1,
         WINSTORY_CONSULTING_Q2,
         WINSTORY_CONSULTING_Q3,
-        WINSTORY_CONSULTING_Q4) values (:0,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28)`
+        WINSTORY_CONSULTING_Q4,
+        WINSTORY_REG_ID,
+        WINSTORY_SPN,
+        WINSTORY_CONSUMING) values (:0,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31)`
     let insertwinstoryOption = [
         newAssetid,
         story.WINSTORY_NAME,
@@ -70,8 +73,10 @@ exports.createWinstory = (host, story, res) => {
         story.WINSTORY_CONSULTING_Q1,
         story.WINSTORY_CONSULTING_Q2,
         story.WINSTORY_CONSULTING_Q3,
-        story.WINSTORY_CONSULTING_Q4
-
+        story.WINSTORY_CONSULTING_Q4,
+        story.WINSTORY_REG_ID,
+        story.WINSTORY_SPN,
+        story.WINSTORY_CONSUMING
     ];
 
     connection.execute(insertwinstorysql, insertwinstoryOption, {
@@ -133,7 +138,10 @@ exports.saveWinstory = (host, story, res) => {
     WINSTORY_CONSULTING_Q2=:24,
     WINSTORY_CONSULTING_Q3=:25,
     WINSTORY_CONSULTING_Q4=:26,
-    WINSTORY_CREATED_ON=:27 where WINSTORY_ID=:28`;
+    WINSTORY_REG_ID=:27,
+    WINSTORY_SPN=:28,
+    WINSTORY_CONSUMING=:29,
+    WINSTORY_CREATED_ON=:30 where WINSTORY_ID=:31`;
 
     let updateWinStoryOptions = [
         story.WINSTORY_NAME,
@@ -163,6 +171,9 @@ exports.saveWinstory = (host, story, res) => {
         story.WINSTORY_CONSULTING_Q2,
         story.WINSTORY_CONSULTING_Q3,
         story.WINSTORY_CONSULTING_Q4,
+        story.WINSTORY_REG_ID,
+        story.WINSTORY_SPN,
+        story.WINSTORY_CONSUMING,
         story.WINSTORY_CREATED_ON,
         story.WINSTORY_ID];
 
