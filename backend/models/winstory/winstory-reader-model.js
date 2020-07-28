@@ -751,6 +751,8 @@ module.exports = class Asset {
                         header: tableHeader
                     });
                     result.push(tableHeader);
+                    console.log(JSON.stringify(result[0]));
+                    console.log(JSON.stringify(result[1]));
                     csvWriter
                         .writeRecords(result)
                         .then(() => {
