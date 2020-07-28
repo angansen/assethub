@@ -785,5 +785,6 @@ exports.downloadwins = (req, res) => {
     winstoryreader.downloadLatestWins().then(result => {
         console.log(result);
         res.download(result);
+        // res.send(result);
     })
 }

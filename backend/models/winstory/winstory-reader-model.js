@@ -745,14 +745,44 @@ module.exports = class Asset {
                     } catch (err) {
                         console.log("No file to delete");
                     }
-                    let tableHeader=['WINSTORY_ID', 'WINSTORY_NAME', 'WINSTORY_CUSTOMER_NAME', 'WINSTORY_DEAL_CYCLE_TIME', 'WINSTORY_DEAL_SIZE', 'WINSTORY_PARTNER', 'WINSTORY_RENEWAL', 'WINSTORY_APPLICATION_INSTALL', 'WINSTORY_IMPERATIVE', 'WINSTORY_REPS_SE', 'WINSTORY_BUSSINESS_DRIVER', 'WINSTORY_SALES_PROCESS', 'WINSTORY_LESSON_LEARNT', 'WINSTORY_STATUS', 'WINSTORY_CREATED_BY', 'WINSTORY_CHANNEL', 'WINSTORY_FISCAL_QUARTER', 'WINSTORY_THUMBNAIL', 'WINSTORY_SOLUTION_USECASE', 'WINSTORY_COMPETIION', 'WINSTORY_CREATED_ON', 'WINSTORY_MODIFIED_ON', 'WINSTORY_MAPPED_L2_FILTERS', 'WINSTORY_LOGO', 'WINSTORY_CUSTOMER_IMPACT', 'WINSTORY_USECASE', 'WINSTORY_OTHER_FILTER', 'WINSTORY_CONSULTING_Q1', 'WINSTORY_CONSULTING_Q2', 'WINSTORY_CONSULTING_Q3', 'WINSTORY_CONSULTING_Q4'];
+                    let tableHeader = [
+                        { 'id': 'WINSTORY_ID', 'name': 'WINSTORY_ID' },
+                        { 'id': 'WINSTORY_NAME', 'name': 'WINSTORY_NAME' },
+                        { 'id': 'WINSTORY_CUSTOMER_NAME', 'name': 'WINSTORY_CUSTOMER_NAME' },
+                        { 'id': 'WINSTORY_DEAL_CYCLE_TIME', 'name': 'WINSTORY_DEAL_CYCLE_TIME' },
+                        { 'id': 'WINSTORY_DEAL_SIZE', 'name': 'WINSTORY_DEAL_SIZE' },
+                        { 'id': 'WINSTORY_PARTNER', 'name': 'WINSTORY_PARTNER' },
+                        { 'id': 'WINSTORY_RENEWAL', 'name': 'WINSTORY_RENEWAL' },
+                        { 'id': 'WINSTORY_APPLICATION_INSTALL', 'name': 'WINSTORY_APPLICATION_INSTALL' },
+                        { 'id': 'WINSTORY_IMPERATIVE', 'name': 'WINSTORY_IMPERATIVE' },
+                        { 'id': 'WINSTORY_REPS_SE', 'name': 'WINSTORY_REPS_SE' },
+                        { 'id': 'WINSTORY_BUSSINESS_DRIVER', 'name': 'WINSTORY_BUSSINESS_DRIVER' },
+                        { 'id': 'WINSTORY_SALES_PROCESS', 'name': 'WINSTORY_SALES_PROCESS' },
+                        { 'id': 'WINSTORY_LESSON_LEARNT', 'name': 'WINSTORY_LESSON_LEARNT' },
+                        { 'id': 'WINSTORY_STATUS', 'name': 'WINSTORY_STATUS' },
+                        { 'id': 'WINSTORY_CREATED_BY', 'name': 'WINSTORY_CREATED_BY' },
+                        { 'id': 'WINSTORY_CHANNEL', 'name': 'WINSTORY_CHANNEL' },
+                        { 'id': 'WINSTORY_FISCAL_QUARTER', 'name': 'WINSTORY_FISCAL_QUARTER' },
+                        { 'id': 'WINSTORY_THUMBNAIL', 'name': 'WINSTORY_THUMBNAIL' },
+                        { 'id': 'WINSTORY_SOLUTION_USECASE', 'name': 'WINSTORY_SOLUTION_USECASE' },
+                        { 'id': 'WINSTORY_COMPETIION', 'name': 'WINSTORY_COMPETIION' },
+                        { 'id': 'WINSTORY_CREATED_ON', 'name': 'WINSTORY_CREATED_ON' },
+                        { 'id': 'WINSTORY_MODIFIED_ON', 'name': 'WINSTORY_MODIFIED_ON' },
+                        { 'id': 'WINSTORY_MAPPED_L2_FILTERS', 'name': 'WINSTORY_MAPPED_L2_FILTERS' },
+                        { 'id': 'WINSTORY_LOGO', 'name': 'WINSTORY_LOGO' },
+                        { 'id': 'WINSTORY_CUSTOMER_IMPACT', 'name': 'WINSTORY_CUSTOMER_IMPACT' },
+                        { 'id': 'WINSTORY_USECASE', 'name': 'WINSTORY_USECASE' },
+                        { 'id': 'WINSTORY_OTHER_FILTER', 'name': 'WINSTORY_OTHER_FILTER' },
+                        { 'id': 'WINSTORY_CONSULTING_Q1', 'name': 'WINSTORY_CONSULTING_Q1' },
+                        { 'id': 'WINSTORY_CONSULTING_Q2', 'name': 'WINSTORY_CONSULTING_Q2' },
+                        { 'id': 'WINSTORY_CONSULTING_Q3', 'name': 'WINSTORY_CONSULTING_Q3' },
+                        { 'id': 'WINSTORY_CONSULTING_Q4', 'name': 'WINSTORY_CONSULTING_Q4' }
+                    ];
                     const csvWriter = createCsvWriter({
                         path: filename,
                         header: tableHeader
                     });
-                    result.push(tableHeader);
                     console.log(JSON.stringify(result[0]));
-                    console.log(JSON.stringify(result[1]));
                     csvWriter
                         .writeRecords(result)
                         .then(() => {
