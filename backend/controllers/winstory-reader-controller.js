@@ -779,3 +779,11 @@ exports.getSocialData = (req, res) => {
 exports.submitfeedback = (req, res) => {
     Asset.savefeedback(req.params.email, req.params.assetid, req.params.feedback, res);
 }
+
+exports.downloadwins = (req, res) => {
+    console.log("-----------   DOWNLOAD 1  ---------");
+    winstoryreader.downloadLatestWins().then(result => {
+        console.log(result);
+        res.download(result);
+    })
+}

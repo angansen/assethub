@@ -1,8 +1,9 @@
 const getDb = require('../../database/db').getDb;
-
+const fs = require('fs');
 var uniqid = require('uniqid');
 const oracledb = require('oracledb');
 const path = require('path');
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 //console.log=function(){}
 
 const generateFileName = (sampleFile, assetId, filesArray, imageDescription) => {
@@ -229,6 +230,39 @@ const getLikesByAssetIdAndUserId = (assetId, userId) => {
         })
 }
 
+async function convertToCSV(objArray) {
+    var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+    var str = '';
+    for (var i = 0; i < array.length; i++) {
+        var line = '';
+        for (var index in array[i]) {
+            if (line != '') line += ','
+
+            line += array[i][index];
+        }
+        str += line + '\r\n';
+    }
+    let filename = '/u01/ahweb/backend/winstory.csv';
+    try {
+        try {
+            fs.unlinkSync(filename);
+        } catch (err) {
+            console.log("No file to delete");
+        }
+        const csvWriter = createCsvWriter({
+            path: filename,
+        });
+        csvWriter
+            .writeRecords(JSON.stringify(str))
+            .then(() => console.log('The CSV file was written successfully'));
+        // const file = fs.writeFileSync(filename, JSON.stringify(str));
+        // console.log("csv saved " + JSON.stringify(file));
+    } catch (error) {
+        console.log(error);
+    }
+    return filename;
+}
+
 module.exports = class Asset {
     constructor(assetId, title, description, usercase, customer, createdBy,
         createdDate, scrmId, oppId,
@@ -302,23 +336,23 @@ module.exports = class Asset {
 
                 connection.transaction([
                     function firstAction() {
-                        return connection.update(`UPDATE asset_winstory_details set 
-            ASSET_TITLE=:ASSET_TITLE,
-            ASSET_DESCRIPTION=:ASSET_DESCRIPTION,
-            ASSET_USERCASE=:ASSET_USERCASE,
-            ASSET_CUSTOMER=:ASSET_CUSTOMER,
-            ASSET_CREATEDBY=:ASSET_CREATEDBY,
-            ASSET_SCRM_ID=:ASSET_SCRM_ID,
-            ASSET_OPP_ID=:ASSET_OPP_ID,
-            ASSET_MODIFIED_DATE=:ASSET_MODIFIED_DATE,
-            ASSET_MODIFIED_BY=:ASSET_MODIFIED_BY,
-            ASSET_EXPIRY_DATE=:ASSET_EXPIRY_DATE,
-	    ASSET_VIDEO_LINK=:ASSET_VIDEO_LINK,
-        ASSET_LOCATION=:ASSET_LOCATION,
-        ASSET_OWNER=:ASSET_OWNER,
-        ASSET_STATUS=:ASSET_STATUS,
-        ASSET_ARCHITECTURE_DESCRIPTION=:ASSET_ARCHITECTURE_DESCRIPTION
-             WHERE WINSTORY_ID=:WINSTORY_ID`,
+                        return connection.update(`UPDATE asset_winstory_details set
+    ASSET_TITLE =: ASSET_TITLE,
+        ASSET_DESCRIPTION =: ASSET_DESCRIPTION,
+            ASSET_USERCASE =: ASSET_USERCASE,
+                ASSET_CUSTOMER =: ASSET_CUSTOMER,
+                    ASSET_CREATEDBY =: ASSET_CREATEDBY,
+                        ASSET_SCRM_ID =: ASSET_SCRM_ID,
+                            ASSET_OPP_ID =: ASSET_OPP_ID,
+                                ASSET_MODIFIED_DATE =: ASSET_MODIFIED_DATE,
+                                    ASSET_MODIFIED_BY =: ASSET_MODIFIED_BY,
+                                        ASSET_EXPIRY_DATE =: ASSET_EXPIRY_DATE,
+                                            ASSET_VIDEO_LINK =: ASSET_VIDEO_LINK,
+                                                ASSET_LOCATION =: ASSET_LOCATION,
+                                                    ASSET_OWNER =: ASSET_OWNER,
+                                                        ASSET_STATUS =: ASSET_STATUS,
+                                                            ASSET_ARCHITECTURE_DESCRIPTION =: ASSET_ARCHITECTURE_DESCRIPTION
+    WHERE WINSTORY_ID =: WINSTORY_ID`,
                             [self.title, self.description, self.usercase, self.customer, self.createdBy,
                             self.scrmId, self.oppId, new Date(), self.modifiedBy, self.expiryDate, self.video_link, self.location, self.owner, 'Pending Review', self.asset_architecture_description, self.assetId],
                             {
@@ -330,32 +364,32 @@ module.exports = class Asset {
                     , function secondAction() {
                         if (oj.length > 0) {
                             // console.log("statement:", oj)
-                            return connection.execute(`delete from ASSET_LINKS  WHERE WINSTORY_ID=:WINSTORY_ID`, [self.assetId]
+                            return connection.execute(`delete from ASSET_LINKS  WHERE WINSTORY_ID =: WINSTORY_ID`, [self.assetId]
                                 , {
                                     autoCommit: true
                                 }
                             ).then(res => {
                                 console.log('2nd update done(Asset links updated)' + res)
-                                connection.batchInsert(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,WINSTORY_ID) values(
-                                    :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:WINSTORY_ID)`,
+                                connection.batchInsert(`INSERT into ASSET_LINKS(LINK_URL_TYPE, LINK_URL, LINK_REPOS_TYPE, LINK_DESCRIPTION, LINK_DESCRIPTION_DATA, DEPLOY_STATUS, LINK_ID, WINSTORY_ID) values(
+                                    : LINK_URL_TYPE,: LINK_URL,: LINK_REPOS_TYPE,: LINK_DESCRIPTION,: LINK_DESCRIPTION_DATA,: DEPLOY_STATUS,: LINK_ID,: WINSTORY_ID)`,
                                     oj, {
                                     autoCommit: true
                                 })
                             })
                         }
                         else {
-                            return connection.query(`SELECT * from asset_links `, {})
+                            return connection.query(`SELECT * from asset_links`, {})
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
                             // console.log(filterArr)
-                            return connection.execute(`delete from asset_winstory_filter_winstory_map WHERE WINSTORY_ID=:WINSTORY_ID`, [self.assetId],
+                            return connection.execute(`delete from asset_winstory_filter_winstory_map WHERE WINSTORY_ID =: WINSTORY_ID`, [self.assetId],
                                 {
                                     autocommit: true
                                 }
                             ).then(res => {
                                 connection.batchInsert(`INSERT into asset_winstory_filter_winstory_map values(
-                            :FILTER_ASSET_MAP_ID,:FILTER_ID,:WINSTORY_ID)`, filterArr,
+                            : FILTER_ASSET_MAP_ID,: FILTER_ID,: WINSTORY_ID)`, filterArr,
                                     {
                                         outFormat: oracledb.Object
                                     }).then(res => {
@@ -419,11 +453,11 @@ module.exports = class Asset {
 
                 connection.transaction([
                     function firstAction() {
-                        return connection.insert(`INSERT into asset_winstory_details(WINSTORY_ID,ASSET_TITLE,ASSET_DESCRIPTION,
-                ASSET_USERCASE,ASSET_CUSTOMER,ASSET_CREATEDBY,ASSET_CREATED_DATE,ASSET_SCRM_ID,ASSET_OPP_ID,
-                ASSET_THUMBNAIL,ASSET_MODIFIED_DATE,ASSET_MODIFIED_BY,ASSET_VIDEO_URL,ASSET_EXPIRY_DATE,ASSET_VIDEO_LINK,ASSET_LOCATION,ASSET_OWNER,ASSET_STATUS,ASSET_ARCHITECTURE_DESCRIPTION) values(:WINSTORY_ID,:ASSET_TITLE,:ASSET_DESCRIPTION,
-                :ASSET_USERCASE,:ASSET_CUSTOMER,:ASSET_CREATEDBY,:CREATED_DATE,:ASSET_SCRM_ID,:ASSET_OPP_ID,
-                :ASSET_THUMBNAIL,:ASSET_MODIFIED_DATE,:ASSET_MODIFIED_BY,:ASSET_VIDEO_URL,:ASSET_EXPIRY_DATE,:ASSET_VIDEO_LINK,:ASSET_LOCATION,:ASSET_OWNER,:ASSET_STATUS,:ASSET_ARCHITECTURE_DESCRIPTION)`,
+                        return connection.insert(`INSERT into asset_winstory_details(WINSTORY_ID, ASSET_TITLE, ASSET_DESCRIPTION,
+        ASSET_USERCASE, ASSET_CUSTOMER, ASSET_CREATEDBY, ASSET_CREATED_DATE, ASSET_SCRM_ID, ASSET_OPP_ID,
+        ASSET_THUMBNAIL, ASSET_MODIFIED_DATE, ASSET_MODIFIED_BY, ASSET_VIDEO_URL, ASSET_EXPIRY_DATE, ASSET_VIDEO_LINK, ASSET_LOCATION, ASSET_OWNER, ASSET_STATUS, ASSET_ARCHITECTURE_DESCRIPTION) values(: WINSTORY_ID,: ASSET_TITLE,: ASSET_DESCRIPTION,
+                : ASSET_USERCASE,: ASSET_CUSTOMER,: ASSET_CREATEDBY,: CREATED_DATE,: ASSET_SCRM_ID,: ASSET_OPP_ID,
+                : ASSET_THUMBNAIL,: ASSET_MODIFIED_DATE,: ASSET_MODIFIED_BY,: ASSET_VIDEO_URL,: ASSET_EXPIRY_DATE,: ASSET_VIDEO_LINK,: ASSET_LOCATION,: ASSET_OWNER,: ASSET_STATUS,: ASSET_ARCHITECTURE_DESCRIPTION)`,
                             [assetid, self.title, self.description, self.usercase, self.customer, self.createdBy,
                                 self.createdDate, self.scrmId, self.oppId, self.thumbnail, self.modifiedDate, self.modifiedBy, self.ASSET_VIDEO_URL, self.expiryDate, self.video_link, self.location, self.owner, 'Pending Review', self.asset_architecture_description],
                             {
@@ -434,8 +468,8 @@ module.exports = class Asset {
                     }
                     , function secondAction() {
                         if (oj.length > 0) {
-                            return connection.batchInsert(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,WINSTORY_ID) values(
-                :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:WINSTORY_ID)`,
+                            return connection.batchInsert(`INSERT into ASSET_LINKS(LINK_URL_TYPE, LINK_URL, LINK_REPOS_TYPE, LINK_DESCRIPTION, LINK_DESCRIPTION_DATA, DEPLOY_STATUS, LINK_ID, WINSTORY_ID) values(
+                : LINK_URL_TYPE,: LINK_URL,: LINK_REPOS_TYPE,: LINK_DESCRIPTION,: LINK_DESCRIPTION_DATA,: DEPLOY_STATUS,: LINK_ID,: WINSTORY_ID)`,
                                 oj, {
                                 autocommit: true
                             }
@@ -443,12 +477,12 @@ module.exports = class Asset {
                         }
                         else {
                             // console.log("oj is empty")
-                            return connection.query(`SELECT * from asset_links `, {})
+                            return connection.query(`SELECT * from asset_links`, {})
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
                             return connection.batchInsert(`INSERT into asset_winstory_filter_winstory_map values(
-                    :FILTER_ASSET_MAP_ID,:FILTER_ID,:WINSTORY_ID)`, filterArr,
+                    : FILTER_ASSET_MAP_ID,: FILTER_ID,: WINSTORY_ID)`, filterArr,
                                 {
                                     outFormat: oracledb.Object
                                 }).then(res => {
@@ -522,23 +556,23 @@ module.exports = class Asset {
 
                 connection.transaction([
                     function firstAction() {
-                        return connection.update(`UPDATE asset_winstory_details set 
-            ASSET_TITLE=:ASSET_TITLE,
-            ASSET_DESCRIPTION=:ASSET_DESCRIPTION,
-            ASSET_USERCASE=:ASSET_USERCASE,
-            ASSET_CUSTOMER=:ASSET_CUSTOMER,
-            ASSET_CREATEDBY=:ASSET_CREATEDBY,
-            ASSET_SCRM_ID=:ASSET_SCRM_ID,
-            ASSET_OPP_ID=:ASSET_OPP_ID,
-            ASSET_MODIFIED_DATE=:ASSET_MODIFIED_DATE,
-            ASSET_MODIFIED_BY=:ASSET_MODIFIED_BY,
-            ASSET_EXPIRY_DATE=:ASSET_EXPIRY_DATE,
-	    ASSET_VIDEO_LINK=:ASSET_VIDEO_LINK,
-        ASSET_LOCATION=:ASSET_LOCATION,
-        ASSET_OWNER=:ASSET_OWNER,
-        ASSET_STATUS=:ASSET_STATUS,
-        ASSET_ARCHITECTURE_DESCRIPTION=:ASSET_ARCHITECTURE_DESCRIPTION
-             WHERE WINSTORY_ID=:WINSTORY_ID`,
+                        return connection.update(`UPDATE asset_winstory_details set
+    ASSET_TITLE =: ASSET_TITLE,
+        ASSET_DESCRIPTION =: ASSET_DESCRIPTION,
+            ASSET_USERCASE =: ASSET_USERCASE,
+                ASSET_CUSTOMER =: ASSET_CUSTOMER,
+                    ASSET_CREATEDBY =: ASSET_CREATEDBY,
+                        ASSET_SCRM_ID =: ASSET_SCRM_ID,
+                            ASSET_OPP_ID =: ASSET_OPP_ID,
+                                ASSET_MODIFIED_DATE =: ASSET_MODIFIED_DATE,
+                                    ASSET_MODIFIED_BY =: ASSET_MODIFIED_BY,
+                                        ASSET_EXPIRY_DATE =: ASSET_EXPIRY_DATE,
+                                            ASSET_VIDEO_LINK =: ASSET_VIDEO_LINK,
+                                                ASSET_LOCATION =: ASSET_LOCATION,
+                                                    ASSET_OWNER =: ASSET_OWNER,
+                                                        ASSET_STATUS =: ASSET_STATUS,
+                                                            ASSET_ARCHITECTURE_DESCRIPTION =: ASSET_ARCHITECTURE_DESCRIPTION
+    WHERE WINSTORY_ID =: WINSTORY_ID`,
                             [self.title, self.description, self.usercase, self.customer, self.createdBy,
                             self.scrmId, self.oppId, new Date(), self.modifiedBy, self.expiryDate, self.video_link, self.location, self.owner, 'Pending Review', self.asset_architecture_description, self.assetId],
                             {
@@ -550,32 +584,32 @@ module.exports = class Asset {
                     , function secondAction() {
                         if (oj.length > 0) {
                             // console.log("statement:", oj)
-                            return connection.execute(`delete from ASSET_LINKS  WHERE WINSTORY_ID=:WINSTORY_ID`, [self.assetId]
+                            return connection.execute(`delete from ASSET_LINKS  WHERE WINSTORY_ID =: WINSTORY_ID`, [self.assetId]
                                 , {
                                     autoCommit: true
                                 }
                             ).then(res => {
                                 console.log('2nd update done(Asset links updated)' + res)
-                                connection.batchInsert(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,WINSTORY_ID) values(
-                                    :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:WINSTORY_ID)`,
+                                connection.batchInsert(`INSERT into ASSET_LINKS(LINK_URL_TYPE, LINK_URL, LINK_REPOS_TYPE, LINK_DESCRIPTION, LINK_DESCRIPTION_DATA, DEPLOY_STATUS, LINK_ID, WINSTORY_ID) values(
+                                    : LINK_URL_TYPE,: LINK_URL,: LINK_REPOS_TYPE,: LINK_DESCRIPTION,: LINK_DESCRIPTION_DATA,: DEPLOY_STATUS,: LINK_ID,: WINSTORY_ID)`,
                                     oj, {
                                     autoCommit: true
                                 })
                             })
                         }
                         else {
-                            return connection.query(`SELECT * from asset_links `, {})
+                            return connection.query(`SELECT * from asset_links`, {})
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
                             //console.log(filterArr)
-                            return connection.execute(`delete from asset_winstory_filter_winstory_map WHERE WINSTORY_ID=:WINSTORY_ID`, [self.assetId],
+                            return connection.execute(`delete from asset_winstory_filter_winstory_map WHERE WINSTORY_ID =: WINSTORY_ID`, [self.assetId],
                                 {
                                     autocommit: true
                                 }
                             ).then(res => {
                                 connection.batchInsert(`INSERT into asset_winstory_filter_winstory_map values(
-                            :FILTER_ASSET_MAP_ID,:FILTER_ID,:WINSTORY_ID)`, filterArr,
+                            : FILTER_ASSET_MAP_ID,: FILTER_ID,: WINSTORY_ID)`, filterArr,
                                     {
                                         outFormat: oracledb.Object
                                     }).then(res => {
@@ -639,11 +673,11 @@ module.exports = class Asset {
 
                 connection.transaction([
                     function firstAction() {
-                        return connection.insert(`INSERT into asset_winstory_details(WINSTORY_ID,ASSET_TITLE,ASSET_DESCRIPTION,
-                ASSET_USERCASE,ASSET_CUSTOMER,ASSET_CREATEDBY,ASSET_CREATED_DATE,ASSET_SCRM_ID,ASSET_OPP_ID,
-                ASSET_THUMBNAIL,ASSET_MODIFIED_DATE,ASSET_MODIFIED_BY,ASSET_VIDEO_URL,ASSET_EXPIRY_DATE,ASSET_VIDEO_LINK,ASSET_LOCATION,ASSET_OWNER,ASSET_STATUS,ASSET_ARCHITECTURE_DESCRIPTION) values(:WINSTORY_ID,:ASSET_TITLE,:ASSET_DESCRIPTION,
-                :ASSET_USERCASE,:ASSET_CUSTOMER,:ASSET_CREATEDBY,:CREATED_DATE,:ASSET_SCRM_ID,:ASSET_OPP_ID,
-                :ASSET_THUMBNAIL,:ASSET_MODIFIED_DATE,:ASSET_MODIFIED_BY,:ASSET_VIDEO_URL,:ASSET_EXPIRY_DATE,:ASSET_VIDEO_LINK,:ASSET_LOCATION,:ASSET_OWNER,:ASSET_STATUS,:ASSET_ARCHITECTURE_DESCRIPTION)`,
+                        return connection.insert(`INSERT into asset_winstory_details(WINSTORY_ID, ASSET_TITLE, ASSET_DESCRIPTION,
+        ASSET_USERCASE, ASSET_CUSTOMER, ASSET_CREATEDBY, ASSET_CREATED_DATE, ASSET_SCRM_ID, ASSET_OPP_ID,
+        ASSET_THUMBNAIL, ASSET_MODIFIED_DATE, ASSET_MODIFIED_BY, ASSET_VIDEO_URL, ASSET_EXPIRY_DATE, ASSET_VIDEO_LINK, ASSET_LOCATION, ASSET_OWNER, ASSET_STATUS, ASSET_ARCHITECTURE_DESCRIPTION) values(: WINSTORY_ID,: ASSET_TITLE,: ASSET_DESCRIPTION,
+                : ASSET_USERCASE,: ASSET_CUSTOMER,: ASSET_CREATEDBY,: CREATED_DATE,: ASSET_SCRM_ID,: ASSET_OPP_ID,
+                : ASSET_THUMBNAIL,: ASSET_MODIFIED_DATE,: ASSET_MODIFIED_BY,: ASSET_VIDEO_URL,: ASSET_EXPIRY_DATE,: ASSET_VIDEO_LINK,: ASSET_LOCATION,: ASSET_OWNER,: ASSET_STATUS,: ASSET_ARCHITECTURE_DESCRIPTION)`,
                             [assetid, self.title, self.description, self.usercase, self.customer, self.createdBy,
                                 self.createdDate, self.scrmId, self.oppId, self.thumbnail, self.modifiedDate, self.modifiedBy, self.ASSET_VIDEO_URL, self.expiryDate, self.video_link, self.location, self.owner, 'Pending Review', self.asset_architecture_description],
                             {
@@ -654,8 +688,8 @@ module.exports = class Asset {
                     }
                     , function secondAction() {
                         if (oj.length > 0) {
-                            return connection.batchInsert(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,WINSTORY_ID) values(
-                :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:WINSTORY_ID)`,
+                            return connection.batchInsert(`INSERT into ASSET_LINKS(LINK_URL_TYPE, LINK_URL, LINK_REPOS_TYPE, LINK_DESCRIPTION, LINK_DESCRIPTION_DATA, DEPLOY_STATUS, LINK_ID, WINSTORY_ID) values(
+                : LINK_URL_TYPE,: LINK_URL,: LINK_REPOS_TYPE,: LINK_DESCRIPTION,: LINK_DESCRIPTION_DATA,: DEPLOY_STATUS,: LINK_ID,: WINSTORY_ID)`,
                                 oj, {
                                 autocommit: true
                             }
@@ -663,12 +697,12 @@ module.exports = class Asset {
                         }
                         else {
                             //console.log("oj is empty")
-                            return connection.query(`SELECT * from asset_links `, {})
+                            return connection.query(`SELECT * from asset_links`, {})
                         }
                     }, function thirdAction() {
                         if (filterArr.length > 0) {
                             return connection.batchInsert(`INSERT into asset_winstory_filter_winstory_map values(
-                    :FILTER_ASSET_MAP_ID,:FILTER_ID,:WINSTORY_ID)`, filterArr,
+                    : FILTER_ASSET_MAP_ID,: FILTER_ID,: WINSTORY_ID)`, filterArr,
                                 {
                                     outFormat: oracledb.Object
                                 }).then(res => {
@@ -694,6 +728,46 @@ module.exports = class Asset {
         })
     }
 
+    static downloadLatestWins() {
+        console.log("-----------   DOWNLOAD 2  ---------");
+        return new Promise((resolve, reject) => {
+            const connection = getDb();
+            connection.query(`select * from asset_winstory_details`, {}, {
+                outFormat: oracledb.Object
+            }).then((result) => {
+                console.log("--> " + JSON.stringify(result.length));
+                let filename = '/u01/ahweb/winstory.csv';
+
+                try {
+                    try {
+                        fs.unlinkSync(filename);
+                        console.log("Old dump file deleted");
+                    } catch (err) {
+                        console.log("No file to delete");
+                    }
+                    let tableHeader=['WINSTORY_ID', 'WINSTORY_NAME', 'WINSTORY_CUSTOMER_NAME', 'WINSTORY_DEAL_CYCLE_TIME', 'WINSTORY_DEAL_SIZE', 'WINSTORY_PARTNER', 'WINSTORY_RENEWAL', 'WINSTORY_APPLICATION_INSTALL', 'WINSTORY_IMPERATIVE', 'WINSTORY_REPS_SE', 'WINSTORY_BUSSINESS_DRIVER', 'WINSTORY_SALES_PROCESS', 'WINSTORY_LESSON_LEARNT', 'WINSTORY_STATUS', 'WINSTORY_CREATED_BY', 'WINSTORY_CHANNEL', 'WINSTORY_FISCAL_QUARTER', 'WINSTORY_THUMBNAIL', 'WINSTORY_SOLUTION_USECASE', 'WINSTORY_COMPETIION', 'WINSTORY_CREATED_ON', 'WINSTORY_MODIFIED_ON', 'WINSTORY_MAPPED_L2_FILTERS', 'WINSTORY_LOGO', 'WINSTORY_CUSTOMER_IMPACT', 'WINSTORY_USECASE', 'WINSTORY_OTHER_FILTER', 'WINSTORY_CONSULTING_Q1', 'WINSTORY_CONSULTING_Q2', 'WINSTORY_CONSULTING_Q3', 'WINSTORY_CONSULTING_Q4'];
+                    const csvWriter = createCsvWriter({
+                        path: filename,
+                        header: tableHeader
+                    });
+                    result.push(tableHeader);
+                    csvWriter
+                        .writeRecords(result)
+                        .then(() => {
+                            console.log('The CSV file was written successfully');
+                            resolve(filename);
+                        });
+                } catch (error) {
+                    console.log(error);
+                }
+
+            }).catch(err => {
+                console.log("--> " + JSON.stringify(err));
+                reject(err)
+            })
+        })
+    }
+
 
     static uploadImages(assetId, images, imageDescription) {
         return new Promise((resolve, reject) => {
@@ -712,7 +786,7 @@ module.exports = class Asset {
                 filesArray = generateFileName(sampleFile, assetId, filesArray, imageDescription);
             }
             //console.log(filesArray)
-            connection.batchInsert(`INSERT INTO ASSET_IMAGES values(:IMAGE_ID,:WINSTORY_ID,:IMAGE_NAME,:IMAGEURL,:IMAGE_DESCRIPTION)`,
+            connection.batchInsert(`INSERT INTO ASSET_IMAGES values(: IMAGE_ID,: WINSTORY_ID,: IMAGE_NAME,: IMAGEURL,: IMAGE_DESCRIPTION)`,
                 filesArray,
                 {
                     autoCommit: true,
