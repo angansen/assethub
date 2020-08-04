@@ -10,6 +10,7 @@ const usermodel = require('../user-model');
 const emailnotification = require('../email-notification');
 
 exports.createWinstory = (host, story, res) => {
+    
     const connection = getDb();
     let newAssetid = uniqid.process("WS-");
     let insertwinstorysql = `Insert into ASSET_WINSTORY_DETAILS (WINSTORY_ID,
@@ -43,7 +44,7 @@ exports.createWinstory = (host, story, res) => {
         WINSTORY_CONSULTING_Q4,
         WINSTORY_REG_ID,
         WINSTORY_SPN,
-        WINSTORY_CONSUMING) values (:0,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31)`
+        WINSTORY_REFERENCEABLE) values (:0,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31)`
     let insertwinstoryOption = [
         newAssetid,
         story.WINSTORY_NAME,
@@ -76,7 +77,7 @@ exports.createWinstory = (host, story, res) => {
         story.WINSTORY_CONSULTING_Q4,
         story.WINSTORY_REG_ID,
         story.WINSTORY_SPN,
-        story.WINSTORY_CONSUMING
+        story.WINSTORY_REFERENCEABLE
     ];
 
     connection.execute(insertwinstorysql, insertwinstoryOption, {
@@ -109,7 +110,6 @@ exports.createWinstory = (host, story, res) => {
 
 exports.saveWinstory = (host, story, res) => {
     const connection = getDb();
-
     let updateWinStorySql = `UPDATE ASSET_WINSTORY_DETAILS SET 
     WINSTORY_NAME=:0,
     WINSTORY_CUSTOMER_NAME=:1,
@@ -140,7 +140,7 @@ exports.saveWinstory = (host, story, res) => {
     WINSTORY_CONSULTING_Q4=:26,
     WINSTORY_REG_ID=:27,
     WINSTORY_SPN=:28,
-    WINSTORY_CONSUMING=:29,
+    WINSTORY_REFERENCEABLE=:29,
     WINSTORY_CREATED_ON=:30 where WINSTORY_ID=:31`;
 
     let updateWinStoryOptions = [
@@ -173,7 +173,7 @@ exports.saveWinstory = (host, story, res) => {
         story.WINSTORY_CONSULTING_Q4,
         story.WINSTORY_REG_ID,
         story.WINSTORY_SPN,
-        story.WINSTORY_CONSUMING,
+        story.WINSTORY_REFERENCEABLE,
         story.WINSTORY_CREATED_ON,
         story.WINSTORY_ID];
 

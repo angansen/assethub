@@ -1174,7 +1174,7 @@ module.exports = class Asset {
     }
 
 
-    static fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, action, email) {
+    static fetchAssets2(host, offset, limit, filters, searchString, sortBy, order, action, email, referenceable) {
         //console.log(JSON.stringify(filters));
         return new Promise((resolve, reject) => {
             if (filters.length > 0 && filters != "") {
@@ -1190,7 +1190,7 @@ module.exports = class Asset {
                     {
                         outFormat: oracledb.OBJECT
                     }).then(data => {
-                        this.convertsql(data).then(query => {
+                        this.convertsql(data, referenceable).then(query => {
                             const connection = getDb();
                             connection.query(query, {},
                                 {
@@ -1222,6 +1222,12 @@ module.exports = class Asset {
             } else {
                 const connection = getDb();
                 let query = "SELECT * FROM ASSET_WINSTORY_DETAILS WHERE WINSTORY_STATUS='Live'";
+
+                if (referenceable == 'yes') {
+                    query += " and winstory_referenceable='yes'";
+                }
+                console.log("-------- NO FIlter Query -----------")
+                console.log(query);
                 connection.query(query, {},
                     {
                         outFormat: oracledb.OBJECT
@@ -1505,7 +1511,7 @@ module.exports = class Asset {
 
 
     // FILTER BASED ON SIMPLE LOGICAL AND 
-    static convertsql(data) {
+    static convertsql(data, referenceable) {
         console.log("----------  Converting SQL WIN -------------");
 
         let filterTypeMap = {};
@@ -1539,6 +1545,9 @@ module.exports = class Asset {
 
             }
 
+            if (referenceable == 'yes') {
+                queryString += " and b.winstory_referenceable='yes'";
+            }
             console.log(queryString);
             // RETURN THE GENERATED QUERY 
             resolve(queryString);
@@ -1628,7 +1637,7 @@ module.exports = class Asset {
     // }
 
 
-    static fetchPreferedWins(host, userEmail, sortBy, order) {
+    static fetchPreferedWins(host, userEmail, sortBy, order,referenceable) {
         let finalList = [];
         const offset = 0
         let limit;
@@ -1649,18 +1658,12 @@ module.exports = class Asset {
                 where a.filter_id in('`+ filterids + `') 
                 and a.WINSTORY_ID=b.WINSTORY_ID 
                 and b.winstory_status='Live'`;
-                // } else {
-                //     fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
-                //     where a.WINSTORY_ID=b.WINSTORY_ID 
-                //     and b.winstory_status='Live'`;
-                // }
 
-                // GET THE MAPPED ASSES FOR THE FILTERS
-                // let fetchAssetsSql = `select b.* from ASSET_WINSTORY_FILTER_WINSTORY_MAP a, ASSET_WINSTORY_DETAILS b 
-                // where a.filter_id in('`+ filterids + `') 
-                // and a.WINSTORY_ID=b.WINSTORY_ID 
-                // and b.winstory_status='Live'`;
-                console.log("> " + fetchAssetsSql);
+                if (referenceable == 'yes') {
+                    fetchAssetsSql += " and winstory_referenceable='yes'";
+                }
+                console.log("--------- Win LOB QUERY ---------");
+                console.log(fetchAssetsSql);
                 connection.query(fetchAssetsSql, {},
                     {
                         outFormat: oracledb.OBJECT
@@ -1678,6 +1681,9 @@ module.exports = class Asset {
                         },
                     ).then(words => {
                         let fetchtopwordssql = `select * from asset_winstory_details where winstory_status='Live'`;
+                        if (referenceable == 'yes') {
+                            fetchtopwordssql += " and winstory_referenceable='yes'";
+                        }
                         connection.query(fetchtopwordssql, {},
                             {
                                 outFormat: oracledb.OBJECT
@@ -2886,7 +2892,7 @@ module.exports = class Asset {
 
 
 
-    static getWinsByLob(host, lob, user_email, sortBy, order) {
+    static getWinsByLob(host, lob, user_email, sortBy, order,referenceable) {
         let assetsArray = [];
         let likesArray = [];
         let viewsArray = [];
@@ -2928,6 +2934,12 @@ module.exports = class Asset {
                 promoteQuerySql = `SELECT WINSTORY_ID from ASSET_WINSTORY_LOB_LEADER_PROMOTED_WINSTORY where status=1`
                 promoteQueryOptions = []
             }
+
+            if (referenceable == 'yes') {
+                lobQuerySql += " and winstory_referenceable='yes'";
+            }
+            console.log("--------- Win LOB QUERY ---------");
+            console.log(lobQuerySql)
             connection.query(lobQuerySql, lobQueryOptions,
                 {
                     outFormat: oracledb.OBJECT
@@ -2937,157 +2949,6 @@ module.exports = class Asset {
                     this.refineAssets(host, 0, assetsArray.length, assetsArray, sortBy, order, '', user_email).then(assets => {
                         resolve(assets);
                     })
-                    // console.log('Calling WinsList')
-                    //WinsList(res);
-                    // connection.query(promoteQuerySql, promoteQueryOptions,
-                    //     {
-                    //         outFormat: oracledb.OBJECT
-                    //     })
-                    //     .then(res => {
-                    //         promotedArray = res;
-                    //         connection.query(`select Count(*) comment_count,WINSTORY_ID from 
-                    // asset_winstory_comments group by WINSTORY_ID`, [],
-                    //             {
-                    //                 outFormat: oracledb.OBJECT
-                    //             })
-                    //             .then(res => {
-                    //                 //console.log("comment count",res)
-                    //                 commentsArray = res;
-                    //                 connection.execute(`SELECT count(*) like_count,WINSTORY_ID from asset_winstory_likes group by WINSTORY_ID`, [],
-                    //                     {
-                    //                         outFormat: oracledb.OBJECT
-                    //                     })
-                    //                     .then(res => {
-                    //                         //console.log("LIKES",res)
-                    //                         likesArray = res.rows;
-                    //                         connection.execute(`SELECT * from ASSET_IMAGES`, {},
-                    //                             {
-                    //                                 outFormat: oracledb.OBJECT
-                    //                             }).then(res => {
-                    //                                 imagesArray = res.rows
-                    //                                 connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Solution Area'`, {},
-                    //                                     {
-                    //                                         outFormat: oracledb.OBJECT
-                    //                                     })
-                    //                                     .then(res => {
-                    //                                         solutionAreasArray = res.rows;
-                    //                                         connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Asset Type'`, {},
-                    //                                             {
-                    //                                                 outFormat: oracledb.OBJECT
-                    //                                             })
-                    //                                             .then(res => {
-                    //                                                 assetTypesArray = res.rows;
-                    //                                                 connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Initiatives'`, {},
-                    //                                                     {
-                    //                                                         outFormat: oracledb.OBJECT
-                    //                                                     })
-                    //                                                     .then(res => {
-                    //                                                         salesPlaysArray = res.rows;
-                    //                                                         connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Industry'`, {},
-                    //                                                             {
-                    //                                                                 outFormat: oracledb.OBJECT
-                    //                                                             })
-                    //                                                             .then(res => {
-                    //                                                                 industryArray = res.rows;
-                    //                                                                 connection.execute(`SELECT * from ASSET_WINSTORY_LINKS  `, {},
-                    //                                                                     {
-                    //                                                                         outFormat: oracledb.OBJECT
-                    //                                                                     }).then(res => {
-                    //                                                                         linksArray = res.rows
-                    //                                                                         connection.execute(`SELECT count(*) view_count,WINSTORY_ID from ASSET_WINSTORY_VIEWS group by WINSTORY_ID`, [],
-                    //                                                                             {
-                    //                                                                                 outFormat: oracledb.OBJECT
-                    //                                                                             })
-                    //                                                                             .then(res => {
-                    //                                                                                 viewsArray = res.rows
-                    //                                                                                 connection.execute(`select m.filter_id,f.filter_name,m.WINSTORY_ID from asset_winstory_filter_winstory_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Win Status'`, {},
-                    //                                                                                     {
-                    //                                                                                         outFormat: oracledb.OBJECT
-                    //                                                                                     })
-                    //                                                                                     .then(res => {
-                    //                                                                                         let winStatusArray = res.rows;
-                    //                                                                                         //console.log("All Arrays",assetsArray,likesArray,viewsArray)
-                    //                                                                                         assetsArray.forEach(asset => {
-                    //                                                                                             allAssetsObj = asset;
-                    //                                                                                             const id = asset.WINSTORY_ID;
-                    //                                                                                             allAssetsObj.createdDate = allAssetsObj.WINSTORY_CREATED_ON;
-                    //                                                                                             let path = allAssetsObj.WINSTORY_THUMBNAIL;
-                    //                                                                                             if (path == null) {
-                    //                                                                                                 allAssetsObj.WINSTORY_THUMBNAIL = `http://${host}/winstorylogo/Logo_Thumbnail.png`
-                    //                                                                                             } else
-                    //                                                                                                 allAssetsObj.WINSTORY_THUMBNAIL = `http://${host}/${path}`;
-
-                    //                                                                                             let logopath = allAssetsObj.WINSTORY_LOGO;
-                    //                                                                                             if (logopath == null) {
-                    //                                                                                                 allAssetsObj.WINSTORY_LOGO = `http://${host}/winstorylogo/Logo_Thumbnail.png`
-                    //                                                                                             } else
-                    //                                                                                                 allAssetsObj.WINSTORY_LOGO = `http://${host}/${logopath}`;
-                    //                                                                                             allAssetsObj.LINKS = [];
-                    //                                                                                             var links = linksArray.filter(link => link.WINSTORY_ID === id)
-                    //                                                                                             ////console.log('links:',links)
-                    //                                                                                             solutionAreas = solutionAreasArray.filter(s => s.WINSTORY_ID == id);
-                    //                                                                                             assetTypes = assetTypesArray.filter(s => s.WINSTORY_ID == id);
-                    //                                                                                             salesPlays = salesPlaysArray.filter(s => s.WINSTORY_ID == id);
-                    //                                                                                             industry = industryArray.filter(s => s.WINSTORY_ID == id);
-                    //                                                                                             allAssetsObj.SOLUTION_AREAS = solutionAreas
-                    //                                                                                             allAssetsObj.ASSET_TYPE = assetTypes;
-                    //                                                                                             allAssetsObj.SALES_PLAY = salesPlays;
-                    //                                                                                             allAssetsObj.INDUSTRY = industry;
-                    //                                                                                             let winStatus = winStatusArray.filter(s => s.WINSTORY_ID == id);
-                    //                                                                                             allAssetsObj.WIN_STATUS = winStatus;
-
-                    //                                                                                             let promote = promotedArray.filter(s => s.WINSTORY_ID === id);
-                    //                                                                                             allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
-                    //                                                                                             linkType = links.map(a => a.LINK_REPOS_TYPE)
-                    //                                                                                             linkType = [...new Set(linkType)]
-                    //                                                                                             ////console.log(linkType)
-                    //                                                                                             linkType.forEach(type => {
-                    //                                                                                                 var links2 = linksArray.filter(link => link.LINK_REPOS_TYPE === type && link.WINSTORY_ID === id)
-                    //                                                                                                 lobj.TYPE = type;
-                    //                                                                                                 lobj.arr = links2;
-                    //                                                                                                 lobj2 = lobj
-                    //                                                                                                 linkObjArr.push(lobj2);
-                    //                                                                                                 lobj = {}
-                    //                                                                                             })
-                    //                                                                                             allAssetsObj.LINKS = linkObjArr;
-
-                    //                                                                                             linkObjArr = [];
-                    //                                                                                             ////console.log(lobj2,"obj2")
-                    //                                                                                             var images = imagesArray.filter(image => image.WINSTORY_ID === id);
-                    //                                                                                             allAssetsObj.IMAGES = images;
-                    //                                                                                             var likes = likesArray.filter(l => l.WINSTORY_ID === id)
-                    //                                                                                             var comments = commentsArray.filter(c => c.WINSTORY_ID === id)
-                    //                                                                                             var views = viewsArray.filter(v => v.WINSTORY_ID === id)
-                    //                                                                                             if (!comments.length) {
-                    //                                                                                                 comments.push({ COMMENT_COUNT: 0 });
-                    //                                                                                             }
-                    //                                                                                             if (!likes.length) {
-                    //                                                                                                 likes.push({ LIKE_COUNT: 0, WINSTORY_ID: id })
-                    //                                                                                             }
-                    //                                                                                             if (!views.length) {
-                    //                                                                                                 views.push({ VIEW_COUNT: 0, WINSTORY_ID: id })
-                    //                                                                                             }
-                    //                                                                                             allAssetsObj.LIKES = likes[0];
-                    //                                                                                             allAssetsObj.VIEWS = views[0];
-                    //                                                                                             allAssetsObj.COMMENTS = comments[0];
-                    //                                                                                             //console.log(allAssetsObj)
-                    //                                                                                             allAssetsFinalArray.push(allAssetsObj)
-                    //                                                                                             allAssetsObj = {};
-                    //                                                                                         })
-                    //                                                                                         allObj.TOTALCOUNT = allAssetsFinalArray.length;
-                    //                                                                                         allObj.WINSTORIES = allAssetsFinalArray;
-                    //                                                                                         resolve(allObj)
-                    //                                                                                     })
-                    //                                                                             })
-                    //                                                                     })
-                    //                                                             })
-                    //                                                     })
-                    //                                             })
-                    //                                     })
-                    //                             })
-                    //                     })
-                    //             })
-                    //     })
                 })
         })
     }

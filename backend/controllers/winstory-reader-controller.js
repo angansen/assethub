@@ -474,6 +474,7 @@ exports.getAllAssetsBySearchString = (req, res) => {
 exports.getAllAssetsByFilters = (req, res) => {
     var obj = {};
     // obj.filters = [];
+    let referenceable=req.header('ref')==undefined?'no':req.header('ref');
     let offset = req.header('offset');
     let limit = req.header('limit');
     let filters = req.header('filters');
@@ -489,7 +490,7 @@ exports.getAllAssetsByFilters = (req, res) => {
         searchtext: searchString
     }
 
-    // console.log("============= Win Controller Activity ==============")
+    console.log("============= Win Controller Activity ==============")
     // console.log(JSON.stringify(activity));
     // console.log("================== Activity ==========================")
 
@@ -502,22 +503,22 @@ exports.getAllAssetsByFilters = (req, res) => {
     searchString = searchString == undefined ? "" : searchString;
     filters = filters == undefined ? [] : filters;
     if (limit === '-1') {
-        //console.log("-1 limit if")
         const connection = getDb();
-        connection.execute(`SELECT count(*) total from ASSET_WINSTORY_DETAILS where lower(WINSTORY_STATUS)='live'`, {},
+        let sql=`SELECT count(*) total from ASSET_WINSTORY_DETAILS where lower(WINSTORY_STATUS)='live'`;
+        connection.execute(sql, {},
             {
                 outFormat: oracledb.OBJECT
             },
         ).then(result => {
             limit = result.rows[0].TOTAL;
             // console.log("new Limit" + limit)
-            winstoryreader.fetchAssets2(req.headers.host, offset, limit, filters, searchString, sortBy, order, "", email).then(result => {
+            winstoryreader.fetchAssets2(req.headers.host, offset, limit, filters, searchString, sortBy, order, "", email,referenceable).then(result => {
                 res.json(result);
             })
         })
     }
     else {
-        winstoryreader.fetchAssets2(req.headers.host, offset, limit, filters, searchString, sortBy, order, "", email).then(result => {
+        winstoryreader.fetchAssets2(req.headers.host, offset, limit, filters, searchString, sortBy, order, "", email,referenceable).then(result => {
             res.json(result);
         })
     }
@@ -574,7 +575,8 @@ exports.getAllPreferredWins1 = (req, res) => {
     const user_email = req.params.user_email;
     let order = req.header('order');
     let sortBy = req.header('sortBy');
-    winstoryreader.fetchPreferedWins(req.headers.host, user_email, sortBy, order)
+    let referenceable = req.header('ref')==undefined?'no':req.header('ref');
+    winstoryreader.fetchPreferedWins(req.headers.host, user_email, sortBy, order,referenceable)
         .then(list => {
             res.send(list);
         })
@@ -734,6 +736,7 @@ exports.getAllAssetsByLob = (req, res) => {
 exports.getAllWinsByLob = (req, res) => {
     const user_email = req.header('user_email');//req.params.user_email;//req.params.user_email
     let order = req.header('order');
+    let referenceable = req.header('ref')==undefined?'no':req.header('ref');
     let sortBy = req.header('sortBy');
     const connection = getDb();
     connection.execute(`Select USER_LOB from ASSET_USER where USER_EMAIL=:USER_EMAIL`, [user_email],
@@ -745,7 +748,7 @@ exports.getAllWinsByLob = (req, res) => {
             console.log(user_lob.rows[0])
             if (user_lob.rows[0]) {
                 let sortBy = req.header('sortBy');
-                winstoryreader.getWinsByLob(req.headers.host, user_lob.rows[0].USER_LOB, user_email, sortBy, order).then(result => {
+                winstoryreader.getWinsByLob(req.headers.host, user_lob.rows[0].USER_LOB, user_email, sortBy, order,referenceable).then(result => {
                     res.json(result)
                 })
             }

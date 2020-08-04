@@ -38,10 +38,10 @@ exports.saveWinstory = (req, res) => {
         WINSTORY_CONSULTING_Q4: req.body.WINSTORY_CONSULTING_Q4,
         WINSTORY_REG_ID:req.body.WINSTORY_REG_ID,
         WINSTORY_SPN:req.body.WINSTORY_SPN,
-        WINSTORY_CONSUMING:req.body.WINSTORY_CONSUMING,
+        WINSTORY_REFERENCEABLE:req.body.WINSTORY_REFERENCEABLE,
     }
 
-    //console.logJSON.stringify(winStory));
+    console.log(JSON.stringify(winStory));
     winstorywriter.createWinstory(req.headers.host, winStory, res);
 
 }
@@ -82,10 +82,10 @@ exports.updateWinstory = (req, res) => {
         WINSTORY_CONSULTING_Q4: req.body.WINSTORY_CONSULTING_Q4,
         WINSTORY_REG_ID:req.body.WINSTORY_REG_ID,
         WINSTORY_SPN:req.body.WINSTORY_SPN,
-        WINSTORY_CONSUMING:req.body.WINSTORY_CONSUMING,
+        WINSTORY_REFERENCEABLE:req.body.WINSTORY_REFERENCEABLE,
     }
 
-    //console.logJSON.stringify(winStory));
+    console.log(JSON.stringify(winStory));
     winstorywriter.saveWinstory(req.headers.host, winStory, res);
 }
 
