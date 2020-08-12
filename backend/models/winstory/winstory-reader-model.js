@@ -728,8 +728,71 @@ module.exports = class Asset {
         })
     }
 
+    static downloadLatestAssets() {
+
+        console.log("-----------   DOWNLOAD asset  ---------");
+        return new Promise((resolve, reject) => {
+            const connection = getDb();
+            connection.query(`select a.*,c.filter_name as ASSET  from asset_details a, asset_filter_asset_map b,asset_filter c
+            where a.asset_id=b.asset_id and b.filter_id=c.filter_id  and c.filter_group like 'type%' order by c.filter_name`, {}, {
+                outFormat: oracledb.Object
+            }).then((result) => {
+                console.log("--> " + JSON.stringify(result.length));
+                let filename = '/u01/ahweb/asset.csv';
+
+                try {
+                    try {
+                        fs.unlinkSync(filename);
+                        console.log("Old dump file deleted");
+                    } catch (err) {
+                        console.log("No file to delete");
+                    }
+                    let tableHeader = [{ 'id': 'ASSET', 'name': 'ASSET' }, 
+                    { 'id': 'ASSET_TITLE', 'name': 'ASSET_TITLE' },
+                    { 'id': 'ASSET_DESC', 'name': 'ASSET_DESC' },
+                    { 'id': 'ASSET_USECASE', 'name': 'ASSET_USECASE' },
+                    { 'id': 'ASSET_CUSTOMER', 'name': 'ASSET_CUSTOMER' },
+                    { 'id': 'ASSET_CREATEDBY', 'name': 'ASSET_CREATEDBY' },
+                    { 'id': 'ASSET_CREATED_DATE', 'name': 'ASSET_CREATED_DATE' },
+                    { 'id': 'ASSET_SCRM_ID', 'name': 'ASSET_SCRM_ID' },
+                    { 'id': 'ASSET_OPP_ID', 'name': 'ASSET_OPP_ID' },
+                    { 'id': 'ASSET_THUMBNAIL', 'name': 'ASSET_THUMBNAIL' },
+                    { 'id': 'ASSET_MODIFIED_DATE', 'name': 'ASSET_MODIFIED_DATE' },
+                    { 'id': 'ASSET_MODIFIED_BY', 'name': 'ASSET_MODIFIED_BY' },
+                    { 'id': 'ASSET_VIDEO_URL', 'name': 'ASSET_VIDEO_URL' },
+                    { 'id': 'ASSET_EXPIRY_DATE', 'name': 'ASSET_EXPIRY_DATE' },
+                    { 'id': 'ASSET_VIDEO_LINK', 'name': 'ASSET_VIDEO_LINK' },
+                    { 'id': 'ASSET_LOCATION', 'name': 'ASSET_LOCATION' },
+                    { 'id': 'ASSET_STATUS', 'name': 'ASSET_STATUS' },
+                    { 'id': 'ASSET_REVIEW_NOTE', 'name': 'ASSET_REVIEW_NOTE' },
+                    { 'id': 'ASSET_OWNER', 'name': 'ASSET_OWNER' },
+                    { 'id': 'ASSET_TYPE', 'name': 'ASSET_TYPE' },
+                    { 'id': 'ASSET_DESCRIPTION', 'name': 'ASSET_DESCRIPTION' },
+                    { 'id': 'ASSET_USERCASE', 'name': 'ASSET_USERCASE' },
+                    { 'id': 'ASSET_ARCHITECTURE_DESCRIPTION', 'name': 'ASSET_ARCHITECTURE_DESCRIPTION' },
+                    { 'id': 'ASSET_NOTIONAL_ARCH', 'name': 'ASSET_NOTIONAL_ARCH' }];
+                    const csvWriter = createCsvWriter({
+                        path: filename,
+                        header: tableHeader
+                    });
+                    console.log(JSON.stringify(result[0]));
+                    csvWriter
+                        .writeRecords(result)
+                        .then(() => {
+                            console.log('The CSV file was written successfully');
+                            resolve(filename);
+                        });
+                } catch (error) {
+                    console.log(error);
+                }
+
+            }).catch(err => {
+                console.log("--> " + JSON.stringify(err));
+                reject(err)
+            })
+        })
+    }
     static downloadLatestWins() {
-        console.log("-----------   DOWNLOAD 2  ---------");
         return new Promise((resolve, reject) => {
             const connection = getDb();
             connection.query(`select * from asset_winstory_details`, {}, {
@@ -1637,7 +1700,7 @@ module.exports = class Asset {
     // }
 
 
-    static fetchPreferedWins(host, userEmail, sortBy, order,referenceable) {
+    static fetchPreferedWins(host, userEmail, sortBy, order, referenceable) {
         let finalList = [];
         const offset = 0
         let limit;
@@ -2892,7 +2955,7 @@ module.exports = class Asset {
 
 
 
-    static getWinsByLob(host, lob, user_email, sortBy, order,referenceable) {
+    static getWinsByLob(host, lob, user_email, sortBy, order, referenceable) {
         let assetsArray = [];
         let likesArray = [];
         let viewsArray = [];

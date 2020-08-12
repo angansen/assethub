@@ -784,8 +784,16 @@ exports.submitfeedback = (req, res) => {
 }
 
 exports.downloadwins = (req, res) => {
-    console.log("-----------   DOWNLOAD 1  ---------");
     winstoryreader.downloadLatestWins().then(result => {
+        console.log(result);
+        res.download(result);
+        // res.send(result);
+    })
+}
+
+exports.downloadassets = (req, res) => {
+    console.log("-----------   DOWNLOAD assets  ---------");
+    winstoryreader.downloadLatestAssets().then(result => {
         console.log(result);
         res.download(result);
         // res.send(result);

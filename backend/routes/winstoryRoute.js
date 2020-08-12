@@ -8,6 +8,7 @@ router.get('/allwinstoryfilters', winstoryreaderController.getAllFilters);
 router.get('/getAllWinStoryByFilters', winstoryreaderController.getAllAssetsByFilters);
 // router.get('/getAllWinStoryByFilters2', winstoryreaderController.getAllAssetsByFilters);
 router.get('/getwinsdump', winstoryreaderController.downloadwins);
+router.get('/getassetsdump', winstoryreaderController.downloadassets);
 router.get('/mywinstory', winstoryreaderController.getUserWinstory);
 router.get('/winstorylobs', winstoryreaderController.getWinStoryLobsList);
 router.get('/winstoryimperative', winstoryreaderController.winstoryimperative);
