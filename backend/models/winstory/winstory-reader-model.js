@@ -739,6 +739,33 @@ module.exports = class Asset {
             }).then((result) => {
                 console.log("--> " + JSON.stringify(result.length));
                 let filename = '/u01/ahweb/asset.csv';
+                let headerarray = [{
+                    "ASSET_ID": "ASSET_ID",
+                    "ASSET_TITLE": "ASSET_TITLE",
+                    "ASSET_DESC": "ASSET_DESC",
+                    "ASSET_USECASE": "ASSET_USECASE",
+                    "ASSET_CUSTOMER": "ASSET_CUSTOMER",
+                    "ASSET_CREATEDBY": "ASSET_CREATEDBY",
+                    "ASSET_CREATED_DATE": "ASSET_CREATED_DATE",
+                    "ASSET_SCRM_ID": "ASSET_SCRM_ID",
+                    "ASSET_OPP_ID": "ASSET_OPP_ID",
+                    "ASSET_THUMBNAIL": "ASSET_THUMBNAIL",
+                    "ASSET_MODIFIED_DATE": "ASSET_MODIFIED_DATE",
+                    "ASSET_MODIFIED_BY": "ASSET_MODIFIED_BY",
+                    "ASSET_VIDEO_URL": "ASSET_VIDEO_URL",
+                    "ASSET_EXPIRY_DATE": "ASSET_EXPIRY_DATE",
+                    "ASSET_VIDEO_LINK": "ASSET_VIDEO_LINK",
+                    "ASSET_LOCATION": "ASSET_LOCATION",
+                    "ASSET_STATUS": "ASSET_STATUS",
+                    "ASSET_REVIEW_NOTE": "ASSET_REVIEW_NOTE",
+                    "ASSET_OWNER": "ASSET_OWNER",
+                    "ASSET_TYPE": "ASSET_TYPE",
+                    "ASSET_DESCRIPTION": "ASSET_DESCRIPTION",
+                    "ASSET_USERCASE": "ASSET_USERCASE",
+                    "ASSET_ARCHITECTURE_DESCRIPTION": "ASSET_ARCHITECTURE_DESCRIPTION",
+                    "ASSET_NOTIONAL_ARCH": "ASSET_NOTIONAL_ARCH",
+                    "ASSET": "ASSET"
+                }]
 
                 try {
                     try {
@@ -747,7 +774,7 @@ module.exports = class Asset {
                     } catch (err) {
                         console.log("No file to delete");
                     }
-                    let tableHeader = [{ 'id': 'ASSET', 'name': 'ASSET' }, 
+                    let tableHeader = [{ 'id': 'ASSET', 'name': 'ASSET' },
                     { 'id': 'ASSET_TITLE', 'name': 'ASSET_TITLE' },
                     { 'id': 'ASSET_DESC', 'name': 'ASSET_DESC' },
                     { 'id': 'ASSET_USECASE', 'name': 'ASSET_USECASE' },
@@ -771,13 +798,17 @@ module.exports = class Asset {
                     { 'id': 'ASSET_USERCASE', 'name': 'ASSET_USERCASE' },
                     { 'id': 'ASSET_ARCHITECTURE_DESCRIPTION', 'name': 'ASSET_ARCHITECTURE_DESCRIPTION' },
                     { 'id': 'ASSET_NOTIONAL_ARCH', 'name': 'ASSET_NOTIONAL_ARCH' }];
+
+                    let headerdataresult = [...headerarray, ...result];
+                    // console.log(JSON.stringify(result[0]));
+                    // console.log(JSON.stringify(headerdataresult[0]));
                     const csvWriter = createCsvWriter({
                         path: filename,
                         header: tableHeader
                     });
-                    console.log(JSON.stringify(result[0]));
+
                     csvWriter
-                        .writeRecords(result)
+                        .writeRecords(headerdataresult)
                         .then(() => {
                             console.log('The CSV file was written successfully');
                             resolve(filename);
@@ -808,6 +839,44 @@ module.exports = class Asset {
                     } catch (err) {
                         console.log("No file to delete");
                     }
+
+                    let headerarray = [{
+                        "WINSTORY_ID": "WINSTORY ID",
+                        "WINSTORY_NAME": "WINSTORY NAME",
+                        "WINSTORY_CUSTOMER_NAME": "WINSTORY_CUSTOMER_NAME",
+                        "WINSTORY_DEAL_CYCLE_TIME": "WINSTORY_DEAL_CYCLE_TIME",
+                        "WINSTORY_DEAL_SIZE": "WINSTORY_DEAL_SIZE",
+                        "WINSTORY_PARTNER": "WINSTORY_DEAL_SIZE",
+                        "WINSTORY_RENEWAL": "WINSTORY_RENEWAL",
+                        "WINSTORY_APPLICATION_INSTALL": "WINSTORY_APPLICATION_INSTALL",
+                        "WINSTORY_IMPERATIVE": "WINSTORY_IMPERATIVE",
+                        "WINSTORY_REPS_SE": "WINSTORY_IMPERATIVE",
+                        "WINSTORY_BUSSINESS_DRIVER": "WINSTORY_BUSSINESS_DRIVER",
+                        "WINSTORY_SALES_PROCESS": "WINSTORY_SALES_PROCESS",
+                        "WINSTORY_LESSON_LEARNT": "WINSTORY_LESSON_LEARNT",
+                        "WINSTORY_STATUS": "WINSTORY_STATUS",
+                        "WINSTORY_CREATED_BY": "WINSTORY_CREATED_BY",
+                        "WINSTORY_CHANNEL": "WINSTORY_CHANNEL",
+                        "WINSTORY_FISCAL_QUARTER": "WINSTORY_FISCAL_QUARTER",
+                        "WINSTORY_THUMBNAIL": "WINSTORY_THUMBNAIL",
+                        "WINSTORY_SOLUTION_USECASE": "WINSTORY_SOLUTION_USECASE",
+                        "WINSTORY_COMPETIION": "WINSTORY_COMPETIION",
+                        "WINSTORY_CREATED_ON": "WINSTORY_CREATED_ON",
+                        "WINSTORY_MODIFIED_ON": "WINSTORY_MODIFIED_ON",
+                        "WINSTORY_MAPPED_L2_FILTERS": "WINSTORY_MAPPED_L2_FILTERS",
+                        "WINSTORY_LOGO": "WINSTORY_LOGO",
+                        "WINSTORY_CUSTOMER_IMPACT": "WINSTORY_CUSTOMER_IMPACT",
+                        "WINSTORY_USECASE": "WINSTORY_USECASE",
+                        "WINSTORY_OTHER_FILTER": "WINSTORY_OTHER_FILTER",
+                        "WINSTORY_CONSULTING_Q1": "WINSTORY_CONSULTING_Q1",
+                        "WINSTORY_CONSULTING_Q2": "WINSTORY_CONSULTING_Q2",
+                        "WINSTORY_CONSULTING_Q3": "WINSTORY_CONSULTING_Q3",
+                        "WINSTORY_CONSULTING_Q4": "WINSTORY_CONSULTING_Q4",
+                        "WINSTORY_REG_ID": "WINSTORY_REG_ID",
+                        "WINSTORY_SPN": "WINSTORY_SPN",
+                        "WINSTORY_REFERENCEABLE": "WINSTORY_REFERENCEABLE"
+                    }]
+
                     let tableHeader = [
                         { 'id': 'WINSTORY_ID', 'name': 'WINSTORY_ID' },
                         { 'id': 'WINSTORY_NAME', 'name': 'WINSTORY_NAME' },
@@ -841,13 +910,16 @@ module.exports = class Asset {
                         { 'id': 'WINSTORY_CONSULTING_Q3', 'name': 'WINSTORY_CONSULTING_Q3' },
                         { 'id': 'WINSTORY_CONSULTING_Q4', 'name': 'WINSTORY_CONSULTING_Q4' }
                     ];
+
+                    let headerdataresult = [...headerarray, ...result];
+                    // console.log(JSON.stringify(result[0]));
+                    // console.log(JSON.stringify(headerdataresult[0]));
                     const csvWriter = createCsvWriter({
                         path: filename,
                         header: tableHeader
                     });
-                    console.log(JSON.stringify(result[0]));
                     csvWriter
-                        .writeRecords(result)
+                        .writeRecords(headerdataresult)
                         .then(() => {
                             console.log('The CSV file was written successfully');
                             resolve(filename);
