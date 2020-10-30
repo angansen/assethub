@@ -44,7 +44,18 @@ exports.createWinstory = (host, story, res) => {
         WINSTORY_CONSULTING_Q4,
         WINSTORY_REG_ID,
         WINSTORY_SPN,
-        WINSTORY_REFERENCEABLE) values (:0,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31)`
+        WINSTORY_REFERENCEABLE,
+        WINSTORY_SALES_LEAD,
+        WINSTORY_ECA_ENGG_LEAD,
+        WINSTORY_CUSTOMER_LIFECYCLE,
+        WINSTORY_REFERENCE_LANGUAGE_INCLUDED,
+        WINSTORY_PROPOSED_GOLIVE_DATE,
+        WINSTORY_CONSUMPTION_MILESTONE_USAGE_TARGET,
+        WINSTORY_REFERENCE_STATUS,
+        WINSTORY_CUSTOMER_CONTACT,
+        WINSTORY_REFERENCE_PLAN,
+        WINSTORY_REFERENCE_ASSET,
+        WINSTORY_NOTES) values (:0,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42)`
     let insertwinstoryOption = [
         newAssetid,
         story.WINSTORY_NAME,
@@ -77,7 +88,18 @@ exports.createWinstory = (host, story, res) => {
         story.WINSTORY_CONSULTING_Q4,
         story.WINSTORY_REG_ID,
         story.WINSTORY_SPN,
-        story.WINSTORY_REFERENCEABLE
+        story.WINSTORY_REFERENCEABLE,
+        story.WINSTORY_SALES_LEAD,
+        story.WINSTORY_ECA_ENGG_LEAD,
+        story.WINSTORY_CUSTOMER_LIFECYCLE,
+        story.WINSTORY_REFERENCE_LANGUAGE_INCLUDED,
+        story.WINSTORY_PROPOSED_GOLIVE_DATE,
+        story.WINSTORY_CONSUMPTION_MILESTONE_USAGE_TARGET,
+        story.WINSTORY_REFERENCE_STATUS,
+        story.WINSTORY_CUSTOMER_CONTACT,
+        story.WINSTORY_REFERENCE_PLAN,
+        story.WINSTORY_REFERENCE_ASSET,
+        story.WINSTORY_NOTES
     ];
 
     connection.execute(insertwinstorysql, insertwinstoryOption, {
@@ -141,7 +163,18 @@ exports.saveWinstory = (host, story, res) => {
     WINSTORY_REG_ID=:27,
     WINSTORY_SPN=:28,
     WINSTORY_REFERENCEABLE=:29,
-    WINSTORY_CREATED_ON=:30 where WINSTORY_ID=:31`;
+    WINSTORY_CREATED_ON=:30,
+    WINSTORY_SALES_LEAD=:31,
+    WINSTORY_ECA_ENGG_LEAD=:32,
+    WINSTORY_CUSTOMER_LIFECYCLE=:33,
+    WINSTORY_REFERENCE_LANGUAGE_INCLUDED=:34,
+    WINSTORY_PROPOSED_GOLIVE_DATE=:35,
+    WINSTORY_CONSUMPTION_MILESTONE_USAGE_TARGET=:36,
+    WINSTORY_REFERENCE_STATUS=:37,
+    WINSTORY_CUSTOMER_CONTACT=:38,
+    WINSTORY_REFERENCE_PLAN=:39,
+    WINSTORY_REFERENCE_ASSET=:40,
+    WINSTORY_NOTES=:41 where WINSTORY_ID=:42`;
 
     let updateWinStoryOptions = [
         story.WINSTORY_NAME,
@@ -175,6 +208,17 @@ exports.saveWinstory = (host, story, res) => {
         story.WINSTORY_SPN,
         story.WINSTORY_REFERENCEABLE,
         story.WINSTORY_CREATED_ON,
+        story.WINSTORY_SALES_LEAD,
+        story.WINSTORY_ECA_ENGG_LEAD,
+        story.WINSTORY_CUSTOMER_LIFECYCLE,
+        story.WINSTORY_REFERENCE_LANGUAGE_INCLUDED,
+        story.WINSTORY_PROPOSED_GOLIVE_DATE,
+        story.WINSTORY_CONSUMPTION_MILESTONE_USAGE_TARGET,
+        story.WINSTORY_REFERENCE_STATUS,
+        story.WINSTORY_CUSTOMER_CONTACT,
+        story.WINSTORY_REFERENCE_PLAN,
+        story.WINSTORY_REFERENCE_ASSET,
+        story.WINSTORY_NOTES,
         story.WINSTORY_ID];
 
 

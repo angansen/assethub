@@ -17,7 +17,7 @@ exports.getBannerLinks = () => {
     return new Promise((resolve, reject) => {
         const connection = getDb();
         try {
-            connection.query(`select * from ASSET_BANNER order by banner_id`, {}, {
+            connection.query(`select * from ASSET_BANNER  where BANNER_STATUS=1 order by banner_id`, {}, {
                 outFormat: oracledb.Object
             }).then(result => {
                 resolve(result);

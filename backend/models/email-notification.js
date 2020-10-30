@@ -59,13 +59,25 @@ exports.triggerEmailNotificationforSEAssistance = (request) => {
     <br/><br/>Your request will be processed as soon as possible and you will be contacted with next steps.
     <br/><br/>Please note: This is a system generated message. Please do not respond to this mail.`
     //console.log(body);
+
+    let headerdata = {
+        "mail_to": `veronica.t.taing@oracle.com,samdani.shaik@oracle.com,jack.kingsley@oracle.com,qualification-dispatch_in_grp@oracle.com,${request.WINSTORY_CREATED_BY},${request.email}`,
+        "mail_subj": `Request for SE Assistance on win ${request.winstory_name} with Win ID ${request.winstoryid}`
+    };
     return new Promise((resolve, reject) => {
-        axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', {
-            "from_email": request.email,
-            "to_email": `veronica.t.taing@oracle.com,samdani.shaik@oracle.com,jack.kingsley@oracle.com,qualification-dispatch_in_grp@oracle.com,${request.WINSTORY_CREATED_BY},${request.email}`,
-            "body1": body,
-            "body_html": body,
-            "subject": `Request for SE Assistance on win ${request.winstory_name} with Win ID ${request.winstoryid}`
+        // axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', {
+        //     "from_email": request.email,
+        //     "to_email": `veronica.t.taing@oracle.com,samdani.shaik@oracle.com,jack.kingsley@oracle.com,qualification-dispatch_in_grp@oracle.com,${request.WINSTORY_CREATED_BY},${request.email}`,
+        //     "body1": body,
+        //     "body_html": body,
+        //     "subject": `Request for SE Assistance on win ${request.winstory_name} with Win ID ${request.winstoryid}`
+        // }).then(res => {
+        //     console.log('Email Sent');
+        //     resolve('Email Sent')
+        // })
+
+        axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', body, {
+            headers: headerdata
         }).then(res => {
             console.log('Email Sent');
             resolve('Email Sent')
@@ -82,16 +94,26 @@ exports.triggerEmailNotificationforFeedback = (request) => {
     <br/>Feedback: ${request.comment}
     <br/><br/>Please note: This is a system generated message. Please do not respond to this mail.`
 
-    let reqbody={
+    let reqbody = {
         "from_email": request.commentBy,
         "to_email": request.asset_owner,
         "body1": body,
         "body_html": body,
         "subject": `Feedback on asset ${request.assetId} with asset ID ${request.assetId}`
     }
-    console.log(" RE BODY : -> "+JSON.stringify(reqbody));
+    let headerdata = {
+        "mail_to": request.asset_owner,
+        "mail_subj": `Feedback on asset ${request.assetId} with asset ID ${request.assetId}`
+    };
+    // console.log(" RE BODY : -> " + JSON.stringify(reqbody));
     return new Promise((resolve, reject) => {
-        axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', reqbody).then(res => {
+        // axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', reqbody).then(res => {
+        //     console.log('Feedback email Sent');
+        //     resolve('Feedback email Sent');
+        // })
+        axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', body, {
+            headers: headerdata
+        }).then(res => {
             console.log('Feedback email Sent');
             resolve('Feedback email Sent');
         })
@@ -117,10 +139,20 @@ exports.notificationForWinStoryComment = (request) => {
         "body_html": body,
         "subject": `Comment on win id ${request.winstoryId}`
     }
+    let headerdata = {
+        "mail_to": request.asset_owner,
+        "mail_subj": `Feedback on asset ${request.assetId} with asset ID ${request.assetId}`
+    };
     console.log(JSON.stringify(reqbody));
     return new Promise((resolve, reject) => {
-        axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', reqbody).then(res => {
-            console.log('Winstory comment email Sent ');
+        // axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', reqbody).then(res => {
+        //     console.log('Winstory comment email Sent ');
+        //     resolve('Winstory comment email Sent');
+        // })
+        axios.put('https://apex.oracle.com/pls/apex/ldap_info/get/send_email', body, {
+            headers: headerdata
+        }).then(res => {
+            console.log('Winstory comment email Sent');
             resolve('Winstory comment email Sent');
         })
     });

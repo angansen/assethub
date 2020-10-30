@@ -6,7 +6,7 @@ var router = express.Router();
 // GET
 router.get('/allwinstoryfilters', winstoryreaderController.getAllFilters);
 router.get('/getAllWinStoryByFilters', winstoryreaderController.getAllAssetsByFilters);
-// router.get('/getAllWinStoryByFilters2', winstoryreaderController.getAllAssetsByFilters);
+router.get('/getwindumpbyfilter', winstoryreaderController.getwindumpbyfilter);
 router.get('/getwinsdump', winstoryreaderController.downloadwins);
 router.get('/getassetsdump', winstoryreaderController.downloadassets);
 router.get('/mywinstory', winstoryreaderController.getUserWinstory);
@@ -18,7 +18,7 @@ router.get('/winfavourites', winstoryreaderController.getAllFavWins);
 router.get('/allPrefferedWins/:user_email', winstoryreaderController.getAllPreferredWins1);
 router.get('/filterWinsbylob', winstoryreaderController.getAllWinsByLob);
 router.get('/:winstoryId', winstoryreaderController.getWinStoryById);
-
+router.get('/getdumpbyid/:user_email/:winstoryId', winstoryreaderController.getwindumpbyid);
 // Delete
 router.delete('/deleteWinstorybyId/:winstoryId', winstorywriterController.deleteAllWinStoryContent);
 
