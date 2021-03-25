@@ -30,6 +30,7 @@
     "nodemon": "^1.18.10",
     "oracledb": "^3.1.2",
     "simple-oracledb": "^1.4.1",
+    "stopword": "^1.0.7",
     "string-similarity": "^3.0.0",
     "uniqid": "^5.0.3"
   }

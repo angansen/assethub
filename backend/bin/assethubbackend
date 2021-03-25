@@ -7,6 +7,16 @@
 var app = require('../app');
 var debug = require('debug')('assethubbackend:server');
 var http = require('http');
+const https = require('https');
+const fs = require('fs');
+
+/**
+ * SSL certificate options
+ */
+const options = {
+  key: fs.readFileSync('/u01/ahweb/backend/bin/key.pem'),
+  cert: fs.readFileSync('/u01/ahweb/backend/bin/cert.pem')
+};
 
 /**
  * Get port from environment and store in Express.
@@ -19,7 +29,13 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+let server = http.createServer(app);
+
+/**
+ * SSL enabled server
+ */
+// let server=https.createServer(options, app).listen(443);
+
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -63,6 +79,7 @@ function onError(error) {
     : 'Port ' + port;
 
   // handle specific listen errors with friendly messages
+  console.log(JSON.stringify(error));
   switch (error.code) {
     case 'EACCES':
       console.error(bind + ' requires elevated privileges');

@@ -3,24 +3,22 @@ var uniqid = require('uniqid');
 const usermodel = require('../models/user-model');
 const oracledb = require('oracledb');
 
-exports.fetchAssets = (user_email, host) => {
+exports.fetchAssets = (user_email, user_role, host) => {
+    console.log("Inside fetch asset");
     const connection = getDb();
-    let role;
+    let reports_emails='';
     return new Promise((resolve, reject) => {
-        let checkForReviewerSql = `select USER_ROLE from asset_user where USER_EMAIL=:USER_EMAIL`;
-        let checkForReviewerOptions = [user_email]
+        let checkForReviewerSql = `select user_email from ASSET_USER where user_manager_email=:USER_EMAIL`;
+        let checkForReviewerOptions = [user_email];
         connection.query(checkForReviewerSql, checkForReviewerOptions,
             {
                 outFormat: oracledb.OBJECT
             }).then(result => {
-                console.log(result)
-                if (result.length > 0) {
-                    role = result[0].USER_ROLE
-                }
-                else {
-                    resolve({ msg: "User does not exist" })
-                }
-
+                console.log(JSON.stringify(result));
+                result.forEach(element =>{
+                    reports_emails+=element.USER_EMAIL+'\',\'';
+                })
+                console.log('\''+reports_emails+'\'');
                 let fetchPendingReviewAssetsSql = `select 
                     ASSET_ID,
                     ASSET_TITLE,
@@ -43,7 +41,7 @@ exports.fetchAssets = (user_email, host) => {
                     ASSET_REVIEW_NOTE
                     from asset_details d,asset_user u where d.asset_status in ('Live','Pending Review','Reject','Pending Rectification')
                     and u.USER_EMAIL=:USER_EMAIL order by d.asset_modified_date desc`;
-                if (role == 'reviewer') {
+                if (user_role.includes('reviewer')) {
                     fetchPendingReviewAssetsSql += ` and d.asset_location = u.user_location`;
                 }
 
@@ -106,8 +104,26 @@ formatAssetByStatus = (result, host) => {
     return assetlist;
 }
 
+exports.captureGovernanceActivity = (review_note, activity_user, asset_status, asset_status_lvl, assetId) => {
+    const connection = getDb();
+    return new Promise((resolve, reject) => {
+        let createGovActivitySQL = `insert into ASSET_GOVERNANCE_ACTIVITY (ASSET_ID,ACTIVITY_REVIEW_NOTE,ACTIVITY_BY,ASSET_STATUS,ASSET_STATUS_LVL) values(:ASSET_ID,:ACTIVITY_REVIEW_NOTE,:ACTIVITY_BY,:ASSET_STATUS,:ASSET_STATUS_LVL)`
+        let sqlValues = [assetId, review_note, activity_user, asset_status, asset_status_lvl];
 
-exports.postAssetReviewNote = (review_note, asset_status, assetId, host) => {
+        connection.execute(createGovActivitySQL, sqlValues, {
+            outFormat: oracledb.OBJECT,
+            autoCommit: true
+        }).then(result => {
+
+            resolve("success")
+        }).catch(err => {
+            reject("failure: " + err);
+        })
+    })
+
+}
+
+exports.postAssetReviewNote = (review_note, asset_status_lvl, asset_status, assetId, host) => {
     const connection = getDb();
     review_note = JSON.stringify(review_note);
     if (asset_status == 'Live') {
@@ -115,8 +131,10 @@ exports.postAssetReviewNote = (review_note, asset_status, assetId, host) => {
     }
 
     let insertReviewNoteSql = `UPDATE ASSET_DETAILS SET ASSET_REVIEW_NOTE = :ASSET_REVIEW_NOTE,
-    ASSET_STATUS=:ASSET_STATUS where ASSET_ID=:ASSET_ID`;
-    let insertReviewNoteOptions = [review_note, asset_status, assetId]
+    ASSET_STATUS=:ASSET_STATUS,ASSET_APPROVAL_LVL=:ASSET_APPROVAL_LVL where ASSET_ID=:ASSET_ID`;
+    let insertReviewNoteOptions = [review_note, asset_status, asset_status_lvl, assetId]
+
+
     return new Promise((resolve, reject) => {
         connection.execute(insertReviewNoteSql, insertReviewNoteOptions,
             {
@@ -124,6 +142,7 @@ exports.postAssetReviewNote = (review_note, asset_status, assetId, host) => {
                 autoCommit: true
             })
             .then(result => {
+
                 console.log("posted and state: " + asset.ASSET_STATUS);
 
                 resolve(result)

@@ -1,13 +1,14 @@
 const Governance = require('../models/governance-model');
 const getDb = require('../database/db').getDb;
-const userController= require('../controllers/user-controller');
+const userController = require('../controllers/user-controller');
 const oracledb = require('oracledb');
 const axios = require('axios');
 
 
 exports.getAssets = (req, res) => {
     const user_email = req.params.user_email;
-    Governance.fetchAssets(user_email, req.headers.host)
+    const user_roles=req.params.user_roles.toLowerCase();
+    Governance.fetchAssets(user_email,user_roles, req.headers.host,)
         .then(result => {
             res.json(result)
         })
@@ -20,16 +21,26 @@ exports.getAssets = (req, res) => {
 exports.addAssetReviewNote = (req, res) => {
     const review_note = req.body.review_note;
     const asset_status = req.body.asset_status;
+    const asset_status_lvl = "2";//req.body.asset_status_lvl;
     const assetId = req.body.assetId;
-    const host=req.headers.host;
+    const host = req.headers.host;
+    const email = req.headers.user_email;
     console.log(req.body)
-    console.log("Host: "+host);
+    console.log("Host: " + host);
     if (!review_note || !asset_status) {
         res.json({ "status": "Enter a review note" })
     }
     else {
-        Governance.postAssetReviewNote(review_note, asset_status, assetId,host)
+        console.log("------------------------------------");
+        console.log("### Capturing activity for governance ###");
+        Governance.postAssetReviewNote(review_note,asset_status_lvl, asset_status, assetId, host)
             .then(result => {
+                Governance.captureGovernanceActivity(JSON.stringify(review_note), email, asset_status, asset_status_lvl, assetId)
+                    .then((status) => {
+                        console.log(status + ": Governance activity captured for " + assetId);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
                 console.log("Review submitted. . .");
                 if (asset_status === 'Live') {
                     console.log("generating notification. . .");

@@ -9,7 +9,8 @@ const emailnotification = require('./email-notification');
 let stringSimilarity = require('string-similarity');
 const fs = require('fs');
 const cluster = require('express-cluster');
-
+const governance = require('../models/governance-model');
+let sw = require('stopword');
 
 const generateFileName = (sampleFile, assetId, filesArray, imageDescription) => {
     let imgObject = {};
@@ -1342,6 +1343,10 @@ module.exports = class Asset {
 
     static filterAssetBySearchString(data, filterdata, searchString, filtersasset) {
         searchString = searchString.trim().toLowerCase();
+        const oldString = searchString.split(' ');
+        const newString = sw.removeStopwords(oldString)
+        searchString = newString.join(' ');
+        //searchString =sw.removeStopwords(searchString).trim().toLowerCase();
         console.log(JSON.stringify("Captured Words ==== > " + searchString));
         // console.log(JSON.stringify("Captured filters ==== > " + JSON.stringify(filterdata)));
 
@@ -1362,7 +1367,7 @@ module.exports = class Asset {
                         combineContentToMatch += filter.FILTER_ID + filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
 
-                let wordlist = searchString.split(/ |,/);
+                let wordlist = searchString.split(/ /);
                 // console.log("----- Asset  WORD SPLIT ------")
                 // console.log(JSON.stringify(wordlist));
 
@@ -1390,7 +1395,55 @@ module.exports = class Asset {
         })
     }
 
+    static filterAssetBySearchString_old(data, filterdata, searchString, filtersasset) {
+        searchString = searchString.trim().toLowerCase();
+        console.log(JSON.stringify("Captured Words ==== > " + searchString));
+        // console.log(JSON.stringify("Captured filters ==== > " + JSON.stringify(filterdata)));
 
+        let assetFilters = [];
+        return new Promise((resolve) => {
+            for (let i = 0; i < data.length; i++) {
+
+                let combineContentToMatch = data[i].ASSET_ID +
+                    data[i].ASSET_TITLE +
+                    data[i].ASSET_DESCRIPTION +
+                    data[i].ASSET_USERCASE +
+                    data[i].ASSET_CUSTOMER +
+                    data[i].ASSET_ARCHITECTURE_DESCRIPTION
+
+                assetFilters = filterdata
+                    .filter(filter => data[i].ASSET_ID === filter.ASSET_ID)
+                    .map((filter) => {
+                        combineContentToMatch += filter.FILTER_ID + filter.FILTER_NAME + filter.FILTER_TYPE;
+                    });
+
+                let wordlist = searchString.split(/ /);
+                // console.log("----- Asset  WORD SPLIT ------")
+                // console.log(JSON.stringify(wordlist));
+
+                combineContentToMatch = combineContentToMatch.toLowerCase();
+                wordlist.forEach(word => {
+                    if (word.includes("+")) {
+                        let isMatch = true;
+                        let wordfrag = word.split("+");
+                        for (let i = 0; i < wordfrag.length; i++) {
+                            if (combineContentToMatch.indexOf(wordfrag[i].toLowerCase()) == -1) {
+                                isMatch = false;
+                                break;
+                            }
+                            if (isMatch) {
+                                filtersasset.push(data[i]);
+                            }
+                        }
+                    } else if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
+                        filtersasset.push(data[i]);
+                    }
+                })
+            }
+            console.log(data.length + " > Filtered By Search : " + filtersasset.length);
+            resolve(true);
+        })
+    }
 
     static fetchAssets(host, offset, limit, filters, searchString, sortBy, order, action, email) {
 
