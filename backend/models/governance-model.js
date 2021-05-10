@@ -6,8 +6,11 @@ const oracledb = require('oracledb');
 exports.fetchAssets = (user_email, user_role, host) => {
     console.log("Inside fetch asset");
     const connection = getDb();
-    let reports_emails='';
+    let filteredAssets = [];
+    let reports_emails = '';
     return new Promise((resolve, reject) => {
+
+        // Get the list of reporting user and then matching with the asset' owner
         let checkForReviewerSql = `select user_email from ASSET_USER where user_manager_email=:USER_EMAIL`;
         let checkForReviewerOptions = [user_email];
         connection.query(checkForReviewerSql, checkForReviewerOptions,
@@ -15,44 +18,46 @@ exports.fetchAssets = (user_email, user_role, host) => {
                 outFormat: oracledb.OBJECT
             }).then(result => {
                 console.log(JSON.stringify(result));
-                result.forEach(element =>{
-                    reports_emails+=element.USER_EMAIL+'\',\'';
+                result.forEach(element => {
+                    reports_emails += element.USER_EMAIL + '\',\'';
                 })
-                console.log('\''+reports_emails+'\'');
-                let fetchPendingReviewAssetsSql = `select 
-                    ASSET_ID,
-                    ASSET_TITLE,
-                    ASSET_DESCRIPTION,
-                    ASSET_USERCASE,
-                    ASSET_CUSTOMER,
-                    ASSET_CREATEDBY,
-                    ASSET_CREATED_DATE,
-                    ASSET_SCRM_ID,
-                    ASSET_OPP_ID,
-                    ASSET_THUMBNAIL,
-                    ASSET_MODIFIED_DATE,
-                    ASSET_MODIFIED_BY,
-                    ASSET_VIDEO_URL,
-                    ASSET_EXPIRY_DATE,
-                    ASSET_VIDEO_LINK,
-                    ASSET_LOCATION,
-                    ASSET_OWNER,
-                    ASSET_STATUS,
-                    ASSET_REVIEW_NOTE
-                    from asset_details d,asset_user u where d.asset_status in ('Live','Pending Review','Reject','Pending Rectification')
-                    and u.USER_EMAIL=:USER_EMAIL order by d.asset_modified_date desc`;
+                reports_emails = '\'' + reports_emails + '\'';
+                console.log(user_role + ' - ' + reports_emails);
+                let fetchPendingReviewAssetsSql = `select a.ASSET_ID,a.ASSET_TITLE,a.ASSET_DESCRIPTION,a.ASSET_CUSTOMER,a.ASSET_CREATEDBY,
+                a.ASSET_CREATED_DATE,a.ASSET_SERVICE_ID,a.ASSET_THUMBNAIL,a.ASSET_MODIFIED_DATE,a.ASSET_MODIFIED_BY,
+                a.ASSET_EXPIRY_DATE,a.ASSET_VIDEO_LINK,a.ASSET_OWNER,a.ASSET_STATUS,
+                a.ASSET_REVIEW_NOTE,a.ASSET_APPROVAL_LVL,c.checklist_items from asset_details a, asset_filter_asset_map b,asset_governance_checkpoint_by_type c
+                where asset_status in ('Live','Pending Review','Reject','Pending Rectification')
+                and a.asset_id=b.asset_id and b.filter_id=c.asset_type_id`;
+
                 if (user_role.includes('reviewer')) {
-                    fetchPendingReviewAssetsSql += ` and d.asset_location = u.user_location`;
+                    fetchPendingReviewAssetsSql += ` and asset_approval_lvl=2`;
+                } else {
+                    fetchPendingReviewAssetsSql += ` and asset_owner in (` + reports_emails + `) and asset_approval_lvl=1`;
                 }
 
-                let fetchPendingReviewAssetsOptions = [user_email];
-                connection.query(fetchPendingReviewAssetsSql, fetchPendingReviewAssetsOptions,
+                fetchPendingReviewAssetsSql += ` order by asset_modified_date desc`;
+
+                console.log(fetchPendingReviewAssetsSql);
+
+                connection.query(fetchPendingReviewAssetsSql, {},
                     {
                         outFormat: oracledb.OBJECT
                     }).then(result => {
                         result.forEach(element => {
-                            element.ASSET_REVIEW_NOTE = JSON.parse(element.ASSET_REVIEW_NOTE)
+                            // element.checklist_items=JSON.parse(element.checklist_items);
+                            if (element.ASSET_REVIEW_NOTE == null) {
+                                console.log("Its null so going in. . .");
+                                element.ASSET_APPROVAL_LVL = 1;
+                                element.ASSET_REVIEW_NOTE = JSON.stringify({
+                                    note: "",
+                                    questions: []
+                                })
+
+                                // element.ASSET_REVIEW_NOTE=JSON.stringify(element.ASSET_REVIEW_NOTE);
+                            }
                         });
+                        console.log(result.length);
                         resolve(formatAssetByStatus(result, host));
                     })
 
