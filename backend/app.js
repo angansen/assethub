@@ -1,5 +1,4 @@
 var express = require('express');
-// var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const Dbconnect = require('./database/db');
@@ -11,7 +10,6 @@ const fileUpload = require('express-fileupload');
 
 var log4js = require('log4js');
 
-// var uniqid = require('uniqid');
 var SimpleOracleDB = require('simple-oracledb');
 const bodyParser = require('body-parser');
 SimpleOracleDB.extend(oracledb);
@@ -21,11 +19,10 @@ var winstoryrouter = require('./routes/winstoryRoute');
 var userrouter = require('./routes/userRoute');
 var governancerouter = require('./routes/governanceRoute');
 var adminrouter = require('./routes/adminRoute');
+var tagrouter = require('./routes/tagsRoute');
 let port=8001;
 
 var app = express();
-// // view engine setup
-// app.use(bodyParser.json());
 app.use(bodyParser.json({ limit: '100mb', extended: true }))
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }))
 app.use(cors());
@@ -34,13 +31,13 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-// app.use(express.static(__dirname + '/public'));
 app.use(express.static('/mnt/ahfs'));
 app.use('/asset', assetrouter);
 app.use('/winstory', winstoryrouter);
 app.use('/user', userrouter);
 app.use('/governance', governancerouter);
 app.use('/admin', adminrouter);
+app.use('/tags', tagrouter);
 
 app.use(log4js.connectLogger(log4js.getLogger("http"), { level: 'debug' }));
 

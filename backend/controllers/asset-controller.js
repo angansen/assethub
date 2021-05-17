@@ -75,7 +75,7 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
                         axios.post('https://apex.oracle.com/pls/apex/ldap_info/asset/sendemailonassetcreation/sendemail', {
                             asset_reviewer_name: asset_reviewer_name,
                             asset_reviewer_email: asset_reviewer_email,
-                            asset_name: asset_details[0].ASSET_TITLE,
+                            asset_name: asset_details[0].ASSET_ID,
                             asset_description: asset_details[0].ASSET_DESCRIPTION,
                             asset_owner: asset_owners_name,
                             status: status
@@ -109,26 +109,44 @@ exports.postAsset = (req, res) => {
 
     const assetId = null;
     // console.log(req.body);
-    const title = req.body.title;
+    // const title = req.body.title;
     // console.log(title);
     const description = req.body.description;
     // console.log(description);
-    const userCase = req.body.userCase;
+    // const userCase = req.body.userCase;
     const customer = req.body.customer;
     const createdBy = req.body.createdBy;
     const createdDate = new Date();
-    const scrmId = req.body.scrmId;
-    const oppId = req.body.oppId;
+    const serviceid = req.body.serviceid;
+    // const oppId = req.body.oppId;
     const thumbnail = req.body.thumbnail;
     const modifiedDate = new Date();
     const modifiedBy = null;
     const video_link = req.body.video_link;
     const owner = req.body.owner.replace(/ /g, '');
-    const location = req.body.location;
+    // const location = req.body.location;
     let filters = req.body.filters;
     const expiryDate = req.body.expiryDate;
-    const asset_architecture_description = req.body.asset_architecture_description
-    let assetCreatedEmailSql = `select  user_email,user_name,asset_title,ASSET_DESCRIPTION from asset_user ,asset_details where user_role='reviewer' and asset_id=:0  and user_location in(
+    // const asset_architecture_description = req.body.asset_architecture_description
+
+    const windata = {};
+    windata.WIN_ECA = req.body.WIN_ECA != undefined ? req.body.WIN_ECA : "";
+    windata.WIN_REGID = req.body.WIN_REGID != undefined ? req.body.WIN_REGID : "";
+    windata.WIN_FISCAL_YR = req.body.WIN_FISCAL_YR != undefined ? req.body.WIN_FISCAL_YR : "";
+    windata.WIN_MEMBERS = req.body.WIN_MEMBERS != undefined ? req.body.WIN_MEMBERS : "";
+    windata.WIN_SOLUTION_SOLD = req.body.WIN_SOLUTION_SOLD != undefined ? req.body.WIN_SOLUTION_SOLD : "";
+    windata.WIN_COSUMING_DATE = req.body.WIN_COSUMING_DATE != undefined ? req.body.WIN_COSUMING_DATE : "";
+    windata.WIN_GOLIVE_ON = req.body.WIN_GOLIVE_ON != undefined ? req.body.WIN_GOLIVE_ON : "";
+    windata.WIN_DEAL_CYCLE = req.body.WIN_DEAL_CYCLE != undefined ? req.body.WIN_DEAL_CYCLE : "";
+    windata.WIN_RENEWAL = req.body.WIN_RENEWAL != undefined ? req.body.WIN_RENEWAL : "";
+    windata.WIN_CUSTOMER_PERSONA = req.body.WIN_CUSTOMER_PERSONA != undefined ? req.body.WIN_CUSTOMER_PERSONA : "";
+    windata.WIN_REF_LANG_INCL_IN_CONTRACT = req.body.WIN_REF_LANG_INCL_IN_CONTRACT != undefined ? req.body.WIN_REF_LANG_INCL_IN_CONTRACT : "";
+    windata.WIN_BUSINESS_IMPACT = req.body.WIN_BUSINESS_IMPACT != undefined ? req.body.WIN_BUSINESS_IMPACT : "";
+    windata.WIN_SALES_PROCESS_TEAMS = req.body.WIN_SALES_PROCESS_TEAMS != undefined ? req.body.WIN_SALES_PROCESS_TEAMS : "";
+    windata.WIN_LESSONS_LEARNED = req.body.WIN_LESSONS_LEARNED != undefined ? req.body.WIN_LESSONS_LEARNED : "";
+    windata.WIN_CUSTOMER_BUSINESS_CHALLANGES = req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES != undefined ? req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES : "";
+
+    let assetCreatedEmailSql = `select  user_email,user_name,ASSET_DESCRIPTION from asset_user ,asset_details where user_role='reviewer' and asset_id=:0  and user_location in(
         select user_location from asset_user where user_email in 
         (  select regexp_substr(asset_owner,'[^,]+', 1, level) from (select asset_owner from asset_details where asset_id=:0)
         connect by regexp_substr(asset_owner, '[^,]+', 1, level) is not null) and user_location is not null) `;
@@ -148,10 +166,10 @@ exports.postAsset = (req, res) => {
     }
     const links = req.body.links;
 
-    var asset = new Asset(assetId, title, description, userCase, customer,
-        createdBy, createdDate, scrmId,
-        oppId, thumbnail, modifiedDate,
-        modifiedBy, filters, links, expiryDate, video_link, location, owner, asset_architecture_description);
+    var asset = new Asset(assetId, description, customer,
+        createdBy, createdDate, serviceid,
+        thumbnail, modifiedDate,
+        modifiedBy, filters, links, expiryDate, video_link, owner, windata);
 
     asset.save(type).then(result => {
         let creationResult = result
@@ -173,26 +191,26 @@ exports.postAssetTest = (req, res) => {
     const assetId = null;
     console.log(req.body);
 
-    const title = req.body.title
-    console.log(title);
+    // const title = req.body.title
+    // console.log(title);
     const description = req.body.description;
     console.log(description);
 
-    const userCase = req.body.userCase;
+    // const userCase = req.body.userCase;
     const customer = req.body.customer;
     const createdBy = req.body.createdBy;
     const createdDate = new Date();
-    const scrmId = req.body.scrmId;
-    const oppId = req.body.oppId;
+    const serviceid = req.body.serviceid;
+    // const oppId = req.body.oppId;
     const thumbnail = req.body.thumbnail;
     const modifiedDate = new Date();
     const modifiedBy = null;
     const video_link = req.body.video_link;
     const owner = req.body.owner;
-    const location = req.body.location;
+    // const location = req.body.location;
     let filters = req.body.filters;
     const expiryDate = req.body.expiryDate;
-    const asset_architecture_description = req.body.asset_architecture_description
+    // const asset_architecture_description = req.body.asset_architecture_description
     console.log(filters)
 
     if (!req.body.links) {
@@ -207,11 +225,10 @@ exports.postAssetTest = (req, res) => {
     }
     const links = req.body.links;
 
-    var asset = new Asset(assetId, title, description, userCase, customer,
-        createdBy, createdDate, scrmId,
-        oppId, thumbnail, modifiedDate,
-        modifiedBy, filters, links, expiryDate, video_link, location, owner, asset_architecture_description);
-
+    var asset = new Asset(assetId, description, customer,
+        createdBy, createdDate, serviceid,
+        thumbnail, modifiedDate,
+        modifiedBy, filters, links, expiryDate, video_link, owner);
     asset.saveTest().then(result => {
         res.json(result);
     }).catch(err => {
@@ -223,7 +240,7 @@ exports.postAssetTest = (req, res) => {
 
 
 exports.postEditAsset = (req, res) => {
-    let assetCreatedEmailSql = `select  user_email,user_name,asset_title,ASSET_DESCRIPTION from asset_user ,asset_details where user_role='reviewer' and asset_id=:0  and user_location in(
+    let assetCreatedEmailSql = `select  user_email,user_name,ASSET_DESCRIPTION from asset_user ,asset_details where user_role='reviewer' and asset_id=:0  and user_location in(
         select user_location from asset_user where user_email in 
         (  select regexp_substr(asset_owner,'[^,]+', 1, level) from (select asset_owner from asset_details where asset_id=:0)
         connect by regexp_substr(asset_owner, '[^,]+', 1, level) is not null) and user_location is not null) `;
@@ -238,28 +255,40 @@ exports.postEditAsset = (req, res) => {
     } else {
         type = 'Saved';
     }
-    console.log("STATE ASSET :::: " + type);
+    console.log(req.body.owner + "Owner -- STATE ASSET :::: " + type);
     const assetId = req.body.assetId;
-    const title = req.body.title
-    // console.log(title);
+ 
     const description = req.body.description;
-    // console.log(description);
-    const userCase = req.body.userCase;
     const customer = req.body.customer;
     const createdBy = req.body.createdBy;
     const createdDate = req.body.createdDate;
-    const scrmId = req.body.scrmId;
-    const oppId = req.body.oppId;
+    const serviceid = req.body.serviceid;
     const thumbnail = req.body.thumbnail;
     const modifiedDate = new Date();
     const modifiedBy = req.body.modifiedBy;
     let filters = req.body.filters;
     const expiryDate = req.body.expiryDate;
     const video_link = req.body.video_link;
-    const location = req.body.location;
     const owner = req.body.owner.replace(/ /g, '');
-    const asset_architecture_description = req.body.asset_architecture_description
-    // console.log(filters)
+    let windata = {};
+    windata.WIN_ECA = req.body.WIN_ECA != undefined ? req.body.WIN_ECA : "";
+    windata.WIN_REGID = req.body.WIN_REGID != undefined ? req.body.WIN_REGID : "";
+    windata.WIN_FISCAL_YR = req.body.WIN_FISCAL_YR != undefined ? req.body.WIN_FISCAL_YR : "";
+    windata.WIN_MEMBERS = req.body.WIN_MEMBERS != undefined ? req.body.WIN_MEMBERS : "";
+    windata.WIN_SOLUTION_SOLD = req.body.WIN_SOLUTION_SOLD != undefined ? req.body.WIN_SOLUTION_SOLD : "";
+    windata.WIN_COSUMING_DATE = req.body.WIN_COSUMING_DATE != undefined ? req.body.WIN_COSUMING_DATE : "";
+    windata.WIN_GOLIVE_ON = req.body.WIN_GOLIVE_ON != undefined ? req.body.WIN_GOLIVE_ON : "";
+    windata.WIN_DEAL_CYCLE = req.body.WIN_DEAL_CYCLE != undefined ? req.body.WIN_DEAL_CYCLE : "";
+    windata.WIN_RENEWAL = req.body.WIN_RENEWAL != undefined ? req.body.WIN_RENEWAL : "";
+    windata.WIN_CUSTOMER_PERSONA = req.body.WIN_CUSTOMER_PERSONA != undefined ? req.body.WIN_CUSTOMER_PERSONA : "";
+    windata.WIN_REF_LANG_INCL_IN_CONTRACT = req.body.WIN_REF_LANG_INCL_IN_CONTRACT != undefined ? req.body.WIN_REF_LANG_INCL_IN_CONTRACT : "";
+    windata.WIN_BUSINESS_IMPACT = req.body.WIN_BUSINESS_IMPACT != undefined ? req.body.WIN_BUSINESS_IMPACT : "";
+    windata.WIN_SALES_PROCESS_TEAMS = req.body.WIN_SALES_PROCESS_TEAMS != undefined ? req.body.WIN_SALES_PROCESS_TEAMS : "";
+    windata.WIN_LESSONS_LEARNED = req.body.WIN_LESSONS_LEARNED != undefined ? req.body.WIN_LESSONS_LEARNED : "";
+    windata.WIN_CUSTOMER_BUSINESS_CHALLANGES = req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES != undefined ? req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES : "";
+
+
+
     if (!req.body.links) {
         req.body.links = null;
     }
@@ -271,10 +300,9 @@ exports.postEditAsset = (req, res) => {
         })
     }
     const links = req.body.links;
-    var asset = new Asset(assetId, title, description, userCase, customer,
-        createdBy, createdDate, scrmId,
-        oppId, thumbnail, modifiedDate,
-        modifiedBy, filters, links, expiryDate, video_link, location, owner, asset_architecture_description);
+    var asset = new Asset(assetId, description, customer,
+        createdBy, createdDate, serviceid, thumbnail, modifiedDate,
+        modifiedBy, filters, links, expiryDate, video_link, owner, windata);
     asset.save(type).then(result => {
         let updationResult = result
         res.json(updationResult);
@@ -294,25 +322,25 @@ exports.postEditAsset = (req, res) => {
 
 exports.postEditAssetTest = (req, res) => {
     const assetId = req.body.assetId;
-    const title = req.body.title
-    console.log(title);
+    // const title = req.body.title
+    // console.log(title);
     const description = req.body.description;
     console.log(description);
-    const userCase = req.body.userCase;
+    // const userCase = req.body.userCase;
     const customer = req.body.customer;
     const createdBy = req.body.createdBy;
     const createdDate = req.body.createdDate;
-    const scrmId = req.body.scrmId;
-    const oppId = req.body.oppId;
+    const serviceid = req.body.serviceid;
+    // const oppId = req.body.oppId;
     const thumbnail = req.body.thumbnail;
     const modifiedDate = new Date();
     const modifiedBy = req.body.modifiedBy;
     let filters = req.body.filters;
     const expiryDate = req.body.expiryDate;
     const video_link = req.body.video_link;
-    const location = req.body.location;
+    // const location = req.body.location;
     const owner = req.body.owner;
-    const asset_architecture_description = req.body.asset_architecture_description
+    // const asset_architecture_description = req.body.asset_architecture_description
     console.log(filters)
     if (!req.body.links) {
         req.body.links = null;
@@ -325,10 +353,9 @@ exports.postEditAssetTest = (req, res) => {
         })
     }
     const links = req.body.links;
-    var asset = new Asset(assetId, title, description, userCase, customer,
-        createdBy, createdDate, scrmId,
-        oppId, thumbnail, modifiedDate,
-        modifiedBy, filters, links, expiryDate, video_link, location, owner, asset_architecture_description);
+    var asset = new Asset(assetId, description, customer,
+        createdBy, createdDate, serviceid, thumbnail, modifiedDate,
+        modifiedBy, filters, links, expiryDate, video_link, owner);
     asset.saveTest().then(result => {
         res.json(result);
     }).catch(err => {
@@ -516,9 +543,9 @@ exports.uploadBanner = (req, res) => {
     console.log("In uploading banner funtion . . .");
     banner.uploadBannerDoc(req).then(result => {
         res.send(result);
-    }).catch(result=>{
+    }).catch(result => {
         console.log(JSON.stringify(result));
-        res.status(500).json({msg:"Error while uploading banner Image # No filed found"});
+        res.status(500).json({ msg: "Error while uploading banner Image # No filed found" });
     })
 
 }
@@ -597,60 +624,7 @@ exports.getAllAssetsByFilters = (req, res) => {
 
 }
 
-// exports.getAllAssetsByFilters = (req, res) => {
 
-//     // var obj = {};
-//     // obj.filters = [];
-//     let offset = req.header('offset');
-//     let limit = req.header('limit');
-//     let filters = req.header('filters');
-//     let searchString = req.header('searchString')
-//     let order = req.header('order');
-//     let sortBy = req.header('sortBy');
-//     let email = req.header('user_email');
-
-//     let activity = {
-//         filters: filters,
-//         email: email,
-//         searchtext: searchString
-//     }
-
-//     console.log("============= Asset Controller Activity ==============")
-//     // console.log(JSON.stringify(activity));
-//     // console.log("================== Activity ==========================")
-
-//     try {
-//         worker.captureSearch(activity);
-//     } catch (err) {
-//         console.log("search activity log error");
-//     }
-
-//     console.log("Host:- " + req.headers.host);
-
-//     searchString = searchString == undefined ? "" : searchString;
-//     filters = filters == undefined ? [] : filters;
-
-//     let host = req.headers.host;
-//     if (limit === '-1') {
-//         const connection = getDb();
-//         connection.execute(`SELECT count(*) total from ASSET_DETAILS where asset_status='Live'`, {},
-//             {
-//                 outFormat: oracledb.OBJECT
-//             },
-//         ).then(result => {
-//             limit = result.rows[0].TOTAL;
-//             Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order, email).then(result => {
-//                 res.json(result);
-//             })
-//         })
-
-//     }
-//     else {
-//         Asset.fetchAssets3(host, offset, limit, filters, searchString, sortBy, order, email).then(result => {
-//             res.json(result);
-//         })
-//     }
-// }
 exports.getAllPreferredAssets = (req, res) => {
     const user_email = req.params.user_email;
     let order = req.header('order');
@@ -661,54 +635,7 @@ exports.getAllPreferredAssets = (req, res) => {
         })
 }
 
-// exports.getAllPreferredAssets = (req, res) => {
-//     const offset = 0
-//     let limit;
-//     let filters = []
-//     let userPreferencesArr = []
-//     let searchString;
-//     let order;
-//     let sortBy;
-//     const user_email = req.params.user_email;
-//     let action = 'preferenceApi'
-//     console.log(user_email)
 
-//     const connection = getDb();
-//     connection.execute(`Select ASSET_FILTER_ID from ASSET_PREFERENCES where USER_EMAIL=:USER_EMAIL`, [user_email],
-//         {
-//             outFormat: oracledb.OBJECT
-//         },
-//     )
-//         .then(result => {
-//             console.log("ROWS:", result.rows)
-//             if (result.rows.length === 0) {
-//                 res.json({ "ASSETS": [] })
-//             }
-//             else {
-
-//                 result.rows.forEach(a => {
-
-//                     let preferenceId = Object.values(a)
-//                     userPreferencesArr.push(preferenceId[0]);
-//                 })
-//                 filters.push(userPreferencesArr.join(','))
-//                 console.log("userPreferencesArr", filters)
-
-//                 connection.execute(`SELECT count(*) total from ASSET_DETAILS`, {},
-//                     {
-//                         outFormat: oracledb.OBJECT
-//                     },
-//                 ).then(result => {
-//                     limit = result.rows[0].TOTAL;
-//                     console.log("new Limit" + limit)
-//                     Asset.fetchAssets(req.headers.host, offset, limit, filters, searchString, sortBy, order, action).then(result => {
-//                         res.json(result);
-//                     })
-//                 })
-//             }
-//         })
-
-// }
 
 exports.getAssetById = (req, res) => {
     const user_email = req.header("user_email")
@@ -771,8 +698,8 @@ exports.deleteDocsByIds = (req, res) => {
 }
 exports.getBannerDetails = (req, res) => {
     Asset.getBannerCounts().then(bannerCounts => {
-        banner.getBannerLinks().then(data=>{
-            bannerCounts.bannerlinks=data;
+        banner.getBannerLinks().then(data => {
+            bannerCounts.bannerlinks = data;
             res.send(bannerCounts);
         })
         // res.json(result);

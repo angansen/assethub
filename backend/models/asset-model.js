@@ -9,7 +9,8 @@ const emailnotification = require('./email-notification');
 let stringSimilarity = require('string-similarity');
 const fs = require('fs');
 const cluster = require('express-cluster');
-
+const governance = require('../models/governance-model');
+let sw = require('stopword');
 
 const generateFileName = (sampleFile, assetId, filesArray, imageDescription) => {
     let imgObject = {};
@@ -21,7 +22,7 @@ const generateFileName = (sampleFile, assetId, filesArray, imageDescription) => 
     const uploadPath = path.join('/', 'mnt/ahfs/assets', assetId, finalFname);
     var content = 'assets/' + assetId + '/' + `${finalFname}`;
 
-    //var content=`http://localhost:3002/${finalFname}`
+    //var content=`https://localhost:3002/${finalFname}`
     imgObject.IMAGE_ID = uniqueId;
     imgObject.ASSET_ID = assetId;
     imgObject.IMAGE_NAME = finalFname;
@@ -166,7 +167,7 @@ const getCommentsById = (assetId, host) => {
     else :0||USER_PROFILE_IMAGE
     end  USER_PROFILE_IMAGE
     from asset_comments c  full outer join asset_user u on (c.commentby=u.user_email)where ASSET_ID=:1`,
-        ["http://" + host + "/", assetId],
+        ["https://" + host + "/", assetId],
         {
             outFormat: oracledb.OBJECT
         })
@@ -184,7 +185,7 @@ const getSharecountByAssetId = (assetId) => {
 
 const getAssetFilterMapByIdandType = (assetId) => {
     const connection = getDb();
-    return connection.query(`select m.filter_id,filter_type,f.filter_name from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where  ASSET_ID=:ASSET_ID`, [assetId],
+    return connection.query(`select m.filter_id,filter_parent_id,f.filter_name from asset_filter_asset_map m join asset_tags f on (m.filter_id=f.filter_id) where  ASSET_ID=:ASSET_ID`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })
@@ -256,18 +257,16 @@ const getLikesByAssetIdAndUserId = (assetId, userId) => {
 }
 
 module.exports = class Asset {
-    constructor(assetId, title, description, usercase, customer, createdBy,
-        createdDate, scrmId, oppId,
-        thumbnail, modifiedDate, modifiedBy, filters, links, expiryDate, video_link, location, owner, asset_architecture_description, assetType) {
+    constructor(assetId, description, customer, createdBy,
+        createdDate, serviceid,
+        thumbnail, modifiedDate, modifiedBy, filters, links, expiryDate, video_link, owner, windata) {
+
         this.assetId = assetId;
-        this.title = title;
         this.description = description;
-        this.usercase = usercase;
         this.customer = customer;
         this.createdBy = createdBy.toLowerCase();
         this.createdDate = createdDate;
-        this.scrmId = scrmId;
-        this.oppId = oppId;
+        this.serviceid = serviceid;
         this.thumbnail = thumbnail;
         this.modifiedDate = modifiedDate;
         this.modifiedBy = modifiedBy;
@@ -275,17 +274,15 @@ module.exports = class Asset {
         this.filters = filters;
         this.expiryDate = expiryDate;
         this.video_link = video_link;
-        this.location = location;
         this.owner = owner.toLowerCase();
-        this.asset_architecture_description = asset_architecture_description;
-        this.asset_type = assetType
+        this.windata = windata;
+
     }
 
 
     save(type) {
 
         let assetState = type;
-
         return new Promise((resolve, reject) => {
             var assetid = this.assetId;
             var self = this;
@@ -293,7 +290,7 @@ module.exports = class Asset {
             let filterObj = {};
             let filterArr = [];
             console.log("------------------ SAVEING ASSET -----------------");
-            // console.log(JSON.stringify(self));
+            console.log(assetState + "  TYPE  " + JSON.stringify(self));
 
             if (this.assetId) {
 
@@ -333,29 +330,53 @@ module.exports = class Asset {
                 // console.log("Option SQL : " + JSON.stringify(self));
                 connection.transaction([
                     function firstAction() {
-                        return connection.update(`UPDATE ASSET_DETAILS set 
-            ASSET_TITLE=:ASSET_TITLE,
+                        return connection.execute(`UPDATE ASSET_DETAILS set 
             ASSET_DESCRIPTION=:ASSET_DESCRIPTION,
-            ASSET_USERCASE=:ASSET_USERCASE,
             ASSET_CUSTOMER=:ASSET_CUSTOMER,
             ASSET_CREATEDBY=:ASSET_CREATEDBY,
-            ASSET_SCRM_ID=:ASSET_SCRM_ID,
-            ASSET_OPP_ID=:ASSET_OPP_ID,
+            ASSET_SERVICE_ID=:ASSET_SERVICE_ID,
             ASSET_MODIFIED_DATE=:ASSET_MODIFIED_DATE,
             ASSET_MODIFIED_BY=:ASSET_MODIFIED_BY,
             ASSET_EXPIRY_DATE=:ASSET_EXPIRY_DATE,
-	    ASSET_VIDEO_LINK=:ASSET_VIDEO_LINK,
-        ASSET_LOCATION=:ASSET_LOCATION,
-        ASSET_OWNER=:ASSET_OWNER,
-        ASSET_STATUS=:ASSET_STATUS,
-        ASSET_ARCHITECTURE_DESCRIPTION=:ASSET_ARCHITECTURE_DESCRIPTION,
-        ASSET_TYPE=:ASSET_TYPE WHERE ASSET_ID=:ASSET_ID`,
-                            [self.title, self.description, self.usercase, self.customer, self.createdBy.toLowerCase(),
-                            self.scrmId, self.oppId, new Date(), self.modifiedBy, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), assetState, self.asset_architecture_description, self.asset_type, self.assetId],
+            ASSET_VIDEO_LINK=:ASSET_VIDEO_LINK,
+            ASSET_OWNER=:ASSET_OWNER,
+            ASSET_STATUS=:ASSET_STATUS,
+            WIN_ECA=:WIN_ECA,
+            WIN_REGID=:WIN_REGID,
+            WIN_FISCAL_YR=:WIN_FISCAL_YR,
+            WIN_MEMBERS=:WIN_MEMBERS,
+            WIN_SOLUTION_SOLD=:WIN_SOLUTION_SOLD,
+            WIN_COSUMING_DATE=:WIN_COSUMING_DATE,
+            WIN_GOLIVE_ON=:WIN_GOLIVE_ON,
+            WIN_DEAL_CYCLE=:WIN_DEAL_CYCLE,
+            WIN_RENEWAL=:WIN_RENEWAL,
+            WIN_CUSTOMER_PERSONA=:WIN_CUSTOMER_PERSONA,
+            WIN_REF_LANG_INCL_IN_CONTRACT=:WIN_REF_LANG_INCL_IN_CONTRACT,
+            WIN_BUSINESS_IMPACT=:WIN_BUSINESS_IMPACT,
+            WIN_SALES_PROCESS_TEAMS=:WIN_SALES_PROCESS_TEAMS,
+            WIN_LESSONS_LEARNED=:WIN_LESSONS_LEARNED,
+            WIN_CUSTOMER_BUSINESS_CHALLANGES=:WIN_CUSTOMER_BUSINESS_CHALLANGES WHERE ASSET_ID=:ASSET_ID`,
+                            [ self.description, self.customer, self.createdBy.toLowerCase(),
+                            self.serviceid, new Date(), self.modifiedBy, self.expiryDate, self.video_link, self.owner.toLowerCase(), assetState,
+                            self.windata.WIN_ECA,
+                            self.windata.WIN_REGID,
+                            self.windata.WIN_FISCAL_YR,
+                            self.windata.WIN_MEMBERS,
+                            self.windata.WIN_SOLUTION_SOLD,
+                            self.windata.WIN_COSUMING_DATE,
+                            self.windata.WIN_GOLIVE_ON,
+                            self.windata.WIN_DEAL_CYCLE,
+                            self.windata.WIN_RENEWAL,
+                            self.windata.WIN_CUSTOMER_PERSONA,
+                            self.windata.WIN_REF_LANG_INCL_IN_CONTRACT,
+                            self.windata.WIN_BUSINESS_IMPACT,
+                            self.windata.WIN_SALES_PROCESS_TEAMS,
+                            self.windata.WIN_LESSONS_LEARNED,
+                            self.windata.WIN_CUSTOMER_BUSINESS_CHALLANGES,self.assetId],
                             {
                                 outFormat: oracledb.Object
                             }).then(res => {
-                                console.log('1st update done(Asset details updated)')
+                                console.log(self.assetId+' 1st update done(Asset details updated --> '+JSON.stringify(res))
                             })
                     }, function secondAction() {
                         if (oj.length >= 0) {
@@ -371,7 +392,7 @@ module.exports = class Asset {
                                     oj, {
                                     autoCommit: true
                                 }).then(linkres => {
-                                    console.log("2nd update Links batch succesfully executed : " + JSON.stringify(linkres));
+                                    console.log("2nd update Links batch succesfully executed --> "+JSON.stringify(res));
                                 }).catch(err => {
                                     console.log("Links batch insert failed");
                                 })
@@ -404,8 +425,8 @@ module.exports = class Asset {
                     }], {
                     sequence: true
                 })
-                    .then(function onTransactionResults(output) {
-                        //console.log('Update transaction successful');
+                    .then((output) => {
+                        console.log('Update transaction executed!');
                         resolve("updated")
                     })
                     .catch(err => {
@@ -439,6 +460,7 @@ module.exports = class Asset {
                 }
                 let oj = this.links;
 
+                console.log('Filters --> ' + JSON.stringify(filterArr));
                 if (!(oj === null)) {
                     oj.forEach(link => {
 
@@ -449,13 +471,80 @@ module.exports = class Asset {
                 // console.log("Option SQL : " + JSON.stringify(self));
                 connection.transaction([
                     function firstAction() {
-                        return connection.insert(`INSERT into ASSET_DETAILS(ASSET_ID,ASSET_TITLE,ASSET_DESCRIPTION,
-                ASSET_USERCASE,ASSET_CUSTOMER,ASSET_CREATEDBY,ASSET_CREATED_DATE,ASSET_SCRM_ID,ASSET_OPP_ID,
-                ASSET_THUMBNAIL,ASSET_MODIFIED_DATE,ASSET_MODIFIED_BY,ASSET_VIDEO_URL,ASSET_EXPIRY_DATE,ASSET_VIDEO_LINK,ASSET_LOCATION,ASSET_OWNER,ASSET_STATUS,ASSET_ARCHITECTURE_DESCRIPTION,ASSET_TYPE) values(:ASSET_ID,:ASSET_TITLE,:ASSET_DESCRIPTION,
-                :ASSET_USERCASE,:ASSET_CUSTOMER,:ASSET_CREATEDBY,:CREATED_DATE,:ASSET_SCRM_ID,:ASSET_OPP_ID,
-                :ASSET_THUMBNAIL,:ASSET_MODIFIED_DATE,:ASSET_MODIFIED_BY,:ASSET_VIDEO_URL,:ASSET_EXPIRY_DATE,:ASSET_VIDEO_LINK,:ASSET_LOCATION,:ASSET_OWNER,:ASSET_STATUS,:ASSET_ARCHITECTURE_DESCRIPTION,:ASSET_TYPE)`,
-                            [assetid, self.title, self.description, self.usercase, self.customer, self.createdBy.toLowerCase(),
-                                self.createdDate, self.scrmId, self.oppId, self.thumbnail, self.modifiedDate, self.modifiedBy, self.ASSET_VIDEO_URL, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), assetState, self.asset_architecture_description, self.asset_type],
+                        return connection.insert(`INSERT into 
+                        ASSET_DETAILS(ASSET_ID,
+                            ASSET_DESCRIPTION,
+                ASSET_CUSTOMER,
+                ASSET_CREATEDBY,
+                ASSET_CREATED_DATE,
+                ASSET_SERVICE_ID,
+                ASSET_THUMBNAIL,
+                ASSET_MODIFIED_DATE,
+                ASSET_MODIFIED_BY,
+                ASSET_EXPIRY_DATE,
+                ASSET_VIDEO_LINK,
+                ASSET_OWNER,
+                ASSET_STATUS,
+                WIN_ECA,
+                WIN_REGID,
+                WIN_FISCAL_YR,
+                WIN_MEMBERS,
+                WIN_SOLUTION_SOLD,
+                WIN_COSUMING_DATE,
+                WIN_GOLIVE_ON,
+                WIN_DEAL_CYCLE,
+                WIN_RENEWAL,
+                WIN_CUSTOMER_PERSONA,
+                WIN_REF_LANG_INCL_IN_CONTRACT,
+                WIN_BUSINESS_IMPACT,
+                WIN_SALES_PROCESS_TEAMS,
+                WIN_LESSONS_LEARNED,
+                WIN_CUSTOMER_BUSINESS_CHALLANGES) 
+                values(:ASSET_ID,
+                :ASSET_DESCRIPTION,
+                :ASSET_CUSTOMER,
+                :ASSET_CREATEDBY,
+                :CREATED_DATE,
+                :ASSET_SERVICE_ID,
+                :ASSET_THUMBNAIL,
+                :ASSET_MODIFIED_DATE,
+                :ASSET_MODIFIED_BY,
+                :ASSET_EXPIRY_DATE,
+                :ASSET_VIDEO_LINK,
+                :ASSET_OWNER,
+                :ASSET_STATUS,
+                :WIN_ECA,
+                :WIN_REGID,
+                :WIN_FISCAL_YR,
+                :WIN_MEMBERS,
+                :WIN_SOLUTION_SOLD,
+                :WIN_COSUMING_DATE,
+                :WIN_GOLIVE_ON,
+                :WIN_DEAL_CYCLE,
+                :WIN_RENEWAL,
+                :WIN_CUSTOMER_PERSONA,
+                :WIN_REF_LANG_INCL_IN_CONTRACT,
+                :WIN_BUSINESS_IMPACT,
+                :WIN_SALES_PROCESS_TEAMS,
+                :WIN_LESSONS_LEARNED,
+                :WIN_CUSTOMER_BUSINESS_CHALLANGES)`,
+                            [assetid, self.description, self.customer, self.createdBy.toLowerCase(),
+                                self.createdDate, self.serviceid, self.thumbnail, self.modifiedDate, self.modifiedBy, self.expiryDate, self.video_link, self.owner.toLowerCase(), assetState,
+                                self.windata.WIN_ECA,
+                                self.windata.WIN_REGID,
+                                self.windata.WIN_FISCAL_YR,
+                                self.windata.WIN_MEMBERS,
+                                self.windata.WIN_SOLUTION_SOLD,
+                                self.windata.WIN_COSUMING_DATE,
+                                self.windata.WIN_GOLIVE_ON,
+                                self.windata.WIN_DEAL_CYCLE,
+                                self.windata.WIN_RENEWAL,
+                                self.windata.WIN_CUSTOMER_PERSONA,
+                                self.windata.WIN_REF_LANG_INCL_IN_CONTRACT,
+                                self.windata.WIN_BUSINESS_IMPACT,
+                                self.windata.WIN_SALES_PROCESS_TEAMS,
+                                self.windata.WIN_LESSONS_LEARNED,
+                                self.windata.WIN_CUSTOMER_BUSINESS_CHALLANGES],
                             {
                                 outFormat: oracledb.Object
                             }).then(res => {
@@ -463,6 +552,9 @@ module.exports = class Asset {
                             }).catch(err => {
                                 console.log("First Action error " + err);
                                 reject({ msg: "Asset creation failed on first step" });
+                            }).finally(() => {
+                                console.log("---------------------");
+                                console.log("Asset details section");
                             })
                     }
                     , function secondAction() {
@@ -482,6 +574,9 @@ module.exports = class Asset {
                                     console.log("2nd update Links batch succesfully executed : " + JSON.stringify(linkres));
                                 }).catch(err => {
                                     console.log("Links batch insert failed");
+                                }).finally(() => {
+                                    console.log("---------------------");
+                                    console.log("Asset Links section");
                                 })
                             })
                         }
@@ -500,6 +595,9 @@ module.exports = class Asset {
                                 }).catch(err => {
                                     console.log("Third action error " + err);
                                     reject({ msg: "Asset creation failed on third step" });
+                                }).finally(() => {
+                                    console.log("---------------------");
+                                    console.log("Asset Filter Mapping section");
                                 })
                         }
                         else {
@@ -509,239 +607,22 @@ module.exports = class Asset {
                 ], {
                     sequence: true
                 })
-                    .then(function onTransactionResults(output) {
-                        //console.log('transaction successful');
+                    .then((output) => {
+                        console.log('create transaction executed!');
                         resolve({ Asset_ID: assetid })
                     })
                     .catch(err => {
-                        console.log("onTransactionResults : " + err);
+                        console.log("transaction Block  : " + err);
                         reject({ msg: "Asset creation failed on transaction failure" });
+                    }).finally(() => {
+                        console.log('transaction Block completed');
                     })
 
             }
         })
     }
 
-    saveTest() {
-
-        return new Promise((resolve, reject) => {
-            var assetid = this.assetId;
-            var self = this;
-            const connection = getDb();
-            let filterObj = {};
-            let filterArr = [];
-            //console.log("------------------ SAVEING ASSET -----------------");
-            //console.log(JSON.stringify(self));
-
-            if (this.assetId) {
-
-                //   //console.log("in edit mode")
-                // //console.log(this.links)
-                if (!this.filters) {
-                    this.filters = []
-                }
-                if (this.filters.length > 1) {
-                    this.filters.forEach(f => {
-                        filterObj.FILTER_ASSET_MAP_ID = uniqid.process();
-                        filterObj.FILTER_ID = f.Value;
-                        filterObj.ASSET_ID = assetid;
-                        filterArr.push(filterObj)
-                        filterObj = {};
-                    })
-                }
-                else if (this.filters.length === 1) {
-                    filterObj.FILTER_ASSET_MAP_ID = uniqid.process();
-                    filterObj.FILTER_ID = this.filters[0].Value;
-                    filterObj.ASSET_ID = assetid;
-                    filterArr.push(filterObj)
-                }
-                else {
-                    filterArr = null;
-                }
-                const oj = this.links;
-                if (!(oj === null)) {
-                    oj.forEach(link => {
-                        // linkObj={LINK_ID:uniqid.process(),ASSET_ID:assetid,...link}
-                        // return linkObj
-                        link.LINK_ID = uniqid.process();
-                        link.ASSET_ID = self.assetId;
-                    })
-                }
-
-                connection.transaction([
-                    function firstAction() {
-                        return connection.update(`UPDATE ASSET_DETAILS set 
-            ASSET_TITLE=:ASSET_TITLE,
-            ASSET_DESCRIPTION=:ASSET_DESCRIPTION,
-            ASSET_USERCASE=:ASSET_USERCASE,
-            ASSET_CUSTOMER=:ASSET_CUSTOMER,
-            ASSET_CREATEDBY=:ASSET_CREATEDBY,
-            ASSET_SCRM_ID=:ASSET_SCRM_ID,
-            ASSET_OPP_ID=:ASSET_OPP_ID,
-            ASSET_MODIFIED_DATE=:ASSET_MODIFIED_DATE,
-            ASSET_MODIFIED_BY=:ASSET_MODIFIED_BY,
-            ASSET_EXPIRY_DATE=:ASSET_EXPIRY_DATE,
-	    ASSET_VIDEO_LINK=:ASSET_VIDEO_LINK,
-        ASSET_LOCATION=:ASSET_LOCATION,
-        ASSET_OWNER=:ASSET_OWNER,
-        ASSET_STATUS=:ASSET_STATUS,
-        ASSET_ARCHITECTURE_DESCRIPTION=:ASSET_ARCHITECTURE_DESCRIPTION,
-        ASSET_TYPE=:ASSET_TYPE
-             WHERE ASSET_ID=:ASSET_ID`,
-                            [self.title, self.description, self.description, self.usercase, self.customer, self.createdBy.toLowerCase(),
-                            self.scrmId, self.oppId, new Date(), self.modifiedBy, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), 'Pending Review', self.asset_architecture_description, self.asset_type, self.assetId],
-                            {
-                                outFormat: oracledb.Object
-                            }).then(res => {
-                                console.log('1st update done(Asset details updated)')
-                            })
-                    }
-                    , function secondAction() {
-                        if (oj.length >= 0) {
-                            //console.log("statement:", oj)
-                            return connection.execute(`delete from ASSET_LINKS  WHERE ASSET_ID=:ASSET_ID`, [self.assetId]
-                                , {
-                                    autoCommit: true
-                                }
-                            ).then(res => {
-                                //console.log('2nd update done(Asset links updated)' + res)
-                                connection.batchInsert(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID) values(
-                                    :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:ASSET_ID)`,
-                                    oj, {
-                                    autoCommit: true
-                                })
-                            })
-                        }
-                        else {
-                            return connection.query(`SELECT * from asset_links `, {})
-                        }
-                    }, function thirdAction() {
-                        if (filterArr.length > 0) {
-                            //console.log(filterArr)
-                            return connection.execute(`delete from ASSET_FILTER_ASSET_MAP WHERE ASSET_ID=:ASSET_ID`, [self.assetId],
-                                {
-                                    autocommit: true
-                                }
-                            ).then(res => {
-                                connection.batchInsert(`INSERT into ASSET_FILTER_ASSET_MAP values(
-                            :FILTER_ASSET_MAP_ID,:FILTER_ID,:ASSET_ID)`, filterArr,
-                                    {
-                                        outFormat: oracledb.Object
-                                    }).then(res => {
-                                        console.log("filters inserted successfully")
-                                    })
-                            })
-                        }
-                        else {
-                            return connection.query(`SELECT * from ASSET_FILTER_ASSET_MAP`, {})
-                        }
-                    }], {
-                    sequence: true
-                })
-                    .then(function onTransactionResults(output) {
-                        //console.log('Update transaction successful');
-                        resolve("updated")
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
-            }
-            else {
-                this.assetId = uniqid.process('AH-');
-                assetid = this.assetId;
-                //console.log(this.assetId, self.links)
-                if (!this.filters) {
-                    this.filters = []
-                }
-                if (this.filters.length > 1) {
-                    this.filters.forEach(f => {
-                        filterObj.FILTER_ASSET_MAP_ID = uniqid.process();
-                        filterObj.FILTER_ID = f.Value;
-                        filterObj.ASSET_ID = assetid;
-                        filterArr.push(filterObj)
-                        filterObj = {};
-                    })
-                }
-                else if (this.filters.length === 1) {
-                    filterObj.FILTER_ASSET_MAP_ID = uniqid.process();
-                    filterObj.FILTER_ID = this.filters[0].Value;
-                    filterObj.ASSET_ID = assetid;
-                    filterArr.push(filterObj)
-                }
-                else {
-                    filterArr = null;
-                }
-                let oj = this.links;
-
-                //console.log("MODEL LINK1", oj)
-                if (!(oj === null)) {
-                    oj.forEach(link => {
-                        // linkObj={LINK_ID:uniqid.process(),ASSET_ID:assetid,...link}
-                        // return linkObj
-                        link.LINK_ID = uniqid.process();
-                        link.ASSET_ID = assetid;
-                    })
-                }
-
-                //console.log("FilterArr", filterArr)
-                //console.log("MODEL LINK2", oj)
-
-                connection.transaction([
-                    function firstAction() {
-                        return connection.insert(`INSERT into ASSET_DETAILS(ASSET_ID,ASSET_TITLE,ASSET_DESCRIPTION,
-                ASSET_USERCASE,ASSET_CUSTOMER,ASSET_CREATEDBY,ASSET_CREATED_DATE,ASSET_SCRM_ID,ASSET_OPP_ID,
-                ASSET_THUMBNAIL,ASSET_MODIFIED_DATE,ASSET_MODIFIED_BY,ASSET_VIDEO_URL,ASSET_EXPIRY_DATE,ASSET_VIDEO_LINK,ASSET_LOCATION,ASSET_OWNER,ASSET_STATUS,ASSET_ARCHITECTURE_DESCRIPTION,ASSET_TYPE) values(:ASSET_ID,:ASSET_TITLE,:ASSET_DESCRIPTION,
-                :ASSET_USERCASE,:ASSET_CUSTOMER,:ASSET_CREATEDBY,:CREATED_DATE,:ASSET_SCRM_ID,:ASSET_OPP_ID,
-                :ASSET_THUMBNAIL,:ASSET_MODIFIED_DATE,:ASSET_MODIFIED_BY,:ASSET_VIDEO_URL,:ASSET_EXPIRY_DATE,:ASSET_VIDEO_LINK,:ASSET_LOCATION,:ASSET_OWNER,:ASSET_STATUS,:ASSET_ARCHITECTURE_DESCRIPTION,:ASSET_TYPE)`,
-                            [assetid, self.title, self.description, self.usercase, self.customer, self.createdBy.toLowerCase(),
-                                self.createdDate, self.scrmId, self.oppId, self.thumbnail, self.modifiedDate, self.modifiedBy, self.ASSET_VIDEO_URL, self.expiryDate, self.video_link, self.location, self.owner.toLowerCase(), 'Pending Review', self.asset_architecture_description, self.asset_type],
-                            {
-                                outFormat: oracledb.Object
-                            }).then(res => {
-                                console.log('1st insert done(Asset details inserted)')
-                            })
-                    }
-                    , function secondAction() {
-                        if (oj.length > 0) {
-                            return connection.batchInsert(`INSERT into ASSET_LINKS(LINK_URL_TYPE,LINK_URL,LINK_REPOS_TYPE,LINK_DESCRIPTION,LINK_DESCRIPTION_DATA,DEPLOY_STATUS,LINK_ID,ASSET_ID) values(
-                :LINK_URL_TYPE,:LINK_URL,:LINK_REPOS_TYPE,:LINK_DESCRIPTION,:LINK_DESCRIPTION_DATA,:DEPLOY_STATUS,:LINK_ID,:ASSET_ID)`,
-                                oj, {
-                                autocommit: true
-                            }
-                            )
-                        }
-                        else {
-                            //console.log("oj is empty")
-                            return connection.query(`SELECT * from asset_links`, {})
-                        }
-                    }, function thirdAction() {
-                        if (filterArr.length > 0) {
-                            return connection.batchInsert(`INSERT into ASSET_FILTER_ASSET_MAP values(
-                    :FILTER_ASSET_MAP_ID,:FILTER_ID,:ASSET_ID)`, filterArr,
-                                {
-                                    outFormat: oracledb.Object
-                                }).then(res => {
-                                    console.log("filters inserted successfully")
-                                })
-                        }
-                        else {
-                            return connection.query(`SELECT * from ASSET_FILTER_ASSET_MAP`, {})
-                        }
-                    }
-                ], {
-                    sequence: true
-                })
-                    .then(function onTransactionResults(output) {
-                        //console.log('transaction successful');
-                        resolve({ Asset_ID: assetid })
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
-
-            }
-        })
-    }
+   
 
 
     static uploadImages(assetId, images, imageDescription) {
@@ -966,7 +847,7 @@ module.exports = class Asset {
             const uniqueId = uniqid();
             const finalFname = fname + uniqueId.concat('.', ftype);
             const uploadPath = path.join('/', 'mnt/ahfs/assets', data.assetId, finalFname);
-            var content = 'http://' + host + '/' + 'assets/' + data.assetId + "/" + finalFname;
+            var content = 'https://' + host + '/' + 'assets/' + data.assetId + "/" + finalFname;
             console.log(finalFname);
             try {
                 console.log("---------  FOLDER CREATION ----------")
@@ -1342,6 +1223,10 @@ module.exports = class Asset {
 
     static filterAssetBySearchString(data, filterdata, searchString, filtersasset) {
         searchString = searchString.trim().toLowerCase();
+        const oldString = searchString.split(' ');
+        const newString = sw.removeStopwords(oldString)
+        searchString = newString.join(' ');
+        //searchString =sw.removeStopwords(searchString).trim().toLowerCase();
         console.log(JSON.stringify("Captured Words ==== > " + searchString));
         // console.log(JSON.stringify("Captured filters ==== > " + JSON.stringify(filterdata)));
 
@@ -1350,11 +1235,8 @@ module.exports = class Asset {
             for (let i = 0; i < data.length; i++) {
 
                 let combineContentToMatch = data[i].ASSET_ID +
-                    data[i].ASSET_TITLE +
                     data[i].ASSET_DESCRIPTION +
-                    data[i].ASSET_USERCASE +
-                    data[i].ASSET_CUSTOMER +
-                    data[i].ASSET_ARCHITECTURE_DESCRIPTION
+                    data[i].ASSET_CUSTOMER
 
                 assetFilters = filterdata
                     .filter(filter => data[i].ASSET_ID === filter.ASSET_ID)
@@ -1362,7 +1244,7 @@ module.exports = class Asset {
                         combineContentToMatch += filter.FILTER_ID + filter.FILTER_NAME + filter.FILTER_TYPE;
                     });
 
-                let wordlist = searchString.split(/ |,/);
+                let wordlist = searchString.split(/ /);
                 // console.log("----- Asset  WORD SPLIT ------")
                 // console.log(JSON.stringify(wordlist));
 
@@ -1390,7 +1272,53 @@ module.exports = class Asset {
         })
     }
 
+    // static filterAssetBySearchString_old(data, filterdata, searchString, filtersasset) {
+    //     searchString = searchString.trim().toLowerCase();
+    //     console.log(JSON.stringify("Captured Words ==== > " + searchString));
+    //     // console.log(JSON.stringify("Captured filters ==== > " + JSON.stringify(filterdata)));
 
+    //     let assetFilters = [];
+    //     return new Promise((resolve) => {
+    //         for (let i = 0; i < data.length; i++) {
+
+    //             let combineContentToMatch = data[i].ASSET_ID +
+    //                 data[i].ASSET_TITLE +
+    //                 data[i].ASSET_DESCRIPTION +
+    //                 data[i].ASSET_CUSTOMER 
+
+    //             assetFilters = filterdata
+    //                 .filter(filter => data[i].ASSET_ID === filter.ASSET_ID)
+    //                 .map((filter) => {
+    //                     combineContentToMatch += filter.FILTER_ID + filter.FILTER_NAME + filter.FILTER_TYPE;
+    //                 });
+
+    //             let wordlist = searchString.split(/ /);
+    //             // console.log("----- Asset  WORD SPLIT ------")
+    //             // console.log(JSON.stringify(wordlist));
+
+    //             combineContentToMatch = combineContentToMatch.toLowerCase();
+    //             wordlist.forEach(word => {
+    //                 if (word.includes("+")) {
+    //                     let isMatch = true;
+    //                     let wordfrag = word.split("+");
+    //                     for (let i = 0; i < wordfrag.length; i++) {
+    //                         if (combineContentToMatch.indexOf(wordfrag[i].toLowerCase()) == -1) {
+    //                             isMatch = false;
+    //                             break;
+    //                         }
+    //                         if (isMatch) {
+    //                             filtersasset.push(data[i]);
+    //                         }
+    //                     }
+    //                 } else if (combineContentToMatch.indexOf(word.toLowerCase()) != -1) {// MATCH FOUND
+    //                     filtersasset.push(data[i]);
+    //                 }
+    //             })
+    //         }
+    //         console.log(data.length + " > Filtered By Search : " + filtersasset.length);
+    //         resolve(true);
+    //     })
+    // }
 
     static fetchAssets(host, offset, limit, filters, searchString, sortBy, order, action, email) {
 
@@ -1400,11 +1328,12 @@ module.exports = class Asset {
                 let finalFilters = filters;//filters.replace('170k5dr4xvz,', '');
                 console.log(finalFilters);
                 let filterString = "'" + finalFilters.toString().replace(/,/g, "','") + "'";
+                console.log(" - - > " + filterString);
 
                 const connection = getDb();
-                let fetchfilterDetailssql = `select filter_name,filter_type,filter_id from asset_filter where filter_id in(` + filterString + `)`;
+                let fetchfilterDetailssql = `select asset_id from asset_details where asset_id in(select asset_id from asset_filter_asset_map where filter_id in(` + filterString + `))`;
                 let fetchfilterDetailsOption = {};
-                console.log("fetchfilterDetailssql" + fetchfilterDetailssql)
+                console.log("fetchfilterDetailssql " + fetchfilterDetailssql)
                 connection.query(fetchfilterDetailssql, fetchfilterDetailsOption,
                     {
                         outFormat: oracledb.OBJECT
@@ -1437,7 +1366,9 @@ module.exports = class Asset {
                     })
             } else {
                 const connection = getDb();
-                let query = "SELECT * FROM ASSET_DETAILS WHERE asset_status='Live'";
+                let query = `SELECT a.*,b.filter_id,c.filter_parent_id FROM ASSET_DETAILS a,asset_filter_asset_map b,asset_tags c  
+                WHERE asset_status='Live' and b.asset_id=a.asset_id and b.filter_id=c.filter_id and b.filter_id in(select filter_id from asset_tags where filter_parent_id 
+                in(select filter_id from asset_tags where filter_parent_id is null))`;
                 connection.query(query, {},
                     {
                         outFormat: oracledb.OBJECT
@@ -1463,7 +1394,7 @@ module.exports = class Asset {
         });
     }
 
-    static refineAssets(host, offset, limit, assetsArray, sortBy, order, action, email) {
+    static refineAssetsold(host, offset, limit, assetsArray, sortBy, order, action, email) {
 
         // REMOVE DUPLICATE ENTRIES
         // console.log("*****************************************refineAssets fun start*******************************************")
@@ -1506,7 +1437,7 @@ module.exports = class Asset {
         let promotedArray = [];
         return new Promise((resolve, reject) => {
             assetsArray.forEach(asset => {
-                asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
+                asset.ASSET_THUMBNAIL = 'https://' + host + '/' + asset.ASSET_THUMBNAIL;
                 asset.createdDate = asset.ASSET_CREATED_DATE;
             })
             const connection = getDb();
@@ -1633,7 +1564,7 @@ module.exports = class Asset {
                                                                                                                                     allAssetsObj.ASSET_TYPE = assetTypes;
                                                                                                                                     allAssetsObj.SALES_PLAY = salesPlays;
                                                                                                                                     allAssetsObj.INDUSTRY = industry;
-                                                                                                                                    allAssetsObj.ASSET_THUMBNAIL = allAssetsObj.ASSET_THUMBNAIL == null ? 'http://' + host + '/no_image.png' : allAssetsObj.ASSET_THUMBNAIL;
+                                                                                                                                    allAssetsObj.ASSET_THUMBNAIL = allAssetsObj.ASSET_THUMBNAIL == null ? 'https://' + host + '/no_image.png' : allAssetsObj.ASSET_THUMBNAIL;
 
                                                                                                                                     linkType = links.map(a => a.LINK_REPOS_TYPE)
                                                                                                                                     linkType = [...new Set(linkType)]
@@ -1652,7 +1583,7 @@ module.exports = class Asset {
                                                                                                                                     ////console.log(lobj2,"obj2")
                                                                                                                                     var images = imagesArray.filter(image => image.ASSET_ID === id);
                                                                                                                                     images.forEach(image => {
-                                                                                                                                        image.IMAGEURL = 'http://' + host + '/' + image.IMAGEURL;
+                                                                                                                                        image.IMAGEURL = 'https://' + host + '/' + image.IMAGEURL;
                                                                                                                                     });
                                                                                                                                     allAssetsObj.IMAGES = images;
                                                                                                                                     var comments = commentsArray.filter(c => c.ASSET_ID === id);
@@ -1697,9 +1628,13 @@ module.exports = class Asset {
                                                                                                                                 dynamicSort(allAssets, sortBy, order);
                                                                                                                                 tAssets = allAssets.slice(offset, limit);
                                                                                                                                 console.log(offset + ' ----- ' + limit + "Asset Count before slice :::: " + allAssets.length);
-                                                                                                                                allObj.ASSETS = tAssets;
+
                                                                                                                                 console.log("Asset Count :::: " + tAssets.length);
-                                                                                                                                resolve(allObj);
+                                                                                                                                this.sortAssetsByType(tAssets).then(sortedAssets => {
+                                                                                                                                    allObj.ASSETS = sortedAssets;
+                                                                                                                                    resolve(allObj);
+                                                                                                                                })
+
                                                                                                                                 //}
 
                                                                                                                             })
@@ -1721,107 +1656,128 @@ module.exports = class Asset {
         })
     }
 
-    // static fetchAssets3(host, offset, limit, filters, searchString, sortBy, order, action, email) {
+    static sortAssetsByType(assets) {
+        return new Promise((resolve, reject) => {
+            let sortedAssets = {};
+            assets.filter(asset => {
+                // console.log(sortedAssets[asset.FILTER_ID]);
+                if (sortedAssets[asset.FILTER_ID] == undefined) {
+                    sortedAssets[asset.FILTER_ID] = [];
+                }
+                sortedAssets[asset.FILTER_ID].push(asset);
+                // console.log("Sorted Assets loop " + sortedAssets[asset.FILTER_ID].length);
+            })
+            // console.log(JSON.stringify(sortedAssets));
+            resolve(sortedAssets);
+        })
+    }
 
-    //     return new Promise((resolve, reject) => {
-    //         if (filters.length > 0 && filters != "") {
-    //             let filterString = "'" + filters.toString().replace(/,/g, "','") + "'";
+    static refineAssets(host, offset, limit, assetsArray, sortBy, order, action, email) {
 
-    //             const connection = getDb();
-    //             let fetchfilterDetailssql = `select filter_name,filter_type,filter_id from asset_filter where filter_id in(` + filterString + `)`;
-    //             let fetchfilterDetailsOption = {};
-    //             // console.log(fetchfilterDetailssql);
-    //             connection.query(fetchfilterDetailssql, fetchfilterDetailsOption,
-    //                 {
-    //                     outFormat: oracledb.OBJECT
-    //                 }).then(data => {
-    //                     this.convertsql2(data).then(query => {
+        let assetidtracker = {};
+        let uniqueassetarray = assetsArray.filter(asset => {
+            if (!assetidtracker[asset.ASSET_ID]) {
+                assetidtracker[asset.ASSET_ID] = 1;
+                return asset;
+            }
+        })
+        assetsArray = uniqueassetarray;
 
-    //                         const connection = getDb();
-    //                         connection.query(query, {},
-    //                             {
-    //                                 outFormat: oracledb.OBJECT
-    //                             }).then(data => {
-    //                                 // WE ARE THE GETTING THE FILTERED ASSETS BASED ON SELECTION
-    //                                 let fetchAllFilterSQL = `select a.filter_id,a.filter_name,a.filter_type,b.asset_id from asset_filter a, asset_filter_asset_map b where a.filter_id=b.filter_id and a.filter_status=1`;
+        let allAssetsObj = {};
+        let tAssets = [];
+        let allAssets = [];
 
-    //                                 connection.query(fetchAllFilterSQL, {},
-    //                                     {
-    //                                         outFormat: oracledb.OBJECT
-    //                                     }).then(filterdata => {
-    //                                         let filtersasset = [];
-    //                                         this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
-    //                                             this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action, email).then(assets => {
-    //                                                 resolve(assets);
-    //                                             })
-    //                                         })
-    //                                     })
-    //                             })
+        let viewsArray = [];
 
-    //                     })
-    //                 }).catch(err => {
-    //                     console.log("error > " + JSON.stringify(err));
-    //                 })
-    //         } else {
-    //             const connection = getDb();
-    //             let query = "SELECT * FROM ASSET_DETAILS WHERE asset_status='Live'";
-    //             connection.query(query, {},
-    //                 {
-    //                     outFormat: oracledb.OBJECT
-    //                 }).then(data => {
-    //                     // WE ARE THE GETTING THE FILTERED ASSETS BASED ON SELECTION
-    //                     let fetchAllFilterSQL = `select a.filter_id,a.filter_name,a.filter_type,b.asset_id from asset_filter a, asset_filter_asset_map b where a.filter_id=b.filter_id and a.filter_status=1`;
+        return new Promise((resolve, reject) => {
 
-    //                     connection.query(fetchAllFilterSQL, {},
-    //                         {
-    //                             outFormat: oracledb.OBJECT
-    //                         }).then(filterdata => {
-    //                             let filtersasset = [];
-    //                             this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
-    //                                 // console.log("Content filter ended : " + filtersasset.length);
-    //                                 this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action, email).then(assets => {
-    //                                     resolve(assets);
-    //                                 })
-    //                             })
-    //                         })
+            const connection = getDb();
 
-    //                 })
-    //         }
-    //     });
-    // }
+            connection.execute(`SELECT count(*) view_count,asset_id from ASSET_VIEWS group by asset_id`, [],
+                {
+                    outFormat: oracledb.OBJECT
+                })
+                .then(res => {
+                    viewsArray = res.rows;
+
+                    assetsArray.forEach(asset => {
+                        const id = asset.ASSET_ID;
+                        allAssetsObj = asset
+                        allAssetsObj.LINKS = [];
+
+                        asset.ASSET_THUMBNAIL = 'https://' + host + '/' + asset.ASSET_THUMBNAIL;
+                        asset.createdDate = asset.ASSET_CREATED_DATE;
+
+
+                        allAssetsObj.ASSET_THUMBNAIL = allAssetsObj.ASSET_THUMBNAIL == null ? 'https://' + host + '/no_image.png' : allAssetsObj.ASSET_THUMBNAIL;
+
+                        var views = viewsArray.filter(v => v.ASSET_ID === id);
+
+                        allAssetsObj.VIEWS = views[0];
+
+                        if (!(sortBy == 'views' && allAssetsObj.VIEWS.VIEW_COUNT == 0)) {
+                            allAssets.push(allAssetsObj);
+                        }
+                    })
+
+                    let allObj = {};
+                    allObj.TOTALCOUNT = allAssets.length;
+
+
+                    // console.log("Asset Count after slice :::: " + tAssets.length);
+                    dynamicSort(allAssets, sortBy, order);
+                    tAssets = allAssets.slice(offset, limit);
+                    console.log(offset + ' ----- ' + limit + "Asset Count before slice :::: " + allAssets.length);
+                    allObj.ASSETS = tAssets;
+                    console.log("Asset Count :::: " + tAssets.length);
+                    this.sortAssetsByType(tAssets).then(sortedAssets => {
+                        allObj.ASSETS = sortedAssets;
+                        resolve(allObj);
+                    })
+                    //}
+
+                    // })
+                })
+            // })
+            //                                                                                         })
+            //                                                                                 })
+            //                                                                         })
+            //                                                                 })
+            //                                                         })
+            //                                                 })
+            //                                         })
+            //                                 })
+            //                         })
+            //                 })
+
+            //         })
+            // })
+        })
+    }
 
 
     // CONVERT SQL BASED ON AND CLAUSE
     static convertsql(data) {
-        console.log("----------  Converting SQL ASSET -------------");
-        let filterTypeMap = {};
         let queryString = "";
-        // let reducedFilter = data.filter(filter => {
-        //     if (filter.FILTER_ID.indexOf("14983ddhswcdol") == -1 && filter.FILTER_ID.indexOf("Gdjfdskyuetr472V") == -1 && filter.FILTER_ID.indexOf("fd5k53p09dl") == -1 ) {//&& filter.FILTER_ID.indexOf("170k5dr4xvz") == -1
-        //         return filter;
-        //     }
-        // })
-
-        // data = reducedFilter;
-        console.log(JSON.stringify(data));
-
         return new Promise((resolve, reject) => {
             // CREATE SQL queries   
             if (data.length > 0) {
-                data.forEach(val => {
-                    let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " INTERSECT select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where " : "select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where ";
-                    filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "' and c.filter_id=d.filter_id and  d.filter_type!='Asset Type'";
-                });
 
-                Object.keys(filterTypeMap).forEach(filterType => {
-
-                    queryString = queryString.length > 0 ? queryString + " INTERSECT " + filterTypeMap[filterType] : filterTypeMap[filterType];
-                })
-
-                queryString = "select b.* from  (" + queryString + ") a,asset_details b where a.asset_id=b.asset_id and b.asset_status='Live'";
+                let assetidList = '';
+                data.filter(id => assetidList += assetidList.length > 0 ? ",'" + id.ASSET_ID + "'" : "'" + id.ASSET_ID + "'");
+                queryString = `select a.*,c.filter_id,c.filter_parent_id from asset_details a, asset_filter_asset_map b, asset_tags c 
+                where a.asset_id=b.asset_id and b.filter_id=c.filter_id and b.asset_id 
+                in(`+ assetidList + `) and c.filter_parent_id 
+                in(select filter_id from asset_tags where filter_parent_id is null)`
 
             } else {
-                queryString = "select b.* from  (select distinct ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where c.filter_id=d.filter_id and  d.filter_type='Asset Type') a,asset_details b where a.ASSET_ID=b.ASSET_ID and b.asset_status='Live'";
+                queryString = `select b.* from  (select distinct ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_tags d 
+                    where c.filter_id=d.filter_id ) 
+                    a,asset_details b,asset_filter_asset_map c,asset_tags d 
+                    where a.ASSET_ID=b.ASSET_ID and b.asset_status='Live' and c.asset_id=b.asset_id 
+                    and c.filter_id=d.filter_id and c.filter_id 
+                    in(select filter_id from asset_tags where filter_parent_id 
+                    in(select filter_id from asset_tags where filter_parent_id is null))`;
 
             }
             console.log("--------- Convert  QUERY  -------");
@@ -1835,41 +1791,49 @@ module.exports = class Asset {
 
     // CREATE QUERY STRING BASED ON SELECTED FILTERS LOGICAL AND && OR
     // static convertsql(data) {
-    //     console.log("----------  Converting 2 SQL ASSET -------------");
-    //     let filterTypeMap = {};
-    //     let queryString = "";
-    //     let reducedFilter = data.filter(filter => {
-    //         if (filter.FILTER_ID.indexOf("14983ddhswcdol") == -1 && filter.FILTER_ID.indexOf("Gdjfdskyuetr472V") == -1 && filter.FILTER_ID.indexOf("fd5k53p09dl") == -1 && filter.FILTER_ID.indexOf("170k5dr4xvz") == -1) {
-    //             return filter;
-    //         }
-    //     })
+    // console.log("----------  Converting SQL ASSET -------------");
+    // let filterTypeMap = {};
+    // let queryString = "";
+    // // let reducedFilter = data.filter(filter => {
+    // //     if (filter.FILTER_ID.indexOf("14983ddhswcdol") == -1 && filter.FILTER_ID.indexOf("Gdjfdskyuetr472V") == -1 && filter.FILTER_ID.indexOf("fd5k53p09dl") == -1 ) {//&& filter.FILTER_ID.indexOf("170k5dr4xvz") == -1
+    // //         return filter;
+    // //     }
+    // // })
 
-    //     data = reducedFilter;
-    //     console.log(JSON.stringify(data));
+    // // data = reducedFilter;
+    // console.log(JSON.stringify(data));
 
-    //     return new Promise((resolve, reject) => {
-    //         // CREATE SQL queries   
-    //         if (data.length > 0) {
-    //             data.forEach(val => {
-    //                 let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " INTERSECT select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where " : "select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where ";
-    //                 filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "' and c.filter_id=d.filter_id and  d.filter_type!='Asset Type'";
-    //             });
+    // return new Promise((resolve, reject) => {
+    //     // CREATE SQL queries   
+    //     if (data.length > 0) {
+    //         data.forEach(val => {
+    //             let filterstring = filterTypeMap[val.FILTER_TYPE] != undefined ? filterTypeMap[val.FILTER_TYPE] + " INTERSECT select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_tags d where " : "select c.ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_tags d where ";
+    //             filterTypeMap[val.FILTER_TYPE] = filterstring + " d.filter_id='" + val.FILTER_ID + "' and c.filter_id=d.filter_id and  d.filter_parent_id is not null";
+    //         });
 
-    //             Object.keys(filterTypeMap).forEach(filterType => {
+    //         Object.keys(filterTypeMap).forEach(filterType => {
 
-    //                 queryString = queryString.length > 0 ? queryString + ") union (" + filterTypeMap[filterType] : filterTypeMap[filterType];
-    //             })
+    //             queryString = queryString.length > 0 ? queryString + " INTERSECT " + filterTypeMap[filterType] : filterTypeMap[filterType];
+    //         })
 
-    //             queryString = "select b.* from  ((" + queryString + ")) a,asset_details b where a.asset_id=b.asset_id and b.asset_status='Live'";
+    //         queryString = `select b.* from  (` + queryString + `) a,asset_details b,asset_filter_asset_map b,asset_tags c where a.asset_id=b.asset_id and b.asset_status='Live' and b.asset_id=a.asset_id and b.filter_id=c.filter_id and b.filter_id in(select filter_id from asset_tags where filter_parent_id 
+    //             in(select filter_id from asset_tags where filter_parent_id is null))`;
 
-    //         } else {
-    //             queryString = "select b.* from  (select distinct ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_filter d where c.filter_id=d.filter_id and  d.filter_type='Asset Type') a,asset_details b where a.ASSET_ID=b.ASSET_ID and b.asset_status='Live'";
+    //     } else {
+    //         queryString = `select b.* from  (select distinct ASSET_ID from ASSET_FILTER_ASSET_MAP c,asset_tags d 
+    //             where c.filter_id=d.filter_id ) 
+    //             a,asset_details b,asset_filter_asset_map c,asset_tags d 
+    //             where a.ASSET_ID=b.ASSET_ID and b.asset_status='Live' and c.asset_id=b.asset_id 
+    //             and c.filter_id=d.filter_id and c.filter_id 
+    //             in(select filter_id from asset_tags where filter_parent_id 
+    //             in(select filter_id from asset_tags where filter_parent_id is null))`;
 
-    //         }
-    //         console.log(queryString);
-    //         // RETURN THE GENERATED QUERY 
-    //         resolve(queryString);
-    //     })
+    //     }
+    //     console.log("--------- Convert  QUERY  -------");
+    //     console.log(queryString);
+    //     // RETURN THE GENERATED QUERY 
+    //     resolve(queryString);
+    // })
     // }
 
 
@@ -1960,266 +1924,6 @@ module.exports = class Asset {
     }
 
 
-    //Fetch asset model function
-    // static fetchAssets(host, offset, limit, filters, searchString2, sortBy, order, action) {
-    //     //console.log(action + "Host Modal Amit:- " + host);
-    //     return new Promise((resolve, reject) => {
-    //         let allAssetsObj = {};
-    //         let tAssets = [];
-    //         let allAssets = [];
-    //         let assetsArray = [];
-    //         let linksArray = [];
-    //         let commentsArray = [];
-    //         let ratingsArray = [];
-    //         let imagesArray = [];
-    //         let linkType = [];
-    //         var lobj2 = {};
-    //         let lobj = {};
-    //         let linkObjArr = [];
-    //         let sql;
-    //         var options = {};
-    //         let likesArray = [];
-    //         let viewsArray = [];
-    //         let solutionAreasArray = [];
-    //         let solutionAreas = [];
-    //         let assetTypes = [];
-    //         let assetTypesArray = [];
-    //         let salesPlays = [];
-    //         let salesPlaysArray = [];
-    //         let industry = [];
-    //         let industryArray = [];
-    //         let promotedArray = [];
-    //         const connection = getDb();
-    //         if (searchString2) {
-    //             let searchString = searchString2.toLowerCase();
-    //             sql = `select * from asset_details where asset_status='Live' and asset_id in(
-    //                 select  d.asset_id from asset_details d join asset_filter_asset_map m on 
-    //                 (d.asset_id=m.asset_id) where m.filter_id in (SELECT filter_id FROM ASSET_FILTER WHERE lower(FILTER_NAME) LIKE '%${searchString}%') UNION select asset_id from asset_details where (lower(ASSET_TITLE) LIKE '%${searchString}%' or lower(ASSET_DESCRIPTION) LIKE '%${searchString}%'))`;
-    //             options = {
-    //             }
-    //             // console.log(sql);
-    //         } else if (filters[0]) {
-    //             //console.log("filters", filters[0])
-
-    //             var filterArr = [];
-    //             filterArr = filters[0].split(',')
-    //             //console.log(filterArr)
-    //             var filter = filters.toString();
-
-    //             const l = filterArr.length;
-    //             if (action === 'preferenceApi') {
-    //                 //console.log("PAPI HIT")
-    //                 sql = `select * from asset_details where asset_status='Live' and asset_id in (
-    //         select  distinct asset_id from asset_filter_asset_map 
-    //         where filter_id in (select regexp_substr(:BIND,'[^,]+', 1, level)
-    //         from dual 
-    //         connect by regexp_substr(:BIND, '[^,]+', 1, level) is not null ))`;
-    //                 options = {
-    //                     BIND: filter
-
-    //                 }
-
-    //             }
-    //             else {
-    //                 sql = `select * from asset_details where asset_status='Live' and asset_id in(
-    //             select  d.asset_id from asset_details d join asset_filter_asset_map m on 
-    //             (d.asset_id=m.asset_id) where m.filter_id in (select regexp_substr(:BIND,'[^,]+', 1, level)
-    //             from dual 
-    //             connect by regexp_substr(:BIND, '[^,]+', 1, level) is not null ) 
-    //             group by d.asset_id having count(distinct(m.filter_id))=:COUNT)`;
-    //                 options = {
-    //                     BIND: filter,
-    //                     COUNT: l
-    //                 }
-    //             }
-    //         }
-    //         else {
-    //             //console.log("no filters if")
-    //             sql = `select * from asset_details where asset_status='Live'`;
-    //             options = {
-
-    //             }
-    //         }
-
-
-    //         connection.query(sql, options,
-    //             {
-    //                 outFormat: oracledb.OBJECT
-    //             })
-    //             .then(res => {
-    //                 ////console.log("Asset Details : ",res)
-    //                 assetsArray = res
-    //                 assetsArray.forEach(asset => {
-    //                     asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
-    //                     asset.createdDate = asset.ASSET_CREATED_DATE;
-    //                 })
-    //                 //console.log("Assets: "+assetsArray)
-    //                 connection.execute(`SELECT * from ASSET_LINKS`, {},
-    //                     {
-    //                         outFormat: oracledb.OBJECT
-    //                     },
-    //                 ).then(res => {
-    //                     ////console.log("links Details : ",res)
-    //                     linksArray = res.rows;
-    //                     connection.query(`select Count(*) comment_count,asset_id from 
-    //             asset_comments group by asset_id`, [],
-    //                         {
-    //                             outFormat: oracledb.OBJECT
-    //                         })
-    //                         .then(res => {
-    //                             //console.log("comment count",res)
-    //                             commentsArray = res;
-    //                             connection.query(`select avg(rate) avg_rating,asset_id from asset_rates group by asset_id`, [],
-    //                                 {
-    //                                     outFormat: oracledb.OBJECT
-    //                                 }).then(res => {
-    //                                     ratingsArray = res;
-    //                                     //console.log(ratingsArray)
-    //                                     connection.execute(`SELECT * from ASSET_IMAGES`, {},
-    //                                         {
-    //                                             outFormat: oracledb.OBJECT
-    //                                         })
-    //                                         .then(res => {
-    //                                             imagesArray = res.rows;
-    //                                             connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Solution Area'`, {},
-    //                                                 {
-    //                                                     outFormat: oracledb.OBJECT
-    //                                                 })
-    //                                                 .then(res => {
-    //                                                     solutionAreasArray = res.rows;
-    //                                                     connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Asset Type'`, {},
-    //                                                         {
-    //                                                             outFormat: oracledb.OBJECT
-    //                                                         })
-    //                                                         .then(res => {
-    //                                                             assetTypesArray = res.rows;
-    //                                                             connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Sales Initiatives'`, {},
-    //                                                                 {
-    //                                                                     outFormat: oracledb.OBJECT
-    //                                                                 })
-    //                                                                 .then(res => {
-    //                                                                     salesPlaysArray = res.rows;
-    //                                                                     connection.execute(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where filter_type='Industry'`, {},
-    //                                                                         {
-    //                                                                             outFormat: oracledb.OBJECT
-    //                                                                         })
-    //                                                                         .then(res => {
-    //                                                                             industryArray = res.rows;
-    //                                                                             //console.log(solutionAreasArray)
-    //                                                                             connection.execute(`SELECT asset_id from ASSET_LOB_LEADER_PROMOTED_ASSETS where status=1`, [],
-    //                                                                                 {
-    //                                                                                     outFormat: oracledb.OBJECT
-    //                                                                                 })
-    //                                                                                 .then(res => {
-    //                                                                                     promotedArray = res.rows;
-    //                                                                                     connection.execute(`SELECT count(*) like_count,asset_id from ASSET_LIKES group by asset_id`, [],
-    //                                                                                         {
-    //                                                                                             outFormat: oracledb.OBJECT
-    //                                                                                         })
-    //                                                                                         .then(res => {
-    //                                                                                             //console.log("LIKES",res)
-    //                                                                                             likesArray = res.rows;
-    //                                                                                             connection.execute(`SELECT count(*) view_count,asset_id from ASSET_VIEWS group by asset_id`, [],
-    //                                                                                                 {
-    //                                                                                                     outFormat: oracledb.OBJECT
-    //                                                                                                 })
-    //                                                                                                 .then(res => {
-    //                                                                                                     viewsArray = res.rows;
-    //                                                                                                     assetsArray.forEach(asset => {
-    //                                                                                                         const id = asset.ASSET_ID;
-    //                                                                                                         allAssetsObj = asset
-    //                                                                                                         allAssetsObj.LINKS = [];
-    //                                                                                                         var links = linksArray.filter(link => link.ASSET_ID === id)
-    //                                                                                                         ////console.log('links:',links)
-    //                                                                                                         solutionAreas = solutionAreasArray.filter(s => s.ASSET_ID === id)
-    //                                                                                                         assetTypes = assetTypesArray.filter(s => s.ASSET_ID === id)
-    //                                                                                                         salesPlays = salesPlaysArray.filter(s => s.ASSET_ID === id)
-    //                                                                                                         industry = industryArray.filter(s => s.ASSET_ID === id);
-    //                                                                                                         let promote = promotedArray.filter(s => s.ASSET_ID === id);
-    //                                                                                                         allAssetsObj.PROMOTE = promote.length == 0 ? false : true;
-    //                                                                                                         allAssetsObj.SOLUTION_AREAS = solutionAreas;
-    //                                                                                                         allAssetsObj.ASSET_TYPE = assetTypes;
-    //                                                                                                         allAssetsObj.SALES_PLAY = salesPlays;
-    //                                                                                                         allAssetsObj.INDUSTRY = industry;
-
-    //                                                                                                         linkType = links.map(a => a.LINK_REPOS_TYPE)
-    //                                                                                                         linkType = [...new Set(linkType)]
-    //                                                                                                         ////console.log(linkType)
-    //                                                                                                         linkType.forEach(type => {
-    //                                                                                                             var links2 = linksArray.filter(link => link.LINK_REPOS_TYPE === type && link.ASSET_ID === id)
-    //                                                                                                             lobj.TYPE = type;
-    //                                                                                                             lobj.arr = links2;
-    //                                                                                                             lobj2 = lobj
-    //                                                                                                             linkObjArr.push(lobj2);
-    //                                                                                                             lobj = {}
-    //                                                                                                         })
-    //                                                                                                         allAssetsObj.LINKS = linkObjArr;
-
-    //                                                                                                         linkObjArr = [];
-    //                                                                                                         ////console.log(lobj2,"obj2")
-    //                                                                                                         var images = imagesArray.filter(image => image.ASSET_ID === id);
-    //                                                                                                         images.forEach(image => {
-    //                                                                                                             image.IMAGEURL = 'http://' + host + '/' + image.IMAGEURL;
-    //                                                                                                         });
-    //                                                                                                         allAssetsObj.IMAGES = images;
-    //                                                                                                         var comments = commentsArray.filter(c => c.ASSET_ID === id);
-
-    //                                                                                                         var ratings = ratingsArray.filter(r => r.ASSET_ID === id)
-    //                                                                                                         var likes = likesArray.filter(l => l.ASSET_ID === id)
-    //                                                                                                         var views = viewsArray.filter(v => v.ASSET_ID === id)
-    //                                                                                                         //console.log(...views);
-    //                                                                                                         if (comments[0]) {
-    //                                                                                                             delete comments[0].ASSET_ID;
-
-    //                                                                                                         }
-    //                                                                                                         if (!comments.length) {
-    //                                                                                                             comments.push({ COMMENT_COUNT: 0 });
-    //                                                                                                         }
-    //                                                                                                         if (!ratings.length) {
-    //                                                                                                             ratings.push({ AVG_RATING: 0, ASSET_ID: id })
-    //                                                                                                         }
-    //                                                                                                         if (!likes.length) {
-    //                                                                                                             likes.push({ LIKE_COUNT: 0, ASSET_ID: id })
-    //                                                                                                         }
-    //                                                                                                         if (!views.length) {
-    //                                                                                                             views.push({ VIEW_COUNT: 0, ASSET_ID: id })
-    //                                                                                                         }
-
-    //                                                                                                         allAssetsObj.COMMENTS = comments[0];
-    //                                                                                                         allAssetsObj.RATINGS = ratings[0];
-    //                                                                                                         allAssetsObj.LIKES = likes[0];
-    //                                                                                                         allAssetsObj.VIEWS = views[0];
-
-    //                                                                                                         if (!(sortBy == 'views' && allAssetsObj.VIEWS.VIEW_COUNT == 0)) {
-    //                                                                                                             allAssets.push(allAssetsObj)
-    //                                                                                                         }
-    //                                                                                                     })
-
-    //                                                                                                     let allObj = {};
-    //                                                                                                     allObj.TOTALCOUNT = allAssets.length;
-    //                                                                                                     tAssets = allAssets.slice(offset, limit);
-    //                                                                                                     dynamicSort(tAssets, sortBy, order)
-    //                                                                                                     allObj.ASSETS = tAssets;
-    //                                                                                                     resolve(allObj);
-    //                                                                                                     //}
-
-    //                                                                                                 })
-    //                                                                                         })
-    //                                                                                 })
-    //                                                                         })
-    //                                                                 })
-    //                                                         })
-    //                                                 })
-    //                                         })
-    //                                 })
-
-    //                         })
-    //                 })
-    //             })
-    //     })
-    // }
-
-
     static fetchAssetsById(assetId, host, user_email) {
         let assetObj = {}
         let linkObjArr = [];
@@ -2262,14 +1966,14 @@ module.exports = class Asset {
                                     lobj = {}
                                 })
                                 assetObj.LINKS = linkObjArr;
-                                // assetObj.ASSET_THUMBNAIL = 'http://' + host + '/' + assetObj.ASSET_THUMBNAIL;
-                                assetObj.ASSET_THUMBNAIL = assetObj.ASSET_THUMBNAIL != null && assetObj.ASSET_THUMBNAIL.trim().length > 0 ? 'http://' + host + '/' + assetObj.ASSET_THUMBNAIL : 'http://' + host + '/no_image.png';
+                                // assetObj.ASSET_THUMBNAIL = 'https://' + host + '/' + assetObj.ASSET_THUMBNAIL;
+                                assetObj.ASSET_THUMBNAIL = assetObj.ASSET_THUMBNAIL != null && assetObj.ASSET_THUMBNAIL.trim().length > 0 ? 'https://' + host + '/' + assetObj.ASSET_THUMBNAIL : 'https://' + host + '/no_image.png';
                                 getImagesById(assetId)
                                     .then(res => {
                                         //  //console.log(res)
                                         assetObj.IMAGES = res;
                                         assetObj.IMAGES.forEach(image => {
-                                            image.IMAGEURL = 'http://' + host + '/' + image.IMAGEURL;
+                                            image.IMAGEURL = 'https://' + host + '/' + image.IMAGEURL;
                                         });
 
                                         getCommentsById(assetId, host)
@@ -2315,7 +2019,7 @@ module.exports = class Asset {
                                                                                                             filterObj = {};
                                                                                                         })
                                                                                                         //console.log(filterObj)
-                                                                                                        assetObj.FILTERMAP = filterArrFinal
+                                                                                                        assetObj.FILTERMAP = filterArrFinal[0].arr;
                                                                                                         resolve(assetObj)
 
                                                                                                     })
@@ -2551,7 +2255,7 @@ module.exports = class Asset {
                                                             filteredArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && !f.FILTER_NAME.toLowerCase().includes('other'));
 
                                                             filterObj.Type = type;
-                                                            filterObj.FILTER_TYPE_IMAGE = 'http://' + host + '/' + filteredArr[0].FILTER_TYPE_IMAGE;
+                                                            filterObj.FILTER_TYPE_IMAGE = 'https://' + host + '/' + filteredArr[0].FILTER_TYPE_IMAGE;
                                                             filteredArr.sort((a, b) => (a.FILTER_NAME > b.FILTER_NAME) ? 1 : -1)
                                                             const otherArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && f.FILTER_NAME.toLowerCase().includes('other'))
                                                             if (otherArr.length === 1) {
@@ -2568,8 +2272,8 @@ module.exports = class Asset {
                                                                 f.ASSET_COUNT = typeCountArr[0].CNT
                                                                 f.WINSTORY_COUNT = winstorytypeCountArr[0].CNT
                                                                 // console.log("f.FILTER_IMAGE" + ': ' + f.FILTER_IMAGE);
-                                                                f.FILTER_TYPE_IMAGE = 'http://' + host + '/' + f.FILTER_TYPE_IMAGE;
-                                                                f.FILTER_IMAGE = 'http://' + host + '/' + f.FILTER_IMAGE;
+                                                                f.FILTER_TYPE_IMAGE = 'https://' + host + '/' + f.FILTER_TYPE_IMAGE;
+                                                                f.FILTER_IMAGE = 'https://' + host + '/' + f.FILTER_IMAGE;
                                                             })
                                                             filterObj.filters = filteredArr;
 
@@ -2642,7 +2346,7 @@ module.exports = class Asset {
                 .then(res => {
                     assetsArray = res
                     assetsArray.forEach(asset => {
-                        asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
+                        asset.ASSET_THUMBNAIL = 'https://' + host + '/' + asset.ASSET_THUMBNAIL;
                     })
                     connection.query(`select Count(*) comment_count,asset_id from 
                     asset_comments group by asset_id`, [],
@@ -2814,7 +2518,7 @@ module.exports = class Asset {
                 .then(res => {
                     assetsArray = res;
                     // assetsArray.forEach(asset => {
-                    //     asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
+                    //     asset.ASSET_THUMBNAIL = 'https://' + host + '/' + asset.ASSET_THUMBNAIL;
                     // })
                     this.refineAssets(host, 0, assetsArray.length, assetsArray, sortBy, order, "", user_email).then(assets => {
                         resolve(assets);
@@ -2871,7 +2575,7 @@ module.exports = class Asset {
                 .then(res => {
                     assetsArray = res
                     assetsArray.forEach(asset => {
-                        asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
+                        asset.ASSET_THUMBNAIL = 'https://' + host + '/' + asset.ASSET_THUMBNAIL;
                     })
                     connection.query(`select Count(*) comment_count,asset_id from 
                     asset_comments group by asset_id`, [],
@@ -3030,9 +2734,9 @@ module.exports = class Asset {
                     });
                     assetsArray = res
                     assetsArray.forEach(asset => {
-                        // asset.ASSET_THUMBNAIL = 'http://' + host + '/' + asset.ASSET_THUMBNAIL;
+                        // asset.ASSET_THUMBNAIL = 'https://' + host + '/' + asset.ASSET_THUMBNAIL;
                         console.log("THUMNNAIL >>>>>>>>>>>> " + asset.ASSET_THUMBNAIL)
-                        asset.ASSET_THUMBNAIL = asset.ASSET_THUMBNAIL != null && asset.ASSET_THUMBNAIL.trim().length > 0 ? 'http://' + host + '/' + asset.ASSET_THUMBNAIL : 'http://' + host + '/no_image.png';
+                        asset.ASSET_THUMBNAIL = asset.ASSET_THUMBNAIL != null && asset.ASSET_THUMBNAIL.trim().length > 0 ? 'https://' + host + '/' + asset.ASSET_THUMBNAIL : 'https://' + host + '/no_image.png';
                     })
                     connection.query(`select Count(*) comment_count,asset_id from 
                     asset_comments group by asset_id`, [],

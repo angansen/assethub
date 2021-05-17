@@ -69,7 +69,7 @@ async function getpoolconnection() {
 
 		// *** STAGING DB CRED ***
 		user: "assethub",
-		password: "AssetHub#19_",
+		password: "Asset_Hub#20",
 		connectString: "db1-s.sb3.ahvcn.oraclevcn.com:1521/pah01s.sb3.ahvcn.oraclevcn.com",
 
 
