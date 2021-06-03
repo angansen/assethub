@@ -126,9 +126,10 @@ exports.postAsset = (req, res) => {
     const owner = req.body.owner.replace(/ /g, '');
     // const location = req.body.location;
     let filters = req.body.filters;
-    const expiryDate = req.body.expiryDate;
+    const expiryDate = req.body.expiryDate != undefined ? req.body.expiryDate : "6";
     // const asset_architecture_description = req.body.asset_architecture_description
 
+    console.log(" --- >>> "+createdBy);
     const windata = {};
     windata.WIN_ECA = req.body.WIN_ECA != undefined ? req.body.WIN_ECA : "";
     windata.WIN_REGID = req.body.WIN_REGID != undefined ? req.body.WIN_REGID : "";
@@ -145,6 +146,7 @@ exports.postAsset = (req, res) => {
     windata.WIN_SALES_PROCESS_TEAMS = req.body.WIN_SALES_PROCESS_TEAMS != undefined ? req.body.WIN_SALES_PROCESS_TEAMS : "";
     windata.WIN_LESSONS_LEARNED = req.body.WIN_LESSONS_LEARNED != undefined ? req.body.WIN_LESSONS_LEARNED : "";
     windata.WIN_CUSTOMER_BUSINESS_CHALLANGES = req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES != undefined ? req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES : "";
+    windata.WIN_TCV_ARR = req.body.WIN_TCV_ARR != undefined ? req.body.WIN_TCV_ARR : "";
 
     let assetCreatedEmailSql = `select  user_email,user_name,ASSET_DESCRIPTION from asset_user ,asset_details where user_role='reviewer' and asset_id=:0  and user_location in(
         select user_location from asset_user where user_email in 
@@ -286,6 +288,7 @@ exports.postEditAsset = (req, res) => {
     windata.WIN_SALES_PROCESS_TEAMS = req.body.WIN_SALES_PROCESS_TEAMS != undefined ? req.body.WIN_SALES_PROCESS_TEAMS : "";
     windata.WIN_LESSONS_LEARNED = req.body.WIN_LESSONS_LEARNED != undefined ? req.body.WIN_LESSONS_LEARNED : "";
     windata.WIN_CUSTOMER_BUSINESS_CHALLANGES = req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES != undefined ? req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES : "";
+    windata.WIN_TCV_ARR = req.body.WIN_TCV_ARR != undefined ? req.body.WIN_TCV_ARR : "";
 
 
 
@@ -599,7 +602,7 @@ exports.getAllAssetsByFilters = (req, res) => {
     searchString = searchString == undefined ? "" : searchString;
     filters = filters == undefined ? [] : filters;
 
-    let host = req.headers.host;
+    let host = req;
     if (limit === '-1') {
         console.log("-1 limit if")
         const connection = getDb();
@@ -609,7 +612,7 @@ exports.getAllAssetsByFilters = (req, res) => {
             },
         ).then(result => {
             limit = result.rows[0].TOTAL;
-            console.log("new Limit" + limit)
+            console.log("new Limit" + limit);
             Asset.fetchAssets(host, offset, limit, filters, searchString, sortBy, order, '', email).then(result => {
                 res.json(result);
             })
@@ -629,7 +632,7 @@ exports.getAllPreferredAssets = (req, res) => {
     const user_email = req.params.user_email;
     let order = req.header('order');
     let sortBy = req.header('sortBy');
-    Asset.fetchPreferedAssets(req.headers.host, user_email, sortBy, order)
+    Asset.fetchPreferedAssets(req, user_email, sortBy, order)
         .then(list => {
             res.send(list);
         })
@@ -639,7 +642,7 @@ exports.getAllPreferredAssets = (req, res) => {
 
 exports.getAssetById = (req, res) => {
     const user_email = req.header("user_email")
-    Asset.fetchAssetsById(req.params.assetId, req.headers.host, user_email).then(result => {
+    Asset.fetchAssetsById(req.params.assetId, req, user_email).then(result => {
         res.json(result);
     })
 }
@@ -737,7 +740,7 @@ exports.getAllAssetsByLob = (req, res) => {
     let order = req.header('order');
     let sortBy = req.header('sortBy');
     console.log("Host >>> " + req.headers.host);
-    Asset.getAssetsByLob(lob, req.headers.host, user_email, sortBy, order).then(result => {
+    Asset.getAssetsByLob(lob, req, user_email, sortBy, order).then(result => {
         res.json(result)
     })
 }
@@ -755,7 +758,7 @@ exports.getAllAssetsByLob2 = (req, res) => {
         .then(user_lob => {
             console.log(user_lob.rows[0])
             if (user_lob.rows[0]) {
-                Asset.getAssetsByLob(user_lob.rows[0].USER_LOB, req.headers.host, user_email).then(result => {
+                Asset.getAssetsByLob(user_lob.rows[0].USER_LOB, req, user_email).then(result => {
                     res.json(result)
                 })
             }
@@ -767,7 +770,7 @@ exports.getAllAssetsByLob2 = (req, res) => {
 
 exports.getUserAssets = (req, res) => {
     const user_email = req.header("user_email");
-    Asset.getMyAssets(user_email, req.headers.host).then(result => {
+    Asset.getMyAssets(user_email, req).then(result => {
         if (result.length > 0) {
             res.json(result);
         }

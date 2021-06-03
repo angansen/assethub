@@ -9,14 +9,10 @@ var debug = require('debug')('assethubbackend:server');
 var http = require('http');
 const https = require('https');
 const fs = require('fs');
+var cluster = require('cluster');
+var numCPUs = require('os').cpus().length;
 
-/**
- * SSL certificate options
- */
- const httpsServer = https.createServer({
-  key: fs.readFileSync('/u01/secureserver/bin/cert/ca.key'),
-  cert: fs.readFileSync('/u01/secureserver/bin/cert/ca.crt'),
-}, app);
+
 
 /**
  * Get port from environment and store in Express.
@@ -25,30 +21,58 @@ const fs = require('fs');
 var port = normalizePort(process.env.PORT || '8443');
 app.set('port', port);
 
-/**
- * Create HTTP server.
- */
+if (cluster.isMaster) {
+  // Fork workers.
+  for (var i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
 
-// let server = http.createServer(app);
-httpsServer.listen(8443,'0.0.0.0', () => {
-  console.log('HTTPS Server running on port ' + port);
-});
-httpsServer.on('error', onError);
-httpsServer.on('listening', onListening);
+  // If a worker dies, log it to the console and start another worker.
+  cluster.on('exit', function (worker, code, signal) {
+    console.log('Worker ' + worker.process.pid + ' died.');
+    cluster.fork();
+  });
 
-/**
- * SSL enabled server
- */
-// let server=https.createServer(options, app).listen(443);
+  // Log when a worker starts listening
+  cluster.on('listening', function (worker, address) {
+    // console.log('Worker started with PID ' + worker.process.pid + '.');
+    // setTimeout(() => {
+    //   worker.kill();
+    // }, 3000);
+  });
 
+  console.log(numCPUs + " worker nodes initiated . . .");
+} else {
 
-/**
- * Listen on provided port, on all network interfaces.
- */
+  /**
+   * Create HTTP server.
+   */
 
-// server.listen(port, '0.0.0.0');
-// server.on('error', onError);
-// server.on('listening', onListening);
+  var server = http.createServer(app);
+  // console.log("Server created");
+  /**
+   * Listen on provided port, on all network interfaces.
+   */
+
+  server.listen(port, '0.0.0.0');
+  server.on('error', onError);
+  server.on('listening', onListening);
+}
+
+// /**
+//  * Create HTTP server.
+//  */
+
+//  var server = http.createServer(app);
+//  // console.log("Server created");
+//  /**
+//   * Listen on provided port, on all network interfaces.
+//   */
+
+//  server.listen(port, '0.0.0.0');
+//  server.on('error', onError);
+//  server.on('listening', onListening);
+
 
 /**
  * Normalize a port into a number, string, or false.
@@ -104,7 +128,7 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = httpsServer.address();
+  var addr = server.address();
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;

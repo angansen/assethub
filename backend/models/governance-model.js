@@ -23,12 +23,14 @@ exports.fetchAssets = (user_email, user_role, host) => {
                 })
                 reports_emails = '\'' + reports_emails + '\'';
                 console.log(user_role + ' - ' + reports_emails);
-                let fetchPendingReviewAssetsSql = `select a.ASSET_ID,a.ASSET_TITLE,a.ASSET_DESCRIPTION,a.ASSET_CUSTOMER,a.ASSET_CREATEDBY,
+                let fetchPendingReviewAssetsSql = `select a.ASSET_ID,a.ASSET_DESCRIPTION,a.ASSET_CUSTOMER,a.ASSET_CREATEDBY,
                 a.ASSET_CREATED_DATE,a.ASSET_SERVICE_ID,a.ASSET_THUMBNAIL,a.ASSET_MODIFIED_DATE,a.ASSET_MODIFIED_BY,
                 a.ASSET_EXPIRY_DATE,a.ASSET_VIDEO_LINK,a.ASSET_OWNER,a.ASSET_STATUS,
-                a.ASSET_REVIEW_NOTE,a.ASSET_APPROVAL_LVL,c.checklist_items from asset_details a, asset_filter_asset_map b,asset_governance_checkpoint_by_type c
+                a.ASSET_REVIEW_NOTE,a.ASSET_APPROVAL_LVL,c.checklist_items,d.filter_name as ASSET_TYPE,d.filter_id as ASSET_TYPE_ID
+                 from asset_details a, asset_filter_asset_map b,asset_governance_checkpoint_by_type c,asset_tags d 
                 where asset_status in ('Live','Pending Review','Reject','Pending Rectification')
-                and a.asset_id=b.asset_id and b.filter_id=c.asset_type_id`;
+                and a.asset_id=b.asset_id and b.filter_id=c.asset_type_id and 
+                b.filter_id=d.filter_id and d.filter_id in (select filter_id from asset_tags where filter_parent_id='goek85ttc43')`;
 
                 if (user_role.includes('reviewer')) {
                     fetchPendingReviewAssetsSql += ` and asset_approval_lvl=2`;

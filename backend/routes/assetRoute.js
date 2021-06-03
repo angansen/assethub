@@ -6,8 +6,6 @@ let router = express.Router();
 router.get('/banner', assetController.getBannerDetails);
 router.get('/myAssets', assetController.getUserAssets);
 router.get('/helpandsupport', assetController.getHelpAndSupport);
-// router.get('/allAssetsBySearchString', assetController.getAllAssetsBySearchString);
-// router.get('/allAssetsFilters2', assetController.getAllAssetsByFilters);
 router.get('/allAssetsFilters', assetController.getAllAssetsByFilters);
 router.get('/allPrefferedAssets/:user_email', assetController.getAllPreferredAssets);
 router.get('/allFilters', assetController.getAllFilters);

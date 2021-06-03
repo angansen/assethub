@@ -155,7 +155,7 @@ const getImagesById = (assetId) => {
 //     })
 // }
 
-const getCommentsById = (assetId, host) => {
+const getCommentsById = (assetId, request) => {
     const connection = getDb();
     return connection.query(`select COMMENT_ID,
     COMMENT_COMMENT,
@@ -167,7 +167,7 @@ const getCommentsById = (assetId, host) => {
     else :0||USER_PROFILE_IMAGE
     end  USER_PROFILE_IMAGE
     from asset_comments c  full outer join asset_user u on (c.commentby=u.user_email)where ASSET_ID=:1`,
-        ["https://" + host + "/", assetId],
+        ["https://" + request.headers.host + "/", assetId],
         {
             outFormat: oracledb.OBJECT
         })
@@ -230,7 +230,7 @@ const getIndustryByAssetId = (assetId) => {
 }
 
 
-const getLikesByAssetId = (host, assetId) => {
+const getLikesByAssetId = (request, assetId) => {
     const connection = getDb();
     return connection.query(`select
     LIKE_ID,
@@ -239,7 +239,7 @@ const getLikesByAssetId = (host, assetId) => {
     LIKE_CREATED,
     LIKE_USERNAME ,
     case when USER_PROFILE_IMAGE is null then null
-    else '${host}'||USER_PROFILE_IMAGE
+    else '${request.host}'||USER_PROFILE_IMAGE
     end  USER_PROFILE_IMAGE
     from asset_likes l  full outer join asset_user u on (l.like_by=u.user_email)where ASSET_ID=:ASSET_ID`, [assetId],
         {
@@ -355,9 +355,12 @@ module.exports = class Asset {
             WIN_BUSINESS_IMPACT=:WIN_BUSINESS_IMPACT,
             WIN_SALES_PROCESS_TEAMS=:WIN_SALES_PROCESS_TEAMS,
             WIN_LESSONS_LEARNED=:WIN_LESSONS_LEARNED,
-            WIN_CUSTOMER_BUSINESS_CHALLANGES=:WIN_CUSTOMER_BUSINESS_CHALLANGES WHERE ASSET_ID=:ASSET_ID`,
-                            [ self.description, self.customer, self.createdBy.toLowerCase(),
-                            self.serviceid, new Date(), self.modifiedBy, self.expiryDate, self.video_link, self.owner.toLowerCase(), assetState,
+            WIN_CUSTOMER_BUSINESS_CHALLANGES=:WIN_CUSTOMER_BUSINESS_CHALLANGES,
+            WIN_TCV_ARR=:WIN_TCV_ARR WHERE ASSET_ID=:ASSET_ID`,
+                            [self.description, self.customer, self.createdBy.toLowerCase(),
+                            self.serviceid, new Date(), self.modifiedBy, 
+                            self.expiryDate, self.video_link,
+                            self.owner.toLowerCase(), assetState,
                             self.windata.WIN_ECA,
                             self.windata.WIN_REGID,
                             self.windata.WIN_FISCAL_YR,
@@ -372,11 +375,12 @@ module.exports = class Asset {
                             self.windata.WIN_BUSINESS_IMPACT,
                             self.windata.WIN_SALES_PROCESS_TEAMS,
                             self.windata.WIN_LESSONS_LEARNED,
-                            self.windata.WIN_CUSTOMER_BUSINESS_CHALLANGES,self.assetId],
+                            self.windata.WIN_CUSTOMER_BUSINESS_CHALLANGES,
+                            self.windata.WIN_TCV_ARR, self.assetId],
                             {
                                 outFormat: oracledb.Object
                             }).then(res => {
-                                console.log(self.assetId+' 1st update done(Asset details updated --> '+JSON.stringify(res))
+                                console.log(self.assetId + ' 1st update done(Asset details updated --> ' + JSON.stringify(res))
                             })
                     }, function secondAction() {
                         if (oj.length >= 0) {
@@ -392,7 +396,7 @@ module.exports = class Asset {
                                     oj, {
                                     autoCommit: true
                                 }).then(linkres => {
-                                    console.log("2nd update Links batch succesfully executed --> "+JSON.stringify(res));
+                                    console.log("2nd update Links batch succesfully executed --> " + JSON.stringify(res));
                                 }).catch(err => {
                                     console.log("Links batch insert failed");
                                 })
@@ -468,7 +472,28 @@ module.exports = class Asset {
                         link.ASSET_ID = assetid;
                     })
                 }
-                // console.log("Option SQL : " + JSON.stringify(self));
+                self.windata.WIN_RENEWAL=self.windata.WIN_RENEWAL?"YES":"NO";
+                let bindvalue=[assetid, self.description, self.customer, self.createdBy.toLowerCase(),
+                    new Date(), "self.serviceid", "self.thumbnail", new Date(), 
+                    "self.modifiedBy", self.expiryDate, self.video_link, self.owner.toLowerCase(), assetState,
+                    self.windata.WIN_ECA,
+                    self.windata.WIN_REGID,
+                    self.windata.WIN_FISCAL_YR,
+                    self.windata.WIN_MEMBERS,
+                    self.windata.WIN_SOLUTION_SOLD,
+                    self.windata.WIN_COSUMING_DATE,
+                    self.windata.WIN_GOLIVE_ON,
+                    self.windata.WIN_DEAL_CYCLE,
+                    self.windata.WIN_RENEWAL,
+                    self.windata.WIN_CUSTOMER_PERSONA,
+                    self.windata.WIN_REF_LANG_INCL_IN_CONTRACT,
+                    self.windata.WIN_BUSINESS_IMPACT,
+                    self.windata.WIN_SALES_PROCESS_TEAMS,
+                    self.windata.WIN_LESSONS_LEARNED,
+                    self.windata.WIN_CUSTOMER_BUSINESS_CHALLANGES,
+                    self.windata.WIN_TCV_ARR];
+
+                console.log("Bind Value : " + JSON.stringify(bindvalue));
                 connection.transaction([
                     function firstAction() {
                         return connection.insert(`INSERT into 
@@ -499,7 +524,8 @@ module.exports = class Asset {
                 WIN_BUSINESS_IMPACT,
                 WIN_SALES_PROCESS_TEAMS,
                 WIN_LESSONS_LEARNED,
-                WIN_CUSTOMER_BUSINESS_CHALLANGES) 
+                WIN_CUSTOMER_BUSINESS_CHALLANGES,
+                WIN_TCV_ARR) 
                 values(:ASSET_ID,
                 :ASSET_DESCRIPTION,
                 :ASSET_CUSTOMER,
@@ -527,30 +553,15 @@ module.exports = class Asset {
                 :WIN_BUSINESS_IMPACT,
                 :WIN_SALES_PROCESS_TEAMS,
                 :WIN_LESSONS_LEARNED,
-                :WIN_CUSTOMER_BUSINESS_CHALLANGES)`,
-                            [assetid, self.description, self.customer, self.createdBy.toLowerCase(),
-                                self.createdDate, self.serviceid, self.thumbnail, self.modifiedDate, self.modifiedBy, self.expiryDate, self.video_link, self.owner.toLowerCase(), assetState,
-                                self.windata.WIN_ECA,
-                                self.windata.WIN_REGID,
-                                self.windata.WIN_FISCAL_YR,
-                                self.windata.WIN_MEMBERS,
-                                self.windata.WIN_SOLUTION_SOLD,
-                                self.windata.WIN_COSUMING_DATE,
-                                self.windata.WIN_GOLIVE_ON,
-                                self.windata.WIN_DEAL_CYCLE,
-                                self.windata.WIN_RENEWAL,
-                                self.windata.WIN_CUSTOMER_PERSONA,
-                                self.windata.WIN_REF_LANG_INCL_IN_CONTRACT,
-                                self.windata.WIN_BUSINESS_IMPACT,
-                                self.windata.WIN_SALES_PROCESS_TEAMS,
-                                self.windata.WIN_LESSONS_LEARNED,
-                                self.windata.WIN_CUSTOMER_BUSINESS_CHALLANGES],
+                :WIN_CUSTOMER_BUSINESS_CHALLANGES,
+                :WIN_TCV_ARR)`,
+                            bindvalue,
                             {
                                 outFormat: oracledb.Object
                             }).then(res => {
                                 console.log('1st insert done(Asset details inserted)')
                             }).catch(err => {
-                                console.log("First Action error " + err);
+                                console.log("First insert Action error " + err);
                                 reject({ msg: "Asset creation failed on first step" });
                             }).finally(() => {
                                 console.log("---------------------");
@@ -622,7 +633,7 @@ module.exports = class Asset {
         })
     }
 
-   
+
 
 
     static uploadImages(assetId, images, imageDescription) {
@@ -838,7 +849,7 @@ module.exports = class Asset {
                 })
         })
     }
-    static uploadDoc(host, data, file) {
+    static uploadDoc(request, data, file) {
         return new Promise((resolve, reject) => {
             const connection = getDb();
             let fname = file.name.split('.')[0];
@@ -847,7 +858,7 @@ module.exports = class Asset {
             const uniqueId = uniqid();
             const finalFname = fname + uniqueId.concat('.', ftype);
             const uploadPath = path.join('/', 'mnt/ahfs/assets', data.assetId, finalFname);
-            var content = 'https://' + host + '/' + 'assets/' + data.assetId + "/" + finalFname;
+            var content =  'https://' + request.headers.host + '/' + 'assets/' + data.assetId + "/" + finalFname;
             console.log(finalFname);
             try {
                 console.log("---------  FOLDER CREATION ----------")
@@ -1320,7 +1331,7 @@ module.exports = class Asset {
     //     })
     // }
 
-    static fetchAssets(host, offset, limit, filters, searchString, sortBy, order, action, email) {
+    static fetchAssets(request, offset, limit, filters, searchString, sortBy, order, action, email) {
 
         return new Promise((resolve, reject) => {
             if (filters.length > 0 && filters != "") {
@@ -1353,7 +1364,7 @@ module.exports = class Asset {
                                         }).then(filterdata => {
                                             let filtersasset = [];
                                             this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
-                                                this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action, email).then(assets => {
+                                                this.refineAssets(request, offset, limit, filtersasset, sortBy, order, action, email).then(assets => {
                                                     resolve(assets);
                                                 })
                                             })
@@ -1383,7 +1394,7 @@ module.exports = class Asset {
                                 let filtersasset = [];
                                 this.filterAssetBySearchString(data, filterdata, searchString, filtersasset).then(res => {
                                     console.log("Content filter ended : " + filtersasset.length);
-                                    this.refineAssets(host, offset, limit, filtersasset, sortBy, order, action, email).then(assets => {
+                                    this.refineAssets(request, offset, limit, filtersasset, sortBy, order, action, email).then(assets => {
                                         resolve(assets);
                                     })
                                 })
@@ -1394,7 +1405,7 @@ module.exports = class Asset {
         });
     }
 
-    static refineAssetsold(host, offset, limit, assetsArray, sortBy, order, action, email) {
+    static refineAssetsold(request, offset, limit, assetsArray, sortBy, order, action, email) {
 
         // REMOVE DUPLICATE ENTRIES
         // console.log("*****************************************refineAssets fun start*******************************************")
@@ -1437,7 +1448,7 @@ module.exports = class Asset {
         let promotedArray = [];
         return new Promise((resolve, reject) => {
             assetsArray.forEach(asset => {
-                asset.ASSET_THUMBNAIL = 'https://' + host + '/' + asset.ASSET_THUMBNAIL;
+                asset.ASSET_THUMBNAIL = this.getimagepath(request) + asset.ASSET_THUMBNAIL;
                 asset.createdDate = asset.ASSET_CREATED_DATE;
             })
             const connection = getDb();
@@ -1564,7 +1575,7 @@ module.exports = class Asset {
                                                                                                                                     allAssetsObj.ASSET_TYPE = assetTypes;
                                                                                                                                     allAssetsObj.SALES_PLAY = salesPlays;
                                                                                                                                     allAssetsObj.INDUSTRY = industry;
-                                                                                                                                    allAssetsObj.ASSET_THUMBNAIL = allAssetsObj.ASSET_THUMBNAIL == null ? 'https://' + host + '/no_image.png' : allAssetsObj.ASSET_THUMBNAIL;
+                                                                                                                                    allAssetsObj.ASSET_THUMBNAIL = allAssetsObj.ASSET_THUMBNAIL == null ? this.getimagepath(request) + '/no_image.png' : allAssetsObj.ASSET_THUMBNAIL;
 
                                                                                                                                     linkType = links.map(a => a.LINK_REPOS_TYPE)
                                                                                                                                     linkType = [...new Set(linkType)]
@@ -1583,7 +1594,7 @@ module.exports = class Asset {
                                                                                                                                     ////console.log(lobj2,"obj2")
                                                                                                                                     var images = imagesArray.filter(image => image.ASSET_ID === id);
                                                                                                                                     images.forEach(image => {
-                                                                                                                                        image.IMAGEURL = 'https://' + host + '/' + image.IMAGEURL;
+                                                                                                                                        image.IMAGEURL = this.getimagepath(request) + image.IMAGEURL;
                                                                                                                                     });
                                                                                                                                     allAssetsObj.IMAGES = images;
                                                                                                                                     var comments = commentsArray.filter(c => c.ASSET_ID === id);
@@ -1656,6 +1667,10 @@ module.exports = class Asset {
         })
     }
 
+    static getimagepath(request) {
+        return (request.headers.host.toLowerCase().includes(':') ? 'http://' + request.headers.host + "/" : 'https://' + request.headers.host + "/image/");
+    }
+
     static sortAssetsByType(assets) {
         return new Promise((resolve, reject) => {
             let sortedAssets = {};
@@ -1672,7 +1687,7 @@ module.exports = class Asset {
         })
     }
 
-    static refineAssets(host, offset, limit, assetsArray, sortBy, order, action, email) {
+    static refineAssets(request, offset, limit, assetsArray, sortBy, order, action, email) {
 
         let assetidtracker = {};
         let uniqueassetarray = assetsArray.filter(asset => {
@@ -1705,15 +1720,14 @@ module.exports = class Asset {
                         allAssetsObj = asset
                         allAssetsObj.LINKS = [];
 
-                        asset.ASSET_THUMBNAIL = 'https://' + host + '/' + asset.ASSET_THUMBNAIL;
+                        asset.ASSET_THUMBNAIL = this.getimagepath(request) + asset.ASSET_THUMBNAIL;
                         asset.createdDate = asset.ASSET_CREATED_DATE;
 
 
-                        allAssetsObj.ASSET_THUMBNAIL = allAssetsObj.ASSET_THUMBNAIL == null ? 'https://' + host + '/no_image.png' : allAssetsObj.ASSET_THUMBNAIL;
+                        allAssetsObj.ASSET_THUMBNAIL = allAssetsObj.ASSET_THUMBNAIL == null ? this.getimagepath(request) + '/no_image.png' : allAssetsObj.ASSET_THUMBNAIL;
 
                         var views = viewsArray.filter(v => v.ASSET_ID === id);
-
-                        allAssetsObj.VIEWS = views[0];
+                        allAssetsObj.VIEWS = views.length == 0 ? { VIEW_COUNT: 0, ASSET_ID: id } : views[0];
 
                         if (!(sortBy == 'views' && allAssetsObj.VIEWS.VIEW_COUNT == 0)) {
                             allAssets.push(allAssetsObj);
@@ -1838,7 +1852,7 @@ module.exports = class Asset {
 
 
 
-    static fetchPreferedAssets(host, userEmail, sortBy, order, keywords = []) {
+    static fetchPreferedAssets(request, userEmail, sortBy, order, keywords = []) {
         const offset = 0
         let limit;
         const connection = getDb();
@@ -1910,7 +1924,7 @@ module.exports = class Asset {
 
                                     this.filterAssetBySearchString(allassets, filterdata, wordlist, filtersasset).then(res => {
                                         filtersasset = [...filtersasset, ...preferedassets];
-                                        this.refineAssets(host, offset, limit, filtersasset, sortBy, order, "", userEmail).then(assets => {
+                                        this.refineAssets(request, offset, limit, filtersasset, sortBy, order, "", userEmail).then(assets => {
                                             resolve(assets);
                                         })
                                     })
@@ -1924,7 +1938,7 @@ module.exports = class Asset {
     }
 
 
-    static fetchAssetsById(assetId, host, user_email) {
+    static fetchAssetsById(assetId, request, user_email) {
         let assetObj = {}
         let linkObjArr = [];
         let lobj = {};
@@ -1966,17 +1980,17 @@ module.exports = class Asset {
                                     lobj = {}
                                 })
                                 assetObj.LINKS = linkObjArr;
-                                // assetObj.ASSET_THUMBNAIL = 'https://' + host + '/' + assetObj.ASSET_THUMBNAIL;
-                                assetObj.ASSET_THUMBNAIL = assetObj.ASSET_THUMBNAIL != null && assetObj.ASSET_THUMBNAIL.trim().length > 0 ? 'https://' + host + '/' + assetObj.ASSET_THUMBNAIL : 'https://' + host + '/no_image.png';
+                                // assetObj.ASSET_THUMBNAIL = request.protocol +'://'+ request.headers.host + this.getimagepath(request.protocol)+ '/' + assetObj.ASSET_THUMBNAIL;
+                                assetObj.ASSET_THUMBNAIL = assetObj.ASSET_THUMBNAIL != null && assetObj.ASSET_THUMBNAIL.trim().length > 0 ? this.getimagepath(request) + assetObj.ASSET_THUMBNAIL : this.getimagepath(request) + 'no_image.png';
                                 getImagesById(assetId)
                                     .then(res => {
                                         //  //console.log(res)
                                         assetObj.IMAGES = res;
                                         assetObj.IMAGES.forEach(image => {
-                                            image.IMAGEURL = 'https://' + host + '/' + image.IMAGEURL;
+                                            image.IMAGEURL = this.getimagepath(request) + image.IMAGEURL;
                                         });
 
-                                        getCommentsById(assetId, host)
+                                        getCommentsById(assetId, request)
                                             .then(res => {
                                                 assetObj.COMMENTS = res;
                                                 getRatingsById(assetId)
@@ -2127,16 +2141,16 @@ module.exports = class Asset {
 
 
 
-    static getSocialDataByAssetId(host, assetId, userId) {
+    static getSocialDataByAssetId(request, assetId, userId) {
         let assetSocialObj = {}
         return new Promise((resolve, reject) => {
             getSharecountByAssetId(assetId)
                 .then(sharecount => {
                     assetSocialObj.sharecount = sharecount[0].COUNT;
-                    getCommentsById(assetId, host)
+                    getCommentsById(assetId, request)
                         .then(comments => {
                             assetSocialObj.COMMENTS = comments;
-                            getLikesByAssetId(host, assetId)
+                            getLikesByAssetId(request, assetId)
                                 .then(likes => {
                                     assetSocialObj.LIKES = likes
                                     getLikesByAssetIdAndUserId(assetId, userId)
@@ -2152,7 +2166,7 @@ module.exports = class Asset {
     }
 
 
-    static getFilters(user_email, host, platform) {
+    static getFilters(user_email, request, platform) {
         // console.log("fetching filters >" + user_email);
         let typeArr = [];
         let filteredArr = [];
@@ -2255,7 +2269,7 @@ module.exports = class Asset {
                                                             filteredArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && !f.FILTER_NAME.toLowerCase().includes('other'));
 
                                                             filterObj.Type = type;
-                                                            filterObj.FILTER_TYPE_IMAGE = 'https://' + host + '/' + filteredArr[0].FILTER_TYPE_IMAGE;
+                                                            filterObj.FILTER_TYPE_IMAGE = this.getimagepath(request) + filteredArr[0].FILTER_TYPE_IMAGE;
                                                             filteredArr.sort((a, b) => (a.FILTER_NAME > b.FILTER_NAME) ? 1 : -1)
                                                             const otherArr = filters.filter(f => f.FILTER_TYPE != null && f.FILTER_TYPE === type && f.FILTER_NAME != null && f.FILTER_NAME.toLowerCase().includes('other'))
                                                             if (otherArr.length === 1) {
@@ -2272,8 +2286,8 @@ module.exports = class Asset {
                                                                 f.ASSET_COUNT = typeCountArr[0].CNT
                                                                 f.WINSTORY_COUNT = winstorytypeCountArr[0].CNT
                                                                 // console.log("f.FILTER_IMAGE" + ': ' + f.FILTER_IMAGE);
-                                                                f.FILTER_TYPE_IMAGE = 'https://' + host + '/' + f.FILTER_TYPE_IMAGE;
-                                                                f.FILTER_IMAGE = 'https://' + host + '/' + f.FILTER_IMAGE;
+                                                                f.FILTER_TYPE_IMAGE = this.getimagepath(request) + f.FILTER_TYPE_IMAGE;
+                                                                f.FILTER_IMAGE = this.getimagepath(request) + f.FILTER_IMAGE;
                                                             })
                                                             filterObj.filters = filteredArr;
 
@@ -2310,7 +2324,7 @@ module.exports = class Asset {
                 .then(res => {
                     assetsArray = res
                     console.log('getFavAssets Length: ' + res.length)
-                    this.refineAssets(host, 0, assetsArray.length, assetsArray, "createdDate", "desc", "", user_email).then(assets => {
+                    this.refineAssets(request, 0, assetsArray.length, assetsArray, "createdDate", "desc", "", user_email).then(assets => {
                         resolve(assets);
                     })
                 })
@@ -2346,7 +2360,7 @@ module.exports = class Asset {
                 .then(res => {
                     assetsArray = res
                     assetsArray.forEach(asset => {
-                        asset.ASSET_THUMBNAIL = 'https://' + host + '/' + asset.ASSET_THUMBNAIL;
+                        asset.ASSET_THUMBNAIL = this.getimagepath(request) + asset.ASSET_THUMBNAIL;
                     })
                     connection.query(`select Count(*) comment_count,asset_id from 
                     asset_comments group by asset_id`, [],
@@ -2470,29 +2484,9 @@ module.exports = class Asset {
                 })
         })
     }
-    static getAssetsByLob(lob, host, user_email, sortBy, order) {
+    static getAssetsByLob(lob, request, user_email, sortBy, order) {
         let assetsArray = [];
-        let likesArray = [];
-        let viewsArray = [];
-        let linksArray = [];
-        let imagesArray = [];
-        let allAssetsObj = {};
-        let allAssetsFinalArray = [];
-        let commentsArray = [];
-        let allObj = {};
-        let linkType = [];
-        var lobj2 = {};
-        let lobj = {};
-        let linkObjArr = [];
-        let solutionAreasArray = [];
-        let solutionAreas = [];
-        let assetTypes = [];
-        let assetTypesArray = [];
-        let salesPlays = [];
-        let salesPlaysArray = [];
-        let promotedArray = [];
-        let industryArray = []
-        let industry = [];
+
         return new Promise((resolve, reject) => {
             const connection = getDb();
             let lobQuerySql;
@@ -2520,7 +2514,7 @@ module.exports = class Asset {
                     // assetsArray.forEach(asset => {
                     //     asset.ASSET_THUMBNAIL = 'https://' + host + '/' + asset.ASSET_THUMBNAIL;
                     // })
-                    this.refineAssets(host, 0, assetsArray.length, assetsArray, sortBy, order, "", user_email).then(assets => {
+                    this.refineAssets(request, 0, assetsArray.length, assetsArray, sortBy, order, "", user_email).then(assets => {
                         resolve(assets);
                     })
                 })
@@ -2575,7 +2569,7 @@ module.exports = class Asset {
                 .then(res => {
                     assetsArray = res
                     assetsArray.forEach(asset => {
-                        asset.ASSET_THUMBNAIL = 'https://' + host + '/' + asset.ASSET_THUMBNAIL;
+                        asset.ASSET_THUMBNAIL = this.getimagepath(request) + asset.ASSET_THUMBNAIL;
                     })
                     connection.query(`select Count(*) comment_count,asset_id from 
                     asset_comments group by asset_id`, [],
@@ -2708,7 +2702,7 @@ module.exports = class Asset {
         })
     }
 
-    static getMyAssets(user_email, host) {
+    static getMyAssets(user_email, request) {
         let assetsArray = [];
         let likesArray = [];
         let viewsArray = [];
@@ -2723,7 +2717,11 @@ module.exports = class Asset {
         let tempStatusArr = [];
         return new Promise((resolve, reject) => {
             const connection = getDb();
-            connection.query(`select * from asset_details where ASSET_CREATEDBY=:ASSET_CREATEDBY or ASSET_OWNER like :ASSET_OWNER`, [user_email, '%' + user_email + '%'],
+            let sql=`select a.*,c.filter_name as ASSET_TYPE,c.filter_id as ASSET_TYPE_ID from asset_details a,asset_filter_asset_map b, asset_tags c 
+            where a.ASSET_OWNER='${user_email}' and a.asset_id=b.asset_id
+            and b.filter_id=c.filter_id and c.filter_id in(select filter_id from asset_tags where filter_parent_id='goek85ttc43')`;
+            console.log("Query: : : "+sql);
+            connection.query(sql, {},
                 {
                     outFormat: oracledb.OBJECT
                 })
@@ -2732,11 +2730,12 @@ module.exports = class Asset {
                         element.ASSET_REVIEW_NOTE = JSON.parse(element.ASSET_REVIEW_NOTE)
 
                     });
-                    assetsArray = res
+                    assetsArray = res;
+                    console.log("My Asset count >>>>>>>>>>>> " + assetsArray.length);
                     assetsArray.forEach(asset => {
-                        // asset.ASSET_THUMBNAIL = 'https://' + host + '/' + asset.ASSET_THUMBNAIL;
-                        console.log("THUMNNAIL >>>>>>>>>>>> " + asset.ASSET_THUMBNAIL)
-                        asset.ASSET_THUMBNAIL = asset.ASSET_THUMBNAIL != null && asset.ASSET_THUMBNAIL.trim().length > 0 ? 'https://' + host + '/' + asset.ASSET_THUMBNAIL : 'https://' + host + '/no_image.png';
+                        // asset.ASSET_THUMBNAIL = 'https://' + host + this.getimagepath(request.protocol)+ '/' + asset.ASSET_THUMBNAIL;
+                        
+                        asset.ASSET_THUMBNAIL = asset.ASSET_THUMBNAIL != null && asset.ASSET_THUMBNAIL.trim().length > 0 ? this.getimagepath(request) + asset.ASSET_THUMBNAIL : this.getimagepath(request) + 'no_image.png';
                     })
                     connection.query(`select Count(*) comment_count,asset_id from 
                     asset_comments group by asset_id`, [],

@@ -4,8 +4,8 @@ var uniqid = require('uniqid');
 const path = require('path');
 let base64 = require('base-64');
 let fs = require('fs');
-exports.getParentTags = (host) => {
-    //console.log("Inside fetch parent tags");
+exports.getParentTags = (request) => {
+    // console.log(JSON.stringify(request));
     const connection = getDb();
     let countArr = [];
     return new Promise((resolve, reject) => {
@@ -36,7 +36,7 @@ exports.getParentTags = (host) => {
                             f.ASSET_COUNT = 0;
 
 
-                        f.FILTER_IMAGE = 'http://' + host + '/' + f.FILTER_IMAGE;
+                        f.FILTER_IMAGE =  getimagepath(request) + f.FILTER_IMAGE;
 
 
                         if (f.FILTER_PARENT_ID == null) {
@@ -54,6 +54,21 @@ exports.getParentTags = (host) => {
                         })
                     })
 
+                    result.forEach(f => {
+
+                        if (f.CHILD != undefined) {
+                            f.CHILD.sort((val1, val2) => {
+                                if (val1.FILTER_NAME.toLowerCase() < val2.FILTER_NAME.toLowerCase()) {
+                                    return -1;
+                                } else if (val1.FILTER_NAME.toLowerCase() > val2.FILTER_NAME.toLowerCase()) {
+                                    return 1;
+                                } else {
+                                    return 0;
+                                }
+                            })
+                        }
+                    })
+
                     resolve(parentFilterMap);
                 }).catch(err => {
                     reject(err + "Something went Wrong.We'll be back soon");
@@ -63,17 +78,17 @@ exports.getParentTags = (host) => {
             })
     })
 }
-exports.getChildTags = (host, filter_parentIds) => {
+exports.getChildTags = (request, filter_parentIds) => {
     //console.log("Inside fetch parent tags");
     const connection = getDb();
     let countArr = [];
     let winstorycountArr = [];
     return new Promise((resolve, reject) => {
-        
+
         let qryOptions = "";
-        filter_parentIds.split(',').filter(id=>qryOptions+=qryOptions.length>0?",'"+id+"'":"'"+id+"'");
-        let qry = `select * from ASSET_TAGS where FILTER_PARENT_ID in(`+qryOptions+`) AND FILTER_STATUS in('1')`;
-        console.log(" parent tags -- > "+qry);
+        filter_parentIds.split(',').filter(id => qryOptions += qryOptions.length > 0 ? ",'" + id + "'" : "'" + id + "'");
+        let qry = `select * from ASSET_TAGS where FILTER_PARENT_ID in(` + qryOptions + `) AND FILTER_STATUS in('1')`;
+        // console.log(" parent tags -- > "+qry);
         connection.query(`select distinct f.filter_id,count(asset_id) cnt from asset_filter f full outer join 
                             (select m.filter_id,d.asset_id from asset_filter_asset_map m join ASSET_DETAILS d on 
                             (m.asset_id=d.asset_id) where d.ASSET_STATUS='Live') a on (f.filter_id=a.filter_id) group by f.filter_id`, [],
@@ -104,7 +119,17 @@ exports.getChildTags = (host, filter_parentIds) => {
                                 //     f.WINSTORY_COUNT = winstorytypeCountArr[0].CNT;
                                 // else
                                 //     f.WINSTORY_COUNT = 0;
-                                f.FILTER_IMAGE = 'http://' + host + '/' + f.FILTER_IMAGE;
+                                f.FILTER_IMAGE = getimagepath(request) + f.FILTER_IMAGE;
+                            });
+                            result.sort((val1, val2) => {
+                                if (val1.FILTER_NAME.toLowerCase() < val2.FILTER_NAME.toLowerCase()) {
+                                    return -1;
+                                } else if (val1.FILTER_NAME.toLowerCase() > val2.FILTER_NAME.toLowerCase()) {
+                                    return 1;
+                                } else {
+                                    return 0;
+                                }
+
                             });
                             resolve(result);
                         }).catch(err => {
@@ -127,7 +152,7 @@ exports.getChildTags1 = (host, filter_parentIds) => {
             outFormat: oracledb.OBJECT
         }).then(result => {
             result.forEach(f => {
-                f.FILTER_IMAGE = 'http://' + host + '/' + f.FILTER_IMAGE;
+                f.FILTER_IMAGE = getimagepath(request) + f.FILTER_IMAGE;
             });
             resolve(result);
         }).catch(err => {
@@ -182,6 +207,10 @@ savefileto = (base64Image, filelocation) => {
             console.log("Image save failed : : " + JSON.stringify(err));
         }
     });
+}
+
+getimagepath = (request) => {
+    return (request.headers.host.toLowerCase().includes(':') ? 'http://' + request.headers.host +"/": 'https://' + request.headers.host +"/image/");
 }
 exports.addNewTag = (filter, host) => {
     const connection = getDb();
