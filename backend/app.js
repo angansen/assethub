@@ -32,12 +32,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static('/mnt/ahfs'));
-app.use('/asset', assetrouter);
-app.use('/winstory', winstoryrouter);
-app.use('/user', userrouter);
-app.use('/governance', governancerouter);
-app.use('/admin', adminrouter);
-app.use('/tags', tagrouter);
+app.use('/api/asset', assetrouter);
+app.use('/api/winstory', winstoryrouter);
+app.use('/api/user', userrouter);
+app.use('/api/governance', governancerouter);
+app.use('/api/admin', adminrouter);
+app.use('/api/tags', tagrouter);
 
 app.use(log4js.connectLogger(log4js.getLogger("http"), { level: 'debug' }));
 

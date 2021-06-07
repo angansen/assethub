@@ -1,5 +1,6 @@
 const tags = require('../models/tag-model');
 exports.getParentTagsctr = (req, res) => {
+
     tags.getParentTags(req)
         .then(result => {
             res.json(result)

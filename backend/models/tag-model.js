@@ -14,9 +14,8 @@ exports.getParentTags = (request) => {
         union
         select * from ASSET_TAGS where FILTER_PARENT_ID is null and filter_status='1'`;
         let qryOptions = [];
-        connection.query(`select distinct f.filter_id,count(asset_id) cnt from asset_filter f full outer join 
-                            (select m.filter_id,d.asset_id from asset_filter_asset_map m join ASSET_DETAILS d on 
-                            (m.asset_id=d.asset_id) where d.ASSET_STATUS='Live') a on (f.filter_id=a.filter_id) group by f.filter_id`, [],
+        connection.query(`select count(*) cnt ,b.filter_id from asset_details a, asset_filter_asset_map b 
+        where a.asset_id=b.asset_id and a.asset_status='Live' group by b.filter_id`, [],
             {
                 outFormat: oracledb.OBJECT
             })

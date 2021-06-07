@@ -1,5 +1,6 @@
 const Asset = require('../models/asset-model');
 const banner = require('../models/banner-model');
+const email = require('../models/email-notification');
 const getDb = require('../database/db').getDb;
 const oracledb = require('oracledb');
 const axios = require('axios');
@@ -28,6 +29,68 @@ const getOwnerEmails = (assetId) => {
         outFormat: oracledb.OBJECT
     })
 }
+
+const getAssetDetailsAndOwnerDetails = (asset) => {
+    // console.log("generating notification. . . " + JSON.stringify(asset));
+    let sql = '';
+    const connection = getDb();
+    /**
+     * When approvalLevel 1 send notification to the asset owner and manager
+     * When approvalLevel 0/2 send notification to the asset owner,their manager and reviewer
+     */
+
+    sql = `select a.asset_id,b.user_email,b.user_manager_email 
+        from asset_details a,asset_user b 
+        where a.asset_owner=b.user_email and a.asset_id=:0`;
+
+    connection.execute(sql, [asset.id], {
+        outFormat: oracledb.OBJECT
+    }).then(data => {
+
+        console.log(JSON.stringify(data.rows));
+
+        let assetowner = data.rows[0].USER_EMAIL;
+        let receipients = `${assetowner},${data.rows[0].USER_MANAGER_EMAIL}`;
+
+        //create email OBJECT
+        let notification = {
+            to: receipients,
+            id: asset.id,
+            assetstatus: asset.status,
+            approvallevel: asset.approvalLevel,
+            host: 'https://'+asset.host
+        };
+        if (asset.approvalLevel === '1') {
+            sql = `select user_email from asset_user where user_role like '%reviewer%'`;
+            connection.execute(sql, {}, {
+                outFormat: oracledb.OBJECT
+            }).then(data => {
+                // console.log(JSON.stringify(data.rows));
+                let reviewers = `${assetowner}`;
+                data.rows.filter(element => {
+
+                    reviewers += "," + element.USER_EMAIL;
+                });
+                // console.log(reviewers);
+                notification.to = reviewers;
+                try {
+                    email.initiateAssetStatusEmail(notification);
+                } catch (err) {
+                    console.log(JSON.stringify(err));
+                }
+
+            })
+        } else {
+            try {
+
+                email.initiateAssetStatusEmail(notification);
+            } catch (err) {
+                console.log(JSON.stringify(err));
+            }
+        }
+    })
+}
+
 
 const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, assetCreatedEmailOptions, status) => {
     let asset_reviewer_name, asset_name, asset_description, asset_details
@@ -115,21 +178,21 @@ exports.postAsset = (req, res) => {
     // console.log(description);
     // const userCase = req.body.userCase;
     const customer = req.body.customer;
-    const createdBy = req.body.createdBy;
+    const createdBy = req.headers.oidc_claim_email;
     const createdDate = new Date();
     const serviceid = req.body.serviceid;
     // const oppId = req.body.oppId;
-    const thumbnail = req.body.thumbnail;
+    const thumbnail = req.body.thumbnail != undefined && req.body.thumbnail.length > 0 ? req.body.thumbnail : "tagsicon/Others.png";
     const modifiedDate = new Date();
     const modifiedBy = null;
     const video_link = req.body.video_link;
-    const owner = req.body.owner.replace(/ /g, '');
+    const owner = req.headers.oidc_claim_email;
     // const location = req.body.location;
     let filters = req.body.filters;
     const expiryDate = req.body.expiryDate != undefined ? req.body.expiryDate : "6";
     // const asset_architecture_description = req.body.asset_architecture_description
 
-    console.log(" --- >>> "+createdBy);
+    console.log(" --- >>> " + createdBy);
     const windata = {};
     windata.WIN_ECA = req.body.WIN_ECA != undefined ? req.body.WIN_ECA : "";
     windata.WIN_REGID = req.body.WIN_REGID != undefined ? req.body.WIN_REGID : "";
@@ -173,13 +236,26 @@ exports.postAsset = (req, res) => {
         thumbnail, modifiedDate,
         modifiedBy, filters, links, expiryDate, video_link, owner, windata);
 
+
     asset.save(type).then(result => {
         let creationResult = result
         res.json(creationResult);
-        sendEmailOnAssetCreation(result.Asset_ID, owner, assetCreatedEmailSql, assetCreatedEmailOptions, 'create')
-            .then(result => {
-                console.log(result)
-            })
+
+        let assetObj = {
+            status: 'Pending Review',
+            activityByUser: owner,
+            approvalLevel: '1',
+            reviewNote: null,
+            host: req.headers.host,
+            id: creationResult.Asset_ID
+        };
+    
+
+        getAssetDetailsAndOwnerDetails(assetObj);
+        // sendEmailOnAssetCreation(result.Asset_ID, owner, assetCreatedEmailSql, assetCreatedEmailOptions, 'create')
+        //     .then(result => {
+        //         console.log(result)
+        //     })
     })
         .catch(err => {
             err.status = "FAILED";
@@ -259,19 +335,19 @@ exports.postEditAsset = (req, res) => {
     }
     console.log(req.body.owner + "Owner -- STATE ASSET :::: " + type);
     const assetId = req.body.assetId;
- 
+
     const description = req.body.description;
     const customer = req.body.customer;
-    const createdBy = req.body.createdBy;
+    const createdBy = req.headers.oidc_claim_email;
     const createdDate = req.body.createdDate;
     const serviceid = req.body.serviceid;
     const thumbnail = req.body.thumbnail;
     const modifiedDate = new Date();
-    const modifiedBy = req.body.modifiedBy;
+    const modifiedBy = req.headers.oidc_claim_email;
     let filters = req.body.filters;
     const expiryDate = req.body.expiryDate;
     const video_link = req.body.video_link;
-    const owner = req.body.owner.replace(/ /g, '');
+    const owner = req.headers.oidc_claim_email;
     let windata = {};
     windata.WIN_ECA = req.body.WIN_ECA != undefined ? req.body.WIN_ECA : "";
     windata.WIN_REGID = req.body.WIN_REGID != undefined ? req.body.WIN_REGID : "";
@@ -641,7 +717,7 @@ exports.getAllPreferredAssets = (req, res) => {
 
 
 exports.getAssetById = (req, res) => {
-    const user_email = req.header("user_email")
+    const user_email = req.headers.oidc_claim_email;
     Asset.fetchAssetsById(req.params.assetId, req, user_email).then(result => {
         res.json(result);
     })

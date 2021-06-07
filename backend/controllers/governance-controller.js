@@ -7,9 +7,9 @@ const axios = require('axios');
 
 
 exports.getAssets = (req, res) => {
-    const user_email = req.params.user_email;
+    const user_email = req.headers.oidc_claim_email;
     const user_roles = req.params.user_roles.toLowerCase();
-    Governance.fetchAssets(user_email, user_roles, req.headers.host,)
+    Governance.fetchAssets(user_email, user_roles, req,)
         .then(result => {
             res.json(result)
         })
@@ -25,7 +25,7 @@ exports.addAssetReviewNote = (req, res) => {
     const asset_status_lvl = req.body.asset_status_lvl;
     const assetId = req.body.assetId;
     const host = req.headers.host;
-    const email = req.headers.user_email;
+    const email = req.headers.oidc_claim_email;
     let asset = {};
     console.log(req.body)
     console.log("Host: " + host);

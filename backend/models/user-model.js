@@ -16,12 +16,12 @@ exports.saveuserActivity = (req, res) => {
     let activity=req.params;
     console.log("------ SHARE ------");
     console.log(activity.type);
-    console.log(req.headers.contentid+" ::: " +req.headers.contenttype);
+    console.log(JSON.stringify(req.headers.contentid));
     let contentid=activity.type=="share"?req.headers.contentid:"";
     let contenttype=activity.type=="share"?req.headers.contenttype:"";
     
     let captureloginsql = `insert into ASSET_USER_ACTIVITY (ACTIVITY_BY_USER_EMAIL,ACIVITY_BY_USERNAME,ACTIVITY_TYPE,ACTIVITY_PLATFORM,ACTIVITY_CONTENT_ID,ACTIVITY_CONTENT_TYPE) values(:0,:1,:2,:3,:4,:5)`;
-    let captureloginOption = [activity.email, activity.name, activity.type, activity.platform,contentid,contenttype];
+    let captureloginOption = [req.headers.oidc_claim_email, activity.name, activity.type, activity.platform,contentid,contenttype];
 
     connection.execute(captureloginsql, captureloginOption, {
         outFormat: oracledb.Object,

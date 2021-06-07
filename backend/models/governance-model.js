@@ -3,7 +3,7 @@ var uniqid = require('uniqid');
 const usermodel = require('../models/user-model');
 const oracledb = require('oracledb');
 
-exports.fetchAssets = (user_email, user_role, host) => {
+exports.fetchAssets = (user_email, user_role, request) => {
     console.log("Inside fetch asset");
     const connection = getDb();
     let filteredAssets = [];
@@ -49,7 +49,6 @@ exports.fetchAssets = (user_email, user_role, host) => {
                         result.forEach(element => {
                             // element.checklist_items=JSON.parse(element.checklist_items);
                             if (element.ASSET_REVIEW_NOTE == null) {
-                                console.log("Its null so going in. . .");
                                 element.ASSET_APPROVAL_LVL = 1;
                                 element.ASSET_REVIEW_NOTE = JSON.stringify({
                                     note: "",
@@ -60,7 +59,7 @@ exports.fetchAssets = (user_email, user_role, host) => {
                             }
                         });
                         console.log(result.length);
-                        resolve(formatAssetByStatus(result, host));
+                        resolve(formatAssetByStatus(result, request));
                     })
 
 
@@ -71,7 +70,7 @@ exports.fetchAssets = (user_email, user_role, host) => {
     })
 }
 
-formatAssetByStatus = (result, host) => {
+formatAssetByStatus = (result, request) => {
     let pendingReviewList = [];
 
     let pendingRectificationList = [];
@@ -96,7 +95,7 @@ formatAssetByStatus = (result, host) => {
     }];
 
     result.map(asset => {
-        asset.ASSET_THUMBNAIL = "http://" + host + "/" + asset.ASSET_THUMBNAIL;
+        asset.ASSET_THUMBNAIL = getimagepath(request)+ asset.ASSET_THUMBNAIL;
         if (asset.ASSET_STATUS == 'Pending Review') {
             pendingReviewList.push(asset);
         } else if (asset.ASSET_STATUS == 'Pending Rectification') {
@@ -109,6 +108,10 @@ formatAssetByStatus = (result, host) => {
     })
 
     return assetlist;
+}
+
+getimagepath = (request) => {
+    return (request.headers.host.toLowerCase().includes(':') ? 'http://' + request.headers.host +"/": 'https://' + request.headers.host +"/image/");
 }
 
 exports.captureGovernanceActivity = (review_note, activity_user, asset_status, asset_status_lvl, assetId) => {

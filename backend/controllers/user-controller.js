@@ -13,8 +13,8 @@ exports.saveUserDetails = (req, res) => {
 }
 
 exports.findUserByEmail = (req, res) => {
-    console.log("finding user. . . " + req.body.user_email);
-    user.findUserByEmail(req.body.user_email, res);
+    console.log("finding user. . . " + req.headers.oidc_claim_email);
+    user.findUserByEmail(req.headers.oidc_claim_email, res);
 }
 
 exports.uploadProfileImage = (req, res) => {

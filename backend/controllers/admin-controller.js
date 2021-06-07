@@ -85,6 +85,7 @@ exports.reMapFilter = (req, res) => {
 }
 exports.promote = (req, res) => {
     let type = req.body.assetId.split('-')[0];
+    req.body.lob_leader_email=req.headers.oidc_claim_email;
     if (type == 'AH') {
         admin.promoteAsset(req.body)
             .then(result => {

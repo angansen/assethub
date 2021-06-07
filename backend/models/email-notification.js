@@ -51,6 +51,7 @@ exports.initiateAssetStatusEmail = (notification) => {
 
     emailbody+=" Please click to view the asset "+notification.host+`/details/?${notification.id}&Governance=Y`;
 
+    console.log("Initiating email notification despatch . . .");
     axios.put('https://apex.oracle.com/pls/apex/assethub/email/despatch', {
         "from": 'angan.sen@oracle.com',
         "to": notification.to,

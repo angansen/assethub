@@ -5,7 +5,6 @@ var router = express.Router();
 
 
 router.post('/save/',userController.saveUserDetails);
-router.post('/findbyemail/',userController.findUserByEmail);
 router.post('/uploadprofileimage/:platform/:email',userController.uploadProfileImage);
 router.post('/requestdemo/',userController.saveRequestDemo);
 router.post('/captureactivity/:platform/:type/:name/:email',userController.captureuserActivity);
@@ -14,6 +13,7 @@ router.post('/updateUserTable',userController.updateUserRepos);
 
 //to populate users from LDAP
 router.get('/getprofileimage/:platform/:email',userController.getProfileImage);
+router.get('/findbyemail/',userController.findUserByEmail);
 router.get('/ldap',userController.getLdapUsers);
 router.get('/ldapcompletelist',worker.triggerWorkers);
 router.get('/ldapupdate',worker.triggerWorkeronce);
