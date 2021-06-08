@@ -178,7 +178,7 @@ exports.postAsset = (req, res) => {
     // console.log(description);
     // const userCase = req.body.userCase;
     const customer = req.body.customer;
-    const createdBy = req.headers.oidc_claim_email;
+    const createdBy = req.headers.oidc_claim_sub;
     const createdDate = new Date();
     const serviceid = req.body.serviceid;
     // const oppId = req.body.oppId;
@@ -186,7 +186,7 @@ exports.postAsset = (req, res) => {
     const modifiedDate = new Date();
     const modifiedBy = null;
     const video_link = req.body.video_link;
-    const owner = req.headers.oidc_claim_email;
+    const owner = req.headers.oidc_claim_sub;
     // const location = req.body.location;
     let filters = req.body.filters;
     const expiryDate = req.body.expiryDate != undefined ? req.body.expiryDate : "6";
@@ -338,16 +338,16 @@ exports.postEditAsset = (req, res) => {
 
     const description = req.body.description;
     const customer = req.body.customer;
-    const createdBy = req.headers.oidc_claim_email;
+    const createdBy = req.headers.oidc_claim_sub;
     const createdDate = req.body.createdDate;
     const serviceid = req.body.serviceid;
     const thumbnail = req.body.thumbnail;
     const modifiedDate = new Date();
-    const modifiedBy = req.headers.oidc_claim_email;
+    const modifiedBy = req.headers.oidc_claim_sub;
     let filters = req.body.filters;
     const expiryDate = req.body.expiryDate;
     const video_link = req.body.video_link;
-    const owner = req.headers.oidc_claim_email;
+    const owner = req.headers.oidc_claim_sub;
     let windata = {};
     windata.WIN_ECA = req.body.WIN_ECA != undefined ? req.body.WIN_ECA : "";
     windata.WIN_REGID = req.body.WIN_REGID != undefined ? req.body.WIN_REGID : "";
@@ -519,8 +519,8 @@ exports.getAllLocations = (req, res) => {
 
 exports.postPreference = (req, res) => {
     const filters = req.body.filters;
-    const user_name = req.body.user_name;
-    const user_email = req.body.user_email;
+    const user_name = req.headers.oidc_claim_name;
+    const user_email = req.headers.oidc_claim_sub;
     let action;
     Asset.addUserPreference(user_name, user_email, filters).then(result => {
         res.json(result)
@@ -655,7 +655,7 @@ exports.getAllAssetsByFilters = (req, res) => {
     let searchString = req.header('searchString')
     let order = req.header('order');
     let sortBy = req.header('sortBy');
-    let email = req.header('user_email');
+    let email = req.headers.oidc_claim_sub;
 
     let activity = {
         filters: filters,
@@ -705,7 +705,7 @@ exports.getAllAssetsByFilters = (req, res) => {
 
 
 exports.getAllPreferredAssets = (req, res) => {
-    const user_email = req.params.user_email;
+    const user_email = req.headers.oidc_claim_sub;
     let order = req.header('order');
     let sortBy = req.header('sortBy');
     Asset.fetchPreferedAssets(req, user_email, sortBy, order)
@@ -717,7 +717,7 @@ exports.getAllPreferredAssets = (req, res) => {
 
 
 exports.getAssetById = (req, res) => {
-    const user_email = req.headers.oidc_claim_email;
+    const user_email = req.headers.oidc_claim_sub;
     Asset.fetchAssetsById(req.params.assetId, req, user_email).then(result => {
         res.json(result);
     })
@@ -762,13 +762,13 @@ exports.deleteAllAssetContent = (req, res) => {
 }
 
 exports.deleteMySearchHistory = (req, res) => {
-    const user_email = req.header("user_email")
+    const user_email = req.headers.oidc_claim_sub
     Asset.deleteSearchHistory(user_email).then(result => {
         res.json(result);
     })
 }
 exports.deleteDocsByIds = (req, res) => {
-    // const user_email = req.header("user_email")
+    // const user_email = req.headers.oidc_claim_sub
     Asset.deleteDocsById(req.header("linkids")).then(result => {
         res.json(result);
     }).catch(err => {
@@ -788,7 +788,7 @@ exports.getBannerDetails = (req, res) => {
 
 exports.getAllFilters = (req, res) => {
     console.log("PLATFORM >>> " + req.header("platform"));
-    const user_email = req.header("user_email")
+    const user_email = req.headers.oidc_claim_sub
     if (req.header("platform") != undefined && req.header("platform") == "w") {
         Asset.getFilters(user_email, req.headers.host, "w").then(result => {
             res.json(result);
@@ -803,7 +803,7 @@ exports.getAllFilters = (req, res) => {
 
 
 exports.getAllFavAssets = (req, res) => {
-    const user_email = req.header("user_email")
+    const user_email = req.headers.oidc_claim_sub
     Asset.getFavAssets(user_email, req.headers.host).then(result => {
         res.json(result)
     })
@@ -812,7 +812,7 @@ exports.getAllFavAssets = (req, res) => {
 
 exports.getAllAssetsByLob = (req, res) => {
     const lob = req.params.lob
-    const user_email = req.header("user_email")
+    const user_email = req.headers.oidc_claim_sub
     let order = req.header('order');
     let sortBy = req.header('sortBy');
     console.log("Host >>> " + req.headers.host);
@@ -824,7 +824,7 @@ exports.getAllAssetsByLob = (req, res) => {
 
 
 exports.getAllAssetsByLob2 = (req, res) => {
-    const user_email = req.params.user_email
+    const user_email = req.headers.oidc_claim_sub
     const connection = getDb();
     connection.execute(`Select USER_LOB from ASSET_USER where USER_EMAIL=:USER_EMAIL`, [user_email],
         {
@@ -845,7 +845,7 @@ exports.getAllAssetsByLob2 = (req, res) => {
 }
 
 exports.getUserAssets = (req, res) => {
-    const user_email = req.header("user_email");
+    const user_email = req.headers.oidc_claim_sub;
     Asset.getMyAssets(user_email, req).then(result => {
         if (result.length > 0) {
             res.json(result);

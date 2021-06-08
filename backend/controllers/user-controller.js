@@ -13,12 +13,12 @@ exports.saveUserDetails = (req, res) => {
 }
 
 exports.findUserByEmail = (req, res) => {
-    console.log("finding user. . . " + req.headers.oidc_claim_email);
-    user.findUserByEmail(req.headers.oidc_claim_email, res);
+    console.log("finding user. . . " + req.headers.oidc_claim_sub);
+    user.findUserByEmail(req.headers.oidc_claim_sub, res);
 }
 
 exports.uploadProfileImage = (req, res) => {
-    console.log("Updating profile image for . . . " + req.params.email);
+    console.log("Updating profile image for . . . " + req.headers.oidc_claim_sub);
     user.saveProfileImage(req.headers.host, req.body.image, req.params.platform, req.params.email, res);
 }
 
@@ -28,7 +28,7 @@ exports.getProfileImage = (req, res) => {
 }
 
 exports.deleteUser = (req, res) => {
-    console.log("Deleting record for " + req.params.email);
+    console.log("Deleting record for " + req.headers.oidc_claim_sub);
     user.deleteUser(req.params.email, res);
 }
 
