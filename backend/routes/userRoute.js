@@ -7,7 +7,7 @@ var router = express.Router();
 router.post('/save/',userController.saveUserDetails);
 router.post('/uploadprofileimage/:platform/:email',userController.uploadProfileImage);
 router.post('/requestdemo/',userController.saveRequestDemo);
-router.post('/captureactivity/:platform/:type/:name/:email',userController.captureuserActivity);
+router.post('/captureactivity/:platform/:type/',userController.captureuserActivity);
 router.post('/updateUserTable',userController.updateUserRepos);
 
 
