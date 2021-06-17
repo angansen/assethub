@@ -13,15 +13,15 @@ const worker = require('../utility/worker');
 
 exports.saveuserActivity = (req, res) => {
     const connection = getDb();
-    let activity=req.params;
+    let activity = req.params;
     console.log("------ SHARE ------");
     console.log(activity.type);
     console.log(JSON.stringify(req.headers.contentid));
-    let contentid=activity.type=="share"?req.headers.contentid:"";
-    let contenttype=activity.type=="share"?req.headers.contenttype:"";
-    
+    let contentid = activity.type == "share" ? req.headers.contentid : "";
+    let contenttype = activity.type == "share" ? req.headers.contenttype : "";
+
     let captureloginsql = `insert into ASSET_USER_ACTIVITY (ACTIVITY_BY_USER_EMAIL,ACIVITY_BY_USERNAME,ACTIVITY_TYPE,ACTIVITY_PLATFORM,ACTIVITY_CONTENT_ID,ACTIVITY_CONTENT_TYPE) values(:0,:1,:2,:3,:4,:5)`;
-    let captureloginOption = [req.headers.oidc_claim_email, activity.name, activity.type, activity.platform,contentid,contenttype];
+    let captureloginOption = [req.headers.oidc_claim_email, activity.name, activity.type, activity.platform, contentid, contenttype];
 
     connection.execute(captureloginsql, captureloginOption, {
         outFormat: oracledb.Object,
@@ -86,13 +86,18 @@ exports.saveUser = (user, res) => {
 exports.findUserByEmail = (email, res) => {
     console.log("finding user with >> " + email);
     const connection = getDb();
-    let findUserSql = "select * from ASSET_USER where user_email=:0";
+    let findUserSql = `select USER_NAME,USER_LOCATION,USER_EMAIL,USER_ROLE,USER_LOB,USER_MANAGER_EMAIL from ASSET_USER where user_email=:0 
+    union
+    select USER_NAME,USER_LOCATION,USER_EMAIL,USER_ROLE,USER_LOB,USER_MANAGER_EMAIL from ASSET_USER where user_manager_email=:0`;
     let finduseroption = [email]
-    connection.execute(findUserSql, finduseroption).then(result => {
-        if (result.rows.length === 0) {
+    connection.query(findUserSql, finduseroption).then(result => {
+        if (result.length === 0) {
             res.json({ exist: "no" })
         } else {
-
+            let isManager=result.length>1?"yes":"no";
+            let record=result.filter(data=>data.USER_EMAIL==email);
+            record=record[0];
+            console.log("User Records : "+JSON.stringify(record));
             let findDeviceTokenSQL = "select * from ASSET_DEVICETOKEN where user_email=:0";
             let option = [email]
             connection.query(findDeviceTokenSQL, option).then(token => {
@@ -103,13 +108,12 @@ exports.findUserByEmail = (email, res) => {
                     if (leader.rows.length === 0) {
                         let userJson = {
                             exist: "yes",
-                            name: result.rows[0][1],
-                            role: result.rows[0][4],
-                            location: result.rows[0][6],
-                            pillar: result.rows[0][7],
-                            lob: result.rows[0][10],
-                            phone: result.rows[0][13],
+                            name: record.USER_NAME,
+                            role: record.USER_ROLE,
+                            location: record.USER_LOCATION,
+                            lob: record.USER_LOB,
                             leader: false,
+                            manager:isManager,
                             devicetokens: token
                         }
 
@@ -117,13 +121,12 @@ exports.findUserByEmail = (email, res) => {
                     } else {
                         let userJson = {
                             exist: "yes",
-                            name: result.rows[0][1],
-                            role: result.rows[0][4],
-                            location: result.rows[0][6],
-                            pillar: result.rows[0][7],
-                            lob: result.rows[0][10],
-                            phone: result.rows[0][13],
+                            name: record.USER_NAME,
+                            role: record.USER_ROLE,
+                            location: record.USER_LOCATION,
+                            lob: record.USER_LOB,
                             leader: true,
+                            manager:isManager,
                             devicetokens: token
                         }
 
@@ -656,7 +659,7 @@ const triggerDeviceNotification = (content) => {
             }
         }
 
-        
+
         try {
             console.log("- - - - - - IOS - - - - - - ");
             console.log(JSON.stringify(iosDevices));
@@ -664,7 +667,7 @@ const triggerDeviceNotification = (content) => {
         } catch (error) {
             console.error(error);
         }
-        
+
         try {
             console.log("- - - - -  ANDROID - - - - - - ");
             console.log(JSON.stringify(androidDevices));
@@ -674,7 +677,7 @@ const triggerDeviceNotification = (content) => {
         }
 
 
-       
+
     })
 
 
@@ -763,13 +766,13 @@ function sendToAPNS(msg, devicetokens) {
     console.log("-------- IOS PAYLOAD ------------");
     console.log(JSON.stringify(note));
     apnConnection.send(note, myDevice)
-    .then(res =>{
-        console.log("IOS Sent: "+JSON.stringify(res.sent));
-        console.log("IOS Failed: "+JSON.stringify(res.failed));
-    })
-    .catch(error=>{
-        console.error(JSON.stringify(error));
-    });
+        .then(res => {
+            console.log("IOS Sent: " + JSON.stringify(res.sent));
+            console.log("IOS Failed: " + JSON.stringify(res.failed));
+        })
+        .catch(error => {
+            console.error(JSON.stringify(error));
+        });
     apnConnection.on('error', function (error) {
         console.error('APNS: Initialization error', error);
     });

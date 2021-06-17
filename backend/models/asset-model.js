@@ -356,7 +356,8 @@ module.exports = class Asset {
             WIN_SALES_PROCESS_TEAMS=:WIN_SALES_PROCESS_TEAMS,
             WIN_LESSONS_LEARNED=:WIN_LESSONS_LEARNED,
             WIN_CUSTOMER_BUSINESS_CHALLANGES=:WIN_CUSTOMER_BUSINESS_CHALLANGES,
-            WIN_TCV_ARR=:WIN_TCV_ARR WHERE ASSET_ID=:ASSET_ID`,
+            WIN_TCV_ARR=:WIN_TCV_ARR,
+            ASSET_APPROVAL_LVL=:ASSET_APPROVAL_LVL WHERE ASSET_ID=:ASSET_ID`,
                             [self.description, self.customer, self.createdBy.toLowerCase(),
                             self.serviceid, new Date(), self.modifiedBy,
                             self.expiryDate, self.video_link,
@@ -376,7 +377,7 @@ module.exports = class Asset {
                             self.windata.WIN_SALES_PROCESS_TEAMS,
                             self.windata.WIN_LESSONS_LEARNED,
                             self.windata.WIN_CUSTOMER_BUSINESS_CHALLANGES,
-                            self.windata.WIN_TCV_ARR, self.assetId],
+                            self.windata.WIN_TCV_ARR,1, self.assetId],
                             {
                                 outFormat: oracledb.Object
                             }).then(res => {
@@ -783,7 +784,7 @@ module.exports = class Asset {
             const uniqueId = uniqid();
             const finalFname = fname + uniqueId.concat('.', ftype);
             const uploadPath = path.join('/', 'mnt/ahfs/assets', data.assetId, finalFname);
-            var content = 'https://' + request.headers.host + '/' + 'assets/' + data.assetId + "/" + finalFname;
+            var content = 'assets/' + data.assetId + "/" + finalFname;
             console.log(finalFname);
             try {
                 console.log("---------  FOLDER CREATION ----------")
@@ -800,7 +801,8 @@ module.exports = class Asset {
                                 console.log("Calling file create " + uploadPath);
                                 file.mv(uploadPath, function (err) {
                                     if (err) {
-                                        return res.status(500).send(err);
+                                        console.log("Error on file movement: "+JSON.stringify(err));
+                                        return res.status(201).send(err);
                                     }
                                 })
                             }
@@ -810,7 +812,8 @@ module.exports = class Asset {
                         console.log("Calling file create " + uploadPath);
                         file.mv(uploadPath, function (err) {
                             if (err) {
-                                return res.status(500).send(err);
+                                console.log("Error on file movement: "+JSON.stringify(err));
+                                return res.status(201).send(err);
                             }
                         })
                     }
@@ -1167,7 +1170,7 @@ module.exports = class Asset {
         let assetFilters = [];
 
         return new Promise((resolve) => {
-            if (searchString.trim().length > 0) {
+            if (searchString.trim().length > 0 && !searchString.includes("undefined")) {
                 data.filter(entry => {
                     let combineContentToMatch = entry.ASSET_ID +
                         entry.ASSET_DESCRIPTION +
@@ -1263,7 +1266,7 @@ module.exports = class Asset {
                 a.WIN_CUSTOMER_BUSINESS_CHALLANGES,a.ASSET_THUMBNAIL,a.ASSET_CREATED_DATE,
                 LISTAGG(c.filter_id,',') as filter_ids,LISTAGG(c.filter_name,',') as filter_names 
                 from asset_details a, asset_filter_asset_map b,asset_tags c
-                where c.filter_id=b.filter_id and b.asset_id in(select asset_id from asset_filter_asset_map ${filterString}) 
+                where c.filter_id=b.filter_id and b.asset_id in(select asset_id from asset_filter_asset_map ${filterString}) and a.asset_status='Live' 
                 and a.asset_id=b.asset_id group by a.asset_id,a.ASSET_CUSTOMER,a.ASSET_DESCRIPTION,a.WIN_BUSINESS_IMPACT,a.WIN_LESSONS_LEARNED,
                 a.WIN_CUSTOMER_BUSINESS_CHALLANGES,a.ASSET_THUMBNAIL,a.ASSET_CREATED_DATE`;
                 let fetchfilterDetailsOption = {};
@@ -1625,13 +1628,13 @@ module.exports = class Asset {
     static refineAssets(request, offset, limit, assetsArray, sortBy, order, action, email) {
 
         let assetidtracker = {};
-        // let uniqueassetarray = assetsArray.filter(asset => {
-        //     if (!assetidtracker[asset.ASSET_ID]) {
-        //         assetidtracker[asset.ASSET_ID] = 1;
-        //         return asset;
-        //     }
-        // })
-        // assetsArray = uniqueassetarray;
+        let uniqueassetarray = assetsArray.filter(asset => {
+            if (!assetidtracker[asset.ASSET_ID]) {
+                assetidtracker[asset.ASSET_ID] = 1;
+                return asset;
+            }
+        })
+        assetsArray = uniqueassetarray;
         console.log("In refine  " + assetsArray.length);
 
         let allAssetsObj = {};
@@ -1656,14 +1659,16 @@ module.exports = class Asset {
                         allAssetsObj = asset
                         allAssetsObj.LINKS = [];
 
-                        asset.ASSET_THUMBNAIL = this.getimagepath(request) + asset.ASSET_THUMBNAIL;
+                        // asset.ASSET_THUMBNAIL = this.getimagepath(request) + asset.ASSET_THUMBNAIL;
                         asset.createdDate = asset.ASSET_CREATED_DATE;
 
+                        console.log(id+" Image Path: "+allAssetsObj.ASSET_THUMBNAIL);
 
-                        allAssetsObj.ASSET_THUMBNAIL = allAssetsObj.ASSET_THUMBNAIL == null ? this.getimagepath(request) + '/no_image.png' : allAssetsObj.ASSET_THUMBNAIL;
+                        allAssetsObj.ASSET_THUMBNAIL = (allAssetsObj.ASSET_THUMBNAIL != null && allAssetsObj.ASSET_THUMBNAIL.trim().length > 0 )? this.getimagepath(request) + allAssetsObj.ASSET_THUMBNAIL : this.getimagepath(request) + '/no_image.png';
 
                         var views = viewsArray.filter(v => v.ASSET_ID === id);
                         allAssetsObj.VIEWS = views.length == 0 ? { VIEW_COUNT: 0, ASSET_ID: id } : views[0];
+                        console.log(id+" Image Path: "+allAssetsObj.ASSET_THUMBNAIL);
 
                         if (!(sortBy == 'views' && allAssetsObj.VIEWS.VIEW_COUNT == 0)) {
                             allAssets.push(allAssetsObj);
@@ -1908,9 +1913,15 @@ module.exports = class Asset {
                                 linkType = [...new Set(linkType)]
                                 ////console.log(linkType)
                                 linkType.forEach(type => {
-                                    var links2 = res.filter(link => link.LINK_REPOS_TYPE === type)
+
+                                    let link2 = []
+                                    res.filter(link => {
+                                        link.LINK_URL = this.getimagepath(request) + link.LINK_URL;
+                                        link.LINK_REPOS_TYPE === type
+                                        link2.push(link);
+                                    })
                                     lobj.TYPE = type;
-                                    lobj.arr = links2;
+                                    lobj.arr = [...link2];
                                     lobj2 = lobj
                                     linkObjArr.push(lobj2);
                                     lobj = {}
@@ -1918,6 +1929,7 @@ module.exports = class Asset {
                                 assetObj.LINKS = linkObjArr;
                                 // assetObj.ASSET_THUMBNAIL = request.protocol +'://'+ request.headers.host + this.getimagepath(request.protocol)+ '/' + assetObj.ASSET_THUMBNAIL;
                                 assetObj.ASSET_THUMBNAIL = assetObj.ASSET_THUMBNAIL != null && assetObj.ASSET_THUMBNAIL.trim().length > 0 ? this.getimagepath(request) + assetObj.ASSET_THUMBNAIL : this.getimagepath(request) + 'no_image.png';
+                                console.log("Image path >> " + assetObj.ASSET_THUMBNAIL);
                                 getImagesById(assetId)
                                     .then(res => {
                                         //  //console.log(res)

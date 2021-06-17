@@ -16,6 +16,8 @@ exports.initiateAssetStatusEmail = (notification) => {
     let subject = `Asset ID ${notification.id}  `;
     if (notification.assetstatus === 'Live') {
         emailbody = `Asset id ${notification.id} `;
+        emailbody+=" Please click to view the asset https://"+notification.host+`/details/?${notification.id}&MyASSET=Y`;
+
         if (notification.approvallevel === '2') {
             emailbody += ` has been submitted for governance review`;
             subject += ` submitted for governance review`;
@@ -26,6 +28,7 @@ exports.initiateAssetStatusEmail = (notification) => {
     }
     else if (notification.assetstatus === 'Pending Rectification') {
         emailbody = `Asset id ${notification.id} sent for rectification with valuable review inputs.`;
+        emailbody+=" Please click to view the asset https://"+notification.host+`/details/?${notification.id}&MyASSET=Y`;
         if (notification.approvallevel === '1') {
             subject += ` has been sent for rectification during manager review`;
         } else if (notification.approvallevel === '2') {
@@ -42,6 +45,7 @@ exports.initiateAssetStatusEmail = (notification) => {
 
     } else if (notification.assetstatus === 'Pending Review') {
         emailbody = `Asset id ${notification.id} has been submitted for governance review.`;
+        emailbody+=" Please click to view the asset https://"+notification.host+`/details/?${notification.id}&Governance=Y`;
         if (notification.approvallevel === '1') {
             subject += ` has been submitted for manager review`;
         } else if (notification.approvallevel === '2') {
@@ -49,14 +53,14 @@ exports.initiateAssetStatusEmail = (notification) => {
         }
     }
 
-    emailbody+=" Please click to view the asset "+notification.host+`/details/?${notification.id}&Governance=Y`;
+    // emailbody+=" Please click to view the asset "+notification.host+`/details/?${notification.id}&Governance=Y`;
 
     console.log("Initiating email notification despatch . . .");
     axios.put('https://apex.oracle.com/pls/apex/assethub/email/despatch', {
         "from": 'angan.sen@oracle.com',
         "to": notification.to,
         "emailbody": emailbody,
-        "subj": subject,
+        "subj": subject
     }).then(res => {
         console.log('Email despatched successfully!');
     }).catch(err => {

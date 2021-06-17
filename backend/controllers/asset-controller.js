@@ -39,7 +39,7 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
      * When approvalLevel 0/2 send notification to the asset owner,their manager and reviewer
      */
 
-    sql = `select a.asset_id,b.user_email,b.user_manager_email 
+    sql = `select a.asset_id,b.user_role,b.user_email,b.user_manager_email 
         from asset_details a,asset_user b 
         where a.asset_owner=b.user_email and a.asset_id=:0`;
 
@@ -58,9 +58,9 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
             id: asset.id,
             assetstatus: asset.status,
             approvallevel: asset.approvalLevel,
-            host: 'https://'+asset.host
+            host: asset.host
         };
-        if (asset.approvalLevel === '1') {
+        if (asset.approvalLevel.includes('1')) {
             sql = `select user_email from asset_user where user_role like '%reviewer%'`;
             connection.execute(sql, {}, {
                 outFormat: oracledb.OBJECT
@@ -189,132 +189,87 @@ exports.postAsset = (req, res) => {
     const owner = req.headers.oidc_claim_sub;
     // const location = req.body.location;
     let filters = req.body.filters;
-    const expiryDate = req.body.expiryDate != undefined ? req.body.expiryDate : "6";
-    // const asset_architecture_description = req.body.asset_architecture_description
+    console.log("Filter length: " + filters.length);
+    if (filters.length > 1) {
+        const expiryDate = req.body.expiryDate != undefined ? req.body.expiryDate : "6";
+        // const asset_architecture_description = req.body.asset_architecture_description
 
-    console.log(" --- >>> " + createdBy);
-    const windata = {};
-    windata.WIN_ECA = req.body.WIN_ECA != undefined ? req.body.WIN_ECA : "";
-    windata.WIN_REGID = req.body.WIN_REGID != undefined ? req.body.WIN_REGID : "";
-    windata.WIN_FISCAL_YR = req.body.WIN_FISCAL_YR != undefined ? req.body.WIN_FISCAL_YR : "";
-    windata.WIN_MEMBERS = req.body.WIN_MEMBERS != undefined ? req.body.WIN_MEMBERS : "";
-    windata.WIN_SOLUTION_SOLD = req.body.WIN_SOLUTION_SOLD != undefined ? req.body.WIN_SOLUTION_SOLD : "";
-    windata.WIN_COSUMING_DATE = req.body.WIN_COSUMING_DATE != undefined ? req.body.WIN_COSUMING_DATE : "";
-    windata.WIN_GOLIVE_ON = req.body.WIN_GOLIVE_ON != undefined ? req.body.WIN_GOLIVE_ON : "";
-    windata.WIN_DEAL_CYCLE = req.body.WIN_DEAL_CYCLE != undefined ? req.body.WIN_DEAL_CYCLE : "";
-    windata.WIN_RENEWAL = req.body.WIN_RENEWAL != undefined ? req.body.WIN_RENEWAL : "";
-    windata.WIN_CUSTOMER_PERSONA = req.body.WIN_CUSTOMER_PERSONA != undefined ? req.body.WIN_CUSTOMER_PERSONA : "";
-    windata.WIN_REF_LANG_INCL_IN_CONTRACT = req.body.WIN_REF_LANG_INCL_IN_CONTRACT != undefined ? req.body.WIN_REF_LANG_INCL_IN_CONTRACT : "";
-    windata.WIN_BUSINESS_IMPACT = req.body.WIN_BUSINESS_IMPACT != undefined ? req.body.WIN_BUSINESS_IMPACT : "";
-    windata.WIN_SALES_PROCESS_TEAMS = req.body.WIN_SALES_PROCESS_TEAMS != undefined ? req.body.WIN_SALES_PROCESS_TEAMS : "";
-    windata.WIN_LESSONS_LEARNED = req.body.WIN_LESSONS_LEARNED != undefined ? req.body.WIN_LESSONS_LEARNED : "";
-    windata.WIN_CUSTOMER_BUSINESS_CHALLANGES = req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES != undefined ? req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES : "";
-    windata.WIN_TCV_ARR = req.body.WIN_TCV_ARR != undefined ? req.body.WIN_TCV_ARR : "";
+        console.log(" --- >>> " + createdBy);
+        const windata = {};
+        windata.WIN_ECA = req.body.WIN_ECA != undefined ? req.body.WIN_ECA : "";
+        windata.WIN_REGID = req.body.WIN_REGID != undefined ? req.body.WIN_REGID : "";
+        windata.WIN_FISCAL_YR = req.body.WIN_FISCAL_YR != undefined ? req.body.WIN_FISCAL_YR : "";
+        windata.WIN_MEMBERS = req.body.WIN_MEMBERS != undefined ? req.body.WIN_MEMBERS : "";
+        windata.WIN_SOLUTION_SOLD = req.body.WIN_SOLUTION_SOLD != undefined ? req.body.WIN_SOLUTION_SOLD : "";
+        windata.WIN_COSUMING_DATE = req.body.WIN_COSUMING_DATE != undefined ? req.body.WIN_COSUMING_DATE : "";
+        windata.WIN_GOLIVE_ON = req.body.WIN_GOLIVE_ON != undefined ? req.body.WIN_GOLIVE_ON : "";
+        windata.WIN_DEAL_CYCLE = req.body.WIN_DEAL_CYCLE != undefined ? req.body.WIN_DEAL_CYCLE : "";
+        windata.WIN_RENEWAL = req.body.WIN_RENEWAL != undefined ? req.body.WIN_RENEWAL : "";
+        windata.WIN_CUSTOMER_PERSONA = req.body.WIN_CUSTOMER_PERSONA != undefined ? req.body.WIN_CUSTOMER_PERSONA : "";
+        windata.WIN_REF_LANG_INCL_IN_CONTRACT = req.body.WIN_REF_LANG_INCL_IN_CONTRACT != undefined ? req.body.WIN_REF_LANG_INCL_IN_CONTRACT : "";
+        windata.WIN_BUSINESS_IMPACT = req.body.WIN_BUSINESS_IMPACT != undefined ? req.body.WIN_BUSINESS_IMPACT : "";
+        windata.WIN_SALES_PROCESS_TEAMS = req.body.WIN_SALES_PROCESS_TEAMS != undefined ? req.body.WIN_SALES_PROCESS_TEAMS : "";
+        windata.WIN_LESSONS_LEARNED = req.body.WIN_LESSONS_LEARNED != undefined ? req.body.WIN_LESSONS_LEARNED : "";
+        windata.WIN_CUSTOMER_BUSINESS_CHALLANGES = req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES != undefined ? req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES : "";
+        windata.WIN_TCV_ARR = req.body.WIN_TCV_ARR != undefined ? req.body.WIN_TCV_ARR : "";
 
-    let assetCreatedEmailSql = `select  user_email,user_name,ASSET_DESCRIPTION from asset_user ,asset_details where user_role='reviewer' and asset_id=:0  and user_location in(
+        let assetCreatedEmailSql = `select  user_email,user_name,ASSET_DESCRIPTION from asset_user ,asset_details where user_role='reviewer' and asset_id=:0  and user_location in(
         select user_location from asset_user where user_email in 
         (  select regexp_substr(asset_owner,'[^,]+', 1, level) from (select asset_owner from asset_details where asset_id=:0)
         connect by regexp_substr(asset_owner, '[^,]+', 1, level) is not null) and user_location is not null) `;
-    let assetCreatedEmailOptions = [];
+        let assetCreatedEmailOptions = [];
 
-    // console.log(filters)
+        // console.log(filters)
 
-    if (!req.body.links) {
-        req.body.links = null;
-    }
-    if (req.body.links !== null) {
-        req.body.links.forEach(link => {
-            if (!link.DEPLOY_STATUS) {
-                link.DEPLOY_STATUS = 0;
-            }
+        if (!req.body.links) {
+            req.body.links = null;
+        }
+        if (req.body.links !== null) {
+            req.body.links.forEach(link => {
+                if (!link.DEPLOY_STATUS) {
+                    link.DEPLOY_STATUS = 0;
+                }
+            })
+        }
+        const links = req.body.links;
+
+        var asset = new Asset(assetId, description, customer,
+            createdBy, createdDate, serviceid,
+            thumbnail, modifiedDate,
+            modifiedBy, filters, links, expiryDate, video_link, owner, windata);
+
+
+        asset.save(type).then(result => {
+            let creationResult = result
+            res.json(creationResult);
+
+            let assetObj = {
+                status: 'Pending Review',
+                activityByUser: owner,
+                approvalLevel: '1',
+                reviewNote: null,
+                host: req.headers.host,
+                id: creationResult.Asset_ID
+            };
+
+
+            getAssetDetailsAndOwnerDetails(assetObj);
+            // sendEmailOnAssetCreation(result.Asset_ID, owner, assetCreatedEmailSql, assetCreatedEmailOptions, 'create')
+            //     .then(result => {
+            //         console.log(result)
+            //     })
         })
+            .catch(err => {
+                err.status = "FAILED";
+                res.status(500).json(err);
+                console.log(err)
+            });
+    } else {
+        res.status(500).json({ status: "FAILED", msg: "Please select Solution Asset Category" });
+        console.log()
     }
-    const links = req.body.links;
-
-    var asset = new Asset(assetId, description, customer,
-        createdBy, createdDate, serviceid,
-        thumbnail, modifiedDate,
-        modifiedBy, filters, links, expiryDate, video_link, owner, windata);
-
-
-    asset.save(type).then(result => {
-        let creationResult = result
-        res.json(creationResult);
-
-        let assetObj = {
-            status: 'Pending Review',
-            activityByUser: owner,
-            approvalLevel: '1',
-            reviewNote: null,
-            host: req.headers.host,
-            id: creationResult.Asset_ID
-        };
-    
-
-        getAssetDetailsAndOwnerDetails(assetObj);
-        // sendEmailOnAssetCreation(result.Asset_ID, owner, assetCreatedEmailSql, assetCreatedEmailOptions, 'create')
-        //     .then(result => {
-        //         console.log(result)
-        //     })
-    })
-        .catch(err => {
-            err.status = "FAILED";
-            res.status(500).json(err);
-            console.log(err)
-        });;
 
 }
-
-exports.postAssetTest = (req, res) => {
-    const assetId = null;
-    console.log(req.body);
-
-    // const title = req.body.title
-    // console.log(title);
-    const description = req.body.description;
-    console.log(description);
-
-    // const userCase = req.body.userCase;
-    const customer = req.body.customer;
-    const createdBy = req.body.createdBy;
-    const createdDate = new Date();
-    const serviceid = req.body.serviceid;
-    // const oppId = req.body.oppId;
-    const thumbnail = req.body.thumbnail;
-    const modifiedDate = new Date();
-    const modifiedBy = null;
-    const video_link = req.body.video_link;
-    const owner = req.body.owner;
-    // const location = req.body.location;
-    let filters = req.body.filters;
-    const expiryDate = req.body.expiryDate;
-    // const asset_architecture_description = req.body.asset_architecture_description
-    console.log(filters)
-
-    if (!req.body.links) {
-        req.body.links = null;
-    }
-    if (req.body.links !== null) {
-        req.body.links.forEach(link => {
-            if (!link.DEPLOY_STATUS) {
-                link.DEPLOY_STATUS = 0;
-            }
-        })
-    }
-    const links = req.body.links;
-
-    var asset = new Asset(assetId, description, customer,
-        createdBy, createdDate, serviceid,
-        thumbnail, modifiedDate,
-        modifiedBy, filters, links, expiryDate, video_link, owner);
-    asset.saveTest().then(result => {
-        res.json(result);
-    }).catch(err => {
-        res.status(500).json({ status: "FAILED", msg: err });
-    });;
-
-}
-
 
 
 exports.postEditAsset = (req, res) => {
@@ -367,34 +322,43 @@ exports.postEditAsset = (req, res) => {
     windata.WIN_TCV_ARR = req.body.WIN_TCV_ARR != undefined ? req.body.WIN_TCV_ARR : "";
 
 
-
-    if (!req.body.links) {
-        req.body.links = null;
-    }
-    if (req.body.links !== null) {
-        req.body.links.forEach(link => {
-            if (!link.DEPLOY_STATUS) {
-                link.DEPLOY_STATUS = 0;
-            }
-        })
-    }
-    const links = req.body.links;
-    var asset = new Asset(assetId, description, customer,
-        createdBy, createdDate, serviceid, thumbnail, modifiedDate,
-        modifiedBy, filters, links, expiryDate, video_link, owner, windata);
-    asset.save(type).then(result => {
-        let updationResult = result
-        res.json(updationResult);
-        sendEmailOnAssetCreation(assetId, owner, assetCreatedEmailSql, assetCreatedEmailOptions, 'update').then(result => {
-            console.log(result)
-        })
-            .catch(err => {
-                console.log(err)
+    if (filters.length > 1) {
+        if (!req.body.links) {
+            req.body.links = null;
+        }
+        if (req.body.links !== null) {
+            req.body.links.forEach(link => {
+                if (!link.DEPLOY_STATUS) {
+                    link.DEPLOY_STATUS = 0;
+                }
             })
-    }).catch(err => {
-        console.log(err)
-        //res.status(500).json({ status: "FAILED", msg: err });
-    });
+        }
+        const links = req.body.links;
+        var asset = new Asset(assetId, description, customer,
+            createdBy, createdDate, serviceid, thumbnail, modifiedDate,
+            modifiedBy, filters, links, expiryDate, video_link, owner, windata);
+        asset.save(type).then(result => {
+            let updationResult = result
+            res.json(updationResult);
+             let assetObj = {
+                status: 'Pending Review',
+                activityByUser: owner,
+                approvalLevel: '1',
+                reviewNote: null,
+                host: req.headers.host,
+                id: assetId
+            };
+
+
+            getAssetDetailsAndOwnerDetails(assetObj);
+        }).catch(err => {
+            console.log("AssetUpdation error : "+err);
+            //res.status(500).json({ status: "FAILED", msg: err });
+        });
+    } else {
+        res.status(500).json({ status: "FAILED", msg: "Please select Solution Asset Category" });
+        console.log()
+    }
 }
 
 
@@ -606,7 +570,7 @@ exports.postAssetDoc = (req, res) => {
         } if (type === 'document') {
             console.log("Doc file size : " + uploadFiles.length);
             console.log("Doc file name : " + uploadFiles.name);
-            Asset.uploadDoc(req.headers.host, data, uploadFiles)
+            Asset.uploadDoc(req, data, uploadFiles)
                 .then(result => {
                     res.json(result)
                 })

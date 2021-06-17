@@ -7,6 +7,7 @@ const axios = require('axios');
 
 
 exports.getAssets = (req, res) => {
+    console.log("Governance getting assets for "+req.headers.oidc_claim_sub);
     const user_email = req.headers.oidc_claim_sub;
     const user_roles = req.params.user_roles.toLowerCase();
     Governance.fetchAssets(user_email, user_roles, req,)
@@ -54,7 +55,7 @@ exports.addAssetReviewNote = (req, res) => {
                     }).catch((error) => {
                         console.log(error);
                     })
-                console.log("Review submitted. . .");
+                console.log(asset_status+" Review submitted. . .");
                 if (asset_status === 'Live') {
 
                     // sendEmailForAssetStatusChange(assetId, 'live');
@@ -95,9 +96,9 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
      * When approvalLevel 0/2 send notification to the asset owner,their manager and reviewer
      */
 
-    sql = `select a.asset_title,a.asset_id,b.user_email,b.user_manager_email 
-        from asset_details a,asset_user b 
-        where a.asset_owner=b.user_email and a.asset_id=:0`;
+    sql = `select a.asset_id,b.user_role,b.user_email,b.user_manager_email 
+    from asset_details a,asset_user b 
+    where a.asset_owner=b.user_email and a.asset_id=:0`;
 
     connection.execute(sql, [asset.id], {
         outFormat: oracledb.OBJECT
@@ -259,7 +260,7 @@ const sendEmailForAssetStatusChange = (assetId, status) => {
 
 const getReviewerAndAssetDetails = (assetId) => {
     const connection = getDb();
-    let rectificationReviewerAndAssetDetailsSql = `select  user_email,user_name,asset_title,ASSET_DESCRIPTION,ASSET_REVIEW_NOTE from asset_user ,asset_details where user_role='reviewer' and asset_id=:0 and user_location in(
+    let rectificationReviewerAndAssetDetailsSql = `select  user_email,user_name,ASSET_DESCRIPTION,ASSET_REVIEW_NOTE from asset_user ,asset_details where user_role='reviewer' and asset_id=:0 and user_location in(
         select user_location from asset_user where user_email in 
         (select distinct regexp_substr(asset_owner,'[^,]+', 1, level) from (select asset_owner from asset_details where asset_id=:0)  where asset_id=:0
         connect by regexp_substr(asset_owner, '[^,]+', 1, level) is not null) and user_location is not null) `;

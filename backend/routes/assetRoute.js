@@ -18,7 +18,6 @@ router.get('/:assetId', assetController.getAssetById);
 
 
 router.post('/', assetController.postAsset);
-router.post('/testPost', assetController.postAssetTest);
 router.post('/uploadImages/:assetId', assetController.postAssetImage)
 router.post('/uploadDoc/:assetId', assetController.postAssetDoc);
 router.post('/uploadComment/', assetController.postAssetComment)
