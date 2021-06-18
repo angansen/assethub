@@ -38,19 +38,19 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
      * When approvalLevel 1 send notification to the asset owner and manager
      * When approvalLevel 0/2 send notification to the asset owner,their manager and reviewer
      */
-
+    let currentReviewer = asset.activityByUser;
     sql = `select a.asset_id,b.user_role,b.user_email,b.user_manager_email 
         from asset_details a,asset_user b 
         where a.asset_owner=b.user_email and a.asset_id=:0`;
 
-    connection.execute(sql, [asset.id], {
+    connection.query(sql, [asset.id], {
         outFormat: oracledb.OBJECT
     }).then(data => {
+        data=data[0];
+        console.log(JSON.stringify(data));
 
-        console.log(JSON.stringify(data.rows));
-
-        let assetowner = data.rows[0].USER_EMAIL;
-        let receipients = `${assetowner},${data.rows[0].USER_MANAGER_EMAIL}`;
+        let assetowner = data.USER_EMAIL;
+        let receipients = `${assetowner},${data.USER_MANAGER_EMAIL}`;
 
         //create email OBJECT
         let notification = {
@@ -60,27 +60,92 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
             approvallevel: asset.approvalLevel,
             host: asset.host
         };
-        if (asset.approvalLevel.includes('1')) {
-            sql = `select user_email from asset_user where user_role like '%reviewer%'`;
-            connection.execute(sql, {}, {
-                outFormat: oracledb.OBJECT
-            }).then(data => {
-                // console.log(JSON.stringify(data.rows));
-                let reviewers = `${assetowner}`;
-                data.rows.filter(element => {
 
-                    reviewers += "," + element.USER_EMAIL;
+
+
+
+        if (data.user_role.includes("reviewer")) {
+            // if the owner is a reviewer 
+            // send notification to all the reviewers
+
+            sql = `select user_email from asset_user where user_role like '%reviewer%'`;
+            connection.query(sql, {}, {
+                outFormat: oracledb.OBJECT
+            }).then(reviewersrecords => {
+                // console.log(JSON.stringify(data.rows));
+                let reviewers = "";
+                reviewersrecords.filter(element => {
+
+                    reviewers += reviewers.trim().length > 0 ? "," + element.USER_EMAIL : element.USER_EMAIL;
                 });
                 // console.log(reviewers);
                 notification.to = reviewers;
                 try {
-                    email.initiateAssetStatusEmail(notification);
+                    // despatch notifications for the reviewers
+
+                    // compile email subject and body
+                    notification.subject = `New Asset has been submitted for Governance review`;
+                    notification.body = `Hi Governance Team, 
+                        /n Asset id https://${asset.host}/details/?${notification.id}&Governance=Y has been submitted for Governance review before publising.`;
+
+                    notification.to = data.USER_MANAGER_EMAIL;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+                    // despatch notification for the Asset owner
+
+                    // Compile email body and subject for the submitter
+                    notification.subject = `Your asset has been queued for Governance review`;
+                    notification.body = `Dear Submitter, 
+                        /n Thank you for submitting your asset. it has been moved to the asset approval queue.
+                        /n/n You can find the link to your asset https://${asset.host}/details/?${notification.id}&MyASSET=Y.
+                        /n/n For more information on AssetHub and Governance process, please visit https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode`;
+
+                    notification.to = assetowner;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
                 } catch (err) {
                     console.log(JSON.stringify(err));
                 }
 
             })
+
         } else {
+            // if the owener is an user
+
+            // despatch notifications for the respective manager
+
+            // compile email subject and body
+            notification.subject = `New Asset has been submitted for Manager review`;
+            notification.body = `Hi Governance Team, 
+                        /n Asset id https://${asset.host}/details/?${notification.id}&Governance=Y has been submitted for Governance review before publising.`;
+
+            notification.to = reviewers;
+            try {
+
+                email.initiateAssetStatusEmail(notification);
+            } catch (err) {
+                console.log(JSON.stringify(err));
+            }
+
+            // despatch notification for the Asset owner
+
+            // Compile email body and subject for the submitter
+            notification.subject = `Your asset has been queued for manager review`;
+            notification.body = `Dear Submitter, 
+            /n Thank you for submitting your asset. it has been moved to the asset approval queue.
+            /n/n You can find the link to your asset https://${asset.host}/details/?${notification.id}&MyASSET=Y.
+            /n/n For more information on AssetHub and Governance process, please visit https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode.`;
+
+            notification.to = assetowner;
             try {
 
                 email.initiateAssetStatusEmail(notification);
@@ -88,6 +153,37 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                 console.log(JSON.stringify(err));
             }
         }
+
+
+
+        // if (asset.approvalLevel.includes('1')) {
+        //     sql = `select user_email from asset_user where user_role like '%reviewer%'`;
+        //     connection.execute(sql, {}, {
+        //         outFormat: oracledb.OBJECT
+        //     }).then(data => {
+        //         // console.log(JSON.stringify(data.rows));
+        //         let reviewers = `${assetowner}`;
+        //         data.rows.filter(element => {
+
+        //             reviewers += "," + element.USER_EMAIL;
+        //         });
+        //         // console.log(reviewers);
+        //         notification.to = reviewers;
+        //         try {
+        //             email.initiateAssetStatusEmail(notification);
+        //         } catch (err) {
+        //             console.log(JSON.stringify(err));
+        //         }
+
+        //     })
+        // } else {
+        //     try {
+
+        //         email.initiateAssetStatusEmail(notification);
+        //     } catch (err) {
+        //         console.log(JSON.stringify(err));
+        //     }
+        // }
     })
 }
 
@@ -340,7 +436,7 @@ exports.postEditAsset = (req, res) => {
         asset.save(type).then(result => {
             let updationResult = result
             res.json(updationResult);
-             let assetObj = {
+            let assetObj = {
                 status: 'Pending Review',
                 activityByUser: owner,
                 approvalLevel: '1',
@@ -352,7 +448,7 @@ exports.postEditAsset = (req, res) => {
 
             getAssetDetailsAndOwnerDetails(assetObj);
         }).catch(err => {
-            console.log("AssetUpdation error : "+err);
+            console.log("AssetUpdation error : " + err);
             //res.status(500).json({ status: "FAILED", msg: err });
         });
     } else {

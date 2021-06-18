@@ -10,61 +10,79 @@ const axios = require('axios');
 
 
 exports.initiateAssetStatusEmail = (notification) => {
+    //     console.log('----------- EMAIL NOTIFICATION ---------');
+    //     console.log(JSON.stringify(notification));
+    //     let emailbody = '';
+    //     let subject = `Asset ID ${notification.id}  `;
+    //     if (notification.assetstatus === 'Live') {
+    //         emailbody = `Asset id ${notification.id} `;
+    //         emailbody+=" Please click to view the asset https://"+notification.host+`/details/?${notification.id}&MyASSET=Y`;
+
+    //         if (notification.approvallevel === '2') {
+    //             emailbody += ` has been submitted for governance review`;
+    //             subject += ` submitted for governance review`;
+    //         } else if (notification.approvallevel === '0') {
+    //             emailbody += ` has been approved after careful governance review`;
+    //             subject += ` has been approved after careful review.`;
+    //         }
+    //     }
+    //     else if (notification.assetstatus === 'Pending Rectification') {
+    //         emailbody = `Asset id ${notification.id} sent for rectification with valuable review inputs.`;
+    //         emailbody+=" Please click to view the asset https://"+notification.host+`/details/?${notification.id}&MyASSET=Y`;
+    //         if (notification.approvallevel === '1') {
+    //             subject += ` has been sent for rectification during manager review`;
+    //         } else if (notification.approvallevel === '2') {
+    //             subject += ` has been sent for rectification during governance review`;
+    //         }
+    //     }
+    //     else if (notification.assetstatus === 'Reject') {
+    //         emailbody = `Asset id ${notification.id} has been rejected after careful evaluation.`;
+    //         if (notification.approvallevel === '1') {
+    //             subject += ` has been rejected during manager review`;
+    //         } else if (notification.approvallevel === '2') {
+    //             subject += ` has been rejected during governance review`;
+    //         }
+
+    //     } else if (notification.assetstatus === 'Pending Review') {
+    //         emailbody = `Asset id ${notification.id} has been submitted for governance review.`;
+    //         emailbody+=" Please click to view the asset https://"+notification.host+`/details/?${notification.id}&Governance=Y`;
+    //         if (notification.approvallevel === '1') {
+    //             subject += ` has been submitted for manager review`;
+    //         } else if (notification.approvallevel === '2') {
+    //             subject += ` has been submitted for governance review`;
+    //         }
+    //     }
+
+    //     // emailbody+=" Please click to view the asset "+notification.host+`/details/?${notification.id}&Governance=Y`;
+
+    //     console.log("Initiating email notification despatch . . .");
+    //     axios.put('https://apex.oracle.com/pls/apex/assethub/email/despatch', {
+    //         "from": 'angan.sen@oracle.com',
+    //         "to": notification.to,
+    //         "emailbody": emailbody,
+    //         "subj": subject
+    //     }).then(res => {
+    //         console.log('Email despatched successfully!');
+    //     }).catch(err => {
+    //         console.log('Email despatched Failed > "'+JSON.stringify(err));
+    //     })
+
+    // }
+
+
     console.log('----------- EMAIL NOTIFICATION ---------');
     console.log(JSON.stringify(notification));
-    let emailbody = '';
-    let subject = `Asset ID ${notification.id}  `;
-    if (notification.assetstatus === 'Live') {
-        emailbody = `Asset id ${notification.id} `;
-        emailbody+=" Please click to view the asset https://"+notification.host+`/details/?${notification.id}&MyASSET=Y`;
-
-        if (notification.approvallevel === '2') {
-            emailbody += ` has been submitted for governance review`;
-            subject += ` submitted for governance review`;
-        } else if (notification.approvallevel === '0') {
-            emailbody += ` has been approved after careful governance review`;
-            subject += ` has been approved after careful review.`;
-        }
-    }
-    else if (notification.assetstatus === 'Pending Rectification') {
-        emailbody = `Asset id ${notification.id} sent for rectification with valuable review inputs.`;
-        emailbody+=" Please click to view the asset https://"+notification.host+`/details/?${notification.id}&MyASSET=Y`;
-        if (notification.approvallevel === '1') {
-            subject += ` has been sent for rectification during manager review`;
-        } else if (notification.approvallevel === '2') {
-            subject += ` has been sent for rectification during governance review`;
-        }
-    }
-    else if (notification.assetstatus === 'Reject') {
-        emailbody = `Asset id ${notification.id} has been rejected after careful evaluation.`;
-        if (notification.approvallevel === '1') {
-            subject += ` has been rejected during manager review`;
-        } else if (notification.approvallevel === '2') {
-            subject += ` has been rejected during governance review`;
-        }
-
-    } else if (notification.assetstatus === 'Pending Review') {
-        emailbody = `Asset id ${notification.id} has been submitted for governance review.`;
-        emailbody+=" Please click to view the asset https://"+notification.host+`/details/?${notification.id}&Governance=Y`;
-        if (notification.approvallevel === '1') {
-            subject += ` has been submitted for manager review`;
-        } else if (notification.approvallevel === '2') {
-            subject += ` has been submitted for governance review`;
-        }
-    }
-
-    // emailbody+=" Please click to view the asset "+notification.host+`/details/?${notification.id}&Governance=Y`;
 
     console.log("Initiating email notification despatch . . .");
     axios.put('https://apex.oracle.com/pls/apex/assethub/email/despatch', {
         "from": 'angan.sen@oracle.com',
         "to": notification.to,
-        "emailbody": emailbody,
-        "subj": subject
+        "emailbody": notification.body,
+        "subj": notification.subject
     }).then(res => {
         console.log('Email despatched successfully!');
     }).catch(err => {
-        console.log('Email despatched Failed > "'+JSON.stringify(err));
+        console.log('Email despatched Failed > "' + JSON.stringify(err));
     })
 
 }

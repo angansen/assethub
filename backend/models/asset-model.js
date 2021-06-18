@@ -110,7 +110,12 @@ const dynamicSort = (tAssets, sortBy, order) => {
 }
 const getAssetsById = (assetId) => {
     const connection = getDb();
-    return connection.query(`SELECT * from ASSET_DETAILS where ASSET_ID=:ASSET_ID`, [assetId],
+    return connection.query(`select a.ASSET_ID,a.ASSET_DESCRIPTION,a.ASSET_CUSTOMER,a.asset_review_note,a.ASSET_CREATEDBY,
+    a.ASSET_CREATED_DATE,a.ASSET_SERVICE_ID,a.ASSET_THUMBNAIL,a.ASSET_MODIFIED_DATE,a.ASSET_MODIFIED_BY,
+    a.ASSET_EXPIRY_DATE,a.ASSET_VIDEO_LINK,a.ASSET_OWNER,a.ASSET_STATUS,
+    a.ASSET_REVIEW_NOTE,a.ASSET_APPROVAL_LVL,c.checklist_items,d.filter_name as ASSET_TYPE,d.filter_id as ASSET_TYPE_ID
+     from asset_details a, asset_filter_asset_map b,asset_governance_checkpoint_by_type c,asset_tags d 
+    where a.asset_id=b.asset_id and b.filter_id=d.filter_id and c.asset_type_id=d.filter_id and a.ASSET_ID=:ASSET_ID`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })

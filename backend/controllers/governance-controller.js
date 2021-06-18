@@ -7,7 +7,7 @@ const axios = require('axios');
 
 
 exports.getAssets = (req, res) => {
-    console.log("Governance getting assets for "+req.headers.oidc_claim_sub);
+    console.log("Governance getting assets for " + req.headers.oidc_claim_sub);
     const user_email = req.headers.oidc_claim_sub;
     const user_roles = req.params.user_roles.toLowerCase();
     Governance.fetchAssets(user_email, user_roles, req,)
@@ -55,7 +55,7 @@ exports.addAssetReviewNote = (req, res) => {
                     }).catch((error) => {
                         console.log(error);
                     })
-                console.log(asset_status+" Review submitted. . .");
+                console.log(asset_status + " Review submitted. . .");
                 if (asset_status === 'Live') {
 
                     // sendEmailForAssetStatusChange(assetId, 'live');
@@ -80,7 +80,7 @@ exports.addAssetReviewNote = (req, res) => {
                 }
             })
             .catch(err => {
-                console.log("postAssetReviewNote . . . error");
+                console.log("postAssetReviewNote . . . error " + err);
                 res.json(err)
             })
     }
@@ -91,6 +91,7 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
     console.log("generating notification. . . " + JSON.stringify(asset));
     let sql = '';
     const connection = getDb();
+    let currentReviewer = asset.activityByUser;
     /**
      * When approvalLevel 1 send notification to the asset owner and manager
      * When approvalLevel 0/2 send notification to the asset owner,their manager and reviewer
@@ -100,18 +101,18 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
     from asset_details a,asset_user b 
     where a.asset_owner=b.user_email and a.asset_id=:0`;
 
-    connection.execute(sql, [asset.id], {
+    connection.query(sql, [asset.id], {
         outFormat: oracledb.OBJECT
     }).then(data => {
+        data = data[0];
+        console.log(JSON.stringify(data));
 
-        console.log(JSON.stringify(data.rows));
-
-        let assetowner = data.rows[0].USER_EMAIL;
-        let receipients = `${assetowner},${data.rows[0].USER_MANAGER_EMAIL}`;
+        let assetowner = data.USER_EMAIL;
+        let manager = data.USER_MANAGER_EMAIL;
 
         //create email OBJECT
         let notification = {
-            to: receipients,
+            to: '',
             id: asset.id,
             assetstatus: asset.status,
             approvallevel: asset.approvalLevel,
@@ -119,36 +120,362 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
         };
         console.log("------------  Notification Prep ------------  " + asset.approvalLevel != '1');
         console.log("Notificiation Object " + JSON.stringify(notification));
-        if (asset.approvalLevel === '1') {
-            sql = `select user_email from asset_user where user_role like '%reviewer%'`;
-            connection.execute(sql, {}, {
-                outFormat: oracledb.OBJECT
-            }).then(data => {
-                // console.log(JSON.stringify(data.rows));
-                let reviewers = `${assetowner}`;
-                data.rows.filter(element => {
 
-                    reviewers += "," + element.USER_EMAIL;
-                });
-                // console.log(reviewers);
-                notification.to = reviewers;
+        sql = `select user_email from asset_user where user_role like '%reviewer%'`;
+        connection.query(sql, {}, {
+            outFormat: oracledb.OBJECT
+        }).then(reviewersrecords => {
+            let reviewers = ``;
+            reviewersrecords.filter(element => {
+
+                reviewers += reviewers.trim().length > 0 ? "," + element.USER_EMAIL : element.USER_EMAIL;
+            });
+
+            console.log(`Receipients: ${reviewers} - ${assetowner} - ${manager} `);
+
+            if (asset.approvalLevel === '2') {
+                // asset Approval level 2 is due for governance review
+
+
+
+                if (notification.assetstatus === 'Pending Rectification') {
+
+                    // despatch notifications for the reviewers
+
+                    // compile email subject and body
+                    notification.subject = `Asset has been sent for rectification after governance review`;
+                    notification.body = `Hi Governance Team, 
+                        <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been sent for rectification.`;
+
+                    notification.to = reviewers;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+
+                    // despatch notification for the Asset owner
+
+                    // Compile email body and subject for the submitter
+                    notification.subject = `Your asset has been requested for rectification after governance review`;
+                    notification.body = `Dear Submitter, 
+                        <br> An asset ${asset.id} you submitted, has been requested for rectification.
+                        <br><br> You can directly edit the asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>  with the relavant review comments.
+                        <br><br> For more information on AssetHub and Governance process, please visit <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">click here</a>`;
+
+                    notification.to = assetowner;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+                } else if (notification.assetstatus === 'Reject') {
+
+                    // despatch notifications for the reviewers
+
+                    // compile email subject and body
+                    notification.subject = `Asset has been rejected after governance review`;
+                    notification.body = `Hi Governance Team, 
+                        <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been rejected after careful governance review.`;
+
+                    notification.to = reviewers;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+
+                    // despatch notification for the Asset owner
+
+                    // Compile email body and subject for the submitter
+                    notification.subject = `Your asset has been reject after governance review`;
+                    notification.body = `Dear Submitter,<br> 
+                         An asset ${asset.id} you submitted, has been rejected after careful governance review.<br><br>                        
+                         You can find the link to your asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>.<br><br>                        
+                         For more information on AssetHub and Governance process, please visit https://confluence.oraclecorp.com/confluence/display<br>ACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode`;
+
+                    notification.to = assetowner;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+
+                } else if (notification.assetstatus === 'Live') {
+                    // despatch notifications for the reviewers
+
+                    // compile email subject and body
+                    notification.subject = `Asset has been queued for governance review`;
+                    notification.body = `Hi Governance Team, 
+                    <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been queued for governance review.`;
+
+                    notification.to = reviewers;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+                    // despatch notifications for the Manager
+
+                    // compile email subject and body
+                    notification.subject = `Asset has been queued for governance review`;
+                    notification.body = `Hello, 
+                    <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been queued for governance review after your initial approval.`;
+
+                    notification.to = reviewers;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+
+
+                    // despatch notification for the Asset owner
+
+                    // Compile email body and subject for the submitter
+                    notification.subject = `Your asset has been queued for governance review`;
+                    notification.body = `Dear Submitter, 
+                    <br> An asset ${asset.id} you submitted has been queued for Governance review after initial manager review.
+                    <br><br> You can find the link to your asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>.
+                    <br><br> For more information on AssetHub and Governance process, please visit <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">click here</a>`;
+
+                    notification.to = assetowner;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+                }
+
+
+
+            } else if (asset.approvalLevel === '1') {
+                // asset approval level 1 is for manager review
+
+
+                if (notification.assetstatus === 'Pending Rectification') {
+
+                    // despatch notifications for the manager
+
+                    // compile email subject and body
+                    notification.subject = `Asset has been sent for rectification after manager review`;
+                    notification.body = `Hello, 
+                    <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a>  has been sent for rectification.`;
+
+                    notification.to = data.USER_MANAGER_EMAIL;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+
+                    // despatch notification for the Asset owner
+
+                    // Compile email body and subject for the submitter
+                    notification.subject = `Your asset has been requested for rectification during manager review`;
+                    notification.body = `Dear Submitter,<br> 
+                    An asset ${asset.id} you submitted, has been requested for rectification after manager review.<br><br>
+                    You can directly edit the asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>   with the relavant review comments.<br><br>                    
+                    For more information on AssetHub and Governance process, 
+                    please visit <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">click here</a>`;
+
+                    notification.to = assetowner;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+                } else if (notification.assetstatus === 'Reject') {
+
+                    // despatch notifications for the reviewers
+
+                    // compile email subject and body
+                    notification.subject = `Asset has been rejected post manager review`;
+                    notification.body = `Hello, 
+                    <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been rejected after review.`;
+
+                    notification.to = data.USER_MANAGER_EMAIL;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+
+                    // despatch notification for the Asset owner
+
+                    // Compile email body and subject for the submitter
+                    notification.subject = `Your asset has been reject after manager review`;
+                    notification.body = `Dear Submitter, 
+                    <br> An asset ${asset.id} you submitted, has been rejected after careful manager review.
+                    <br><br> You can find the link to your asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>.
+                    <br><br> For more information on AssetHub and Governance process, please visit <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">click here</a>`;
+
+                    notification.to = assetowner;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+
+                } else if (notification.assetstatus === 'Live') {
+                    // despatch notifications for the reviewers
+
+                    // compile email subject and body
+                    notification.subject = `Asset has been queued for governance review`;
+                    notification.body = `Hi Governance Team, 
+                    <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been published on Asset Hub after careful governance review.`;
+
+                    notification.to = reviewers;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+
+                    // despatch notification for the Asset owner
+
+                    // Compile email body and subject for the submitter
+                    notification.subject = `Your asset has been queued for governance review`;
+                    notification.body = `Dear Submitter, 
+                    <br> An asset ${asset.id} you submitted has been queued for Governance review after initial manager review.
+                    <br><br> You can find the link to your asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>.
+                    <br><br> For more information on AssetHub and Governance process, please visit <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">click here</a>`;
+
+                    notification.to = assetowner;
+                    try {
+
+                        email.initiateAssetStatusEmail(notification);
+                    } catch (err) {
+                        console.log(JSON.stringify(err));
+                    }
+
+                }
+
+            } else if (asset.approvalLevel === '0') {
+                // despatch notifications for the reviewers
+
+                // compile email subject and body
+                notification.subject = `Asset has been published after governance review`;
+                notification.body = `Hi Governance Team, 
+                        <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been published on Asset Hub after careful governance review.`;
+
+                notification.to = reviewers + ',' + data.USER_MANAGER_EMAIL;
                 try {
+
                     email.initiateAssetStatusEmail(notification);
                 } catch (err) {
                     console.log(JSON.stringify(err));
                 }
 
-            })
-        } else {
-            try {
 
-                email.initiateAssetStatusEmail(notification);
-            } catch (err) {
-                console.log(JSON.stringify(err));
+                // despatch notification for the Asset owner
+
+                // Compile email body and subject for the submitter
+                notification.subject = `Your asset has been published on Asset Hub after Governance review`;
+                notification.body = `Dear Submitter, 
+                        <br> An asset ${asset.id} you submitted has been published on Assethub after careful governance review.
+                        <br><br> You can find the link to your asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>.
+                        <br><br> For more information on AssetHub and Governance process, please visit <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">click here</a>`;
+
+                notification.to = assetowner;
+                try {
+
+                    email.initiateAssetStatusEmail(notification);
+                } catch (err) {
+                    console.log(JSON.stringify(err));
+                }
             }
-        }
+        })
     })
 }
+
+
+// const getAssetDetailsAndOwnerDetails = (asset) => {
+//     console.log("generating notification. . . " + JSON.stringify(asset));
+//     let sql = '';
+//     const connection = getDb();
+//     /**
+//      * When approvalLevel 1 send notification to the asset owner and manager
+//      * When approvalLevel 0/2 send notification to the asset owner,their manager and reviewer
+//      */
+
+//     sql = `select a.asset_id,b.user_role,b.user_email,b.user_manager_email 
+//     from asset_details a,asset_user b 
+//     where a.asset_owner=b.user_email and a.asset_id=:0`;
+
+//     connection.execute(sql, [asset.id], {
+//         outFormat: oracledb.OBJECT
+//     }).then(data => {
+
+//         console.log(JSON.stringify(data.rows));
+
+//         let assetowner = data.rows[0].USER_EMAIL;
+//         let receipients = `${assetowner},${data.rows[0].USER_MANAGER_EMAIL}`;
+
+//         //create email OBJECT
+//         let notification = {
+//             to: receipients,
+//             id: asset.id,
+//             assetstatus: asset.status,
+//             approvallevel: asset.approvalLevel,
+//             host: asset.host
+//         };
+//         console.log("------------  Notification Prep ------------  " + asset.approvalLevel != '1');
+//         console.log("Notificiation Object " + JSON.stringify(notification));
+//         if (asset.approvalLevel === '1') {
+//             sql = `select user_email from asset_user where user_role like '%reviewer%'`;
+//             connection.execute(sql, {}, {
+//                 outFormat: oracledb.OBJECT
+//             }).then(data => {
+//                 // console.log(JSON.stringify(data.rows));
+//                 let reviewers = `${assetowner}`;
+//                 data.rows.filter(element => {
+
+//                     reviewers += "," + element.USER_EMAIL;
+//                 });
+//                 // console.log(reviewers);
+//                 notification.to = reviewers;
+//                 try {
+//                     email.initiateAssetStatusEmail(notification);
+//                 } catch (err) {
+//                     console.log(JSON.stringify(err));
+//                 }
+
+//             })
+//         } else {
+//             try {
+
+//                 email.initiateAssetStatusEmail(notification);
+//             } catch (err) {
+//                 console.log(JSON.stringify(err));
+//             }
+//         }
+//     })
+// }
 
 const getresp = () => {
     console.log("Testing response");
