@@ -41,6 +41,7 @@ exports.addAssetReviewNote = (req, res) => {
     asset.reviewNote = review_note;
     asset.host = host;
     asset.id = assetId;
+    asset_status=(asset_status_lvl=="2"&&asset_status=='Live')?"Pending Review":asset_status;
     if (!review_note || !asset_status) {
         res.json({ "status": "Enter a review note" })
     }
@@ -60,7 +61,8 @@ exports.addAssetReviewNote = (req, res) => {
 
                     // sendEmailForAssetStatusChange(assetId, 'live');
                     getAssetDetailsAndOwnerDetails(asset);
-                    res.json({ "status": "The asset has been approved successfully." });
+                    let msg = asset.approvalLevel.trim() == "0" ? "The asset has been published successfully in Asset Hub." : "The asset has been approved after manager review and queued for governance review.";
+                    res.json({ "status": msg });
                 }
                 else if (asset_status === 'Pending Rectification') {
                     getAssetDetailsAndOwnerDetails(asset);
@@ -122,10 +124,11 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
         console.log("Notificiation Object " + JSON.stringify(notification));
 
         sql = `select user_email from asset_user where user_role like '%reviewer%'`;
+        let reviewers = ``;
         connection.query(sql, {}, {
             outFormat: oracledb.OBJECT
         }).then(reviewersrecords => {
-            let reviewers = ``;
+            
             reviewersrecords.filter(element => {
 
                 reviewers += reviewers.trim().length > 0 ? "," + element.USER_EMAIL : element.USER_EMAIL;
@@ -150,7 +153,7 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     notification.to = reviewers;
                     try {
 
-                        email.initiateAssetStatusEmail(notification);
+                        // email.initiateAssetStatusEmail(notification);
                     } catch (err) {
                         console.log(JSON.stringify(err));
                     }
@@ -185,7 +188,7 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     notification.to = reviewers;
                     try {
 
-                        email.initiateAssetStatusEmail(notification);
+                        // email.initiateAssetStatusEmail(notification);
                     } catch (err) {
                         console.log(JSON.stringify(err));
                     }
@@ -232,7 +235,7 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     notification.body = `Hello, 
                     <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been queued for governance review after your initial approval.`;
 
-                    notification.to = reviewers;
+                    notification.to = manager;
                     try {
 
                         email.initiateAssetStatusEmail(notification);
@@ -279,7 +282,7 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     notification.to = data.USER_MANAGER_EMAIL;
                     try {
 
-                        email.initiateAssetStatusEmail(notification);
+                        // email.initiateAssetStatusEmail(notification);
                     } catch (err) {
                         console.log(JSON.stringify(err));
                     }

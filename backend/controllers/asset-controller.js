@@ -46,7 +46,7 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
     connection.query(sql, [asset.id], {
         outFormat: oracledb.OBJECT
     }).then(data => {
-        data=data[0];
+        data = data[0];
         console.log(JSON.stringify(data));
 
         let assetowner = data.USER_EMAIL;
@@ -63,8 +63,10 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
 
 
 
+        console.log(JSON.stringify(data));
+        console.log(data.USER_ROLE.includes("reviewer"));
 
-        if (data.user_role.includes("reviewer")) {
+        if (data.USER_ROLE.includes("reviewer")) {
             // if the owner is a reviewer 
             // send notification to all the reviewers
 
@@ -86,7 +88,7 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     // compile email subject and body
                     notification.subject = `New Asset has been submitted for Governance review`;
                     notification.body = `Hi Governance Team, 
-                        /n Asset id https://${asset.host}/details/?${notification.id}&Governance=Y has been submitted for Governance review before publising.`;
+                        <br>Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been submitted for Governance review before publising.`;
 
                     notification.to = data.USER_MANAGER_EMAIL;
                     try {
@@ -100,9 +102,11 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     // Compile email body and subject for the submitter
                     notification.subject = `Your asset has been queued for Governance review`;
                     notification.body = `Dear Submitter, 
-                        /n Thank you for submitting your asset. it has been moved to the asset approval queue.
-                        /n/n You can find the link to your asset https://${asset.host}/details/?${notification.id}&MyASSET=Y.
-                        /n/n For more information on AssetHub and Governance process, please visit https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode`;
+                        <br>Thank you for submitting your asset. it has been moved to the asset approval queue.
+                        <br><br> You can find the link to your asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>.
+                        
+                        <br><br> For more information on AssetHub and Governance process, please visit https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode`;
+                    // /<br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been published on Asset Hub after careful governance review.
 
                     notification.to = assetowner;
                     try {
@@ -126,7 +130,7 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
             // compile email subject and body
             notification.subject = `New Asset has been submitted for Manager review`;
             notification.body = `Hi Governance Team, 
-                        /n Asset id https://${asset.host}/details/?${notification.id}&Governance=Y has been submitted for Governance review before publising.`;
+                        <br>Asset id <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been submitted for Governance review before publising.`;
 
             notification.to = reviewers;
             try {
@@ -141,9 +145,9 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
             // Compile email body and subject for the submitter
             notification.subject = `Your asset has been queued for manager review`;
             notification.body = `Dear Submitter, 
-            /n Thank you for submitting your asset. it has been moved to the asset approval queue.
-            /n/n You can find the link to your asset https://${asset.host}/details/?${notification.id}&MyASSET=Y.
-            /n/n For more information on AssetHub and Governance process, please visit https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode.`;
+            <br>Thank you for submitting your asset. it has been moved to the asset approval queue.
+            <br><br> You can find the link to your asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>.
+            <br><br> For more information on AssetHub and Governance process, please visit https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode.`;
 
             notification.to = assetowner;
             try {
@@ -252,6 +256,19 @@ const sendEmailOnAssetCreation = (assetId, asset_owner, assetCreatedEmailSql, as
 }
 
 
+const getuserByEmail = (email) => {
+    const connection = getDb();
+    /**
+     * When approvalLevel 1 send notification to the asset owner and manager
+     * When approvalLevel 0/2 send notification to the asset owner,their manager and reviewer
+     */
+    sql = `select * from asset_user where user_email=:0`;
+    return connection.query(sql, [email], {
+        outFormat: oracledb.OBJECT
+    })
+}
+
+
 exports.postAsset = (req, res) => {
     let type = req.header('type');
     // type= type==undefined||type==null||type.trim().length==0?"Saved":"Pending Review";
@@ -287,7 +304,7 @@ exports.postAsset = (req, res) => {
     let filters = req.body.filters;
     console.log("Filter length: " + filters.length);
     if (filters.length > 1) {
-        const expiryDate = req.body.expiryDate != undefined ? req.body.expiryDate : "6";
+        const expiryDate = req.body.expiryDate != undefined ? req.body.expiryDate : "12";
         // const asset_architecture_description = req.body.asset_architecture_description
 
         console.log(" --- >>> " + createdBy);
@@ -308,6 +325,7 @@ exports.postAsset = (req, res) => {
         windata.WIN_LESSONS_LEARNED = req.body.WIN_LESSONS_LEARNED != undefined ? req.body.WIN_LESSONS_LEARNED : "";
         windata.WIN_CUSTOMER_BUSINESS_CHALLANGES = req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES != undefined ? req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES : "";
         windata.WIN_TCV_ARR = req.body.WIN_TCV_ARR != undefined ? req.body.WIN_TCV_ARR : "";
+        windata.ASSET_APPROVAL_LVL = req.body.ASSET_APPROVAL_LVL != undefined ? req.body.ASSET_APPROVAL_LVL : 1;
 
         let assetCreatedEmailSql = `select  user_email,user_name,ASSET_DESCRIPTION from asset_user ,asset_details where user_role='reviewer' and asset_id=:0  and user_location in(
         select user_location from asset_user where user_email in 
@@ -342,7 +360,7 @@ exports.postAsset = (req, res) => {
             let assetObj = {
                 status: 'Pending Review',
                 activityByUser: owner,
-                approvalLevel: '1',
+                approvalLevel: windata.ASSET_APPROVAL_LVL,
                 reviewNote: null,
                 host: req.headers.host,
                 id: creationResult.Asset_ID
@@ -399,6 +417,7 @@ exports.postEditAsset = (req, res) => {
     const expiryDate = req.body.expiryDate;
     const video_link = req.body.video_link;
     const owner = req.headers.oidc_claim_sub;
+    const approval_level = req.body.ASSET_APPROVAL_LVL;
     let windata = {};
     windata.WIN_ECA = req.body.WIN_ECA != undefined ? req.body.WIN_ECA : "";
     windata.WIN_REGID = req.body.WIN_REGID != undefined ? req.body.WIN_REGID : "";
@@ -416,6 +435,7 @@ exports.postEditAsset = (req, res) => {
     windata.WIN_LESSONS_LEARNED = req.body.WIN_LESSONS_LEARNED != undefined ? req.body.WIN_LESSONS_LEARNED : "";
     windata.WIN_CUSTOMER_BUSINESS_CHALLANGES = req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES != undefined ? req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES : "";
     windata.WIN_TCV_ARR = req.body.WIN_TCV_ARR != undefined ? req.body.WIN_TCV_ARR : "";
+    windata.ASSET_APPROVAL_LVL = approval_level;
 
 
     if (filters.length > 1) {
@@ -439,7 +459,7 @@ exports.postEditAsset = (req, res) => {
             let assetObj = {
                 status: 'Pending Review',
                 activityByUser: owner,
-                approvalLevel: '1',
+                approvalLevel: approval_level,
                 reviewNote: null,
                 host: req.headers.host,
                 id: assetId

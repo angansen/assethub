@@ -382,7 +382,7 @@ module.exports = class Asset {
                             self.windata.WIN_SALES_PROCESS_TEAMS,
                             self.windata.WIN_LESSONS_LEARNED,
                             self.windata.WIN_CUSTOMER_BUSINESS_CHALLANGES,
-                            self.windata.WIN_TCV_ARR,1, self.assetId],
+                            self.windata.WIN_TCV_ARR, self.windata.ASSET_APPROVAL_LVL, self.assetId],
                             {
                                 outFormat: oracledb.Object
                             }).then(res => {
@@ -497,7 +497,8 @@ module.exports = class Asset {
                     self.windata.WIN_SALES_PROCESS_TEAMS,
                     self.windata.WIN_LESSONS_LEARNED,
                     self.windata.WIN_CUSTOMER_BUSINESS_CHALLANGES,
-                    self.windata.WIN_TCV_ARR];
+                    self.windata.WIN_TCV_ARR,
+                    self.windata.ASSET_APPROVAL_LVL];
 
                 console.log("Bind Value : " + JSON.stringify(bindvalue));
                 connection.transaction([
@@ -531,7 +532,8 @@ module.exports = class Asset {
                 WIN_SALES_PROCESS_TEAMS,
                 WIN_LESSONS_LEARNED,
                 WIN_CUSTOMER_BUSINESS_CHALLANGES,
-                WIN_TCV_ARR) 
+                WIN_TCV_ARR,
+                ASSET_APPROVAL_LVL) 
                 values(:ASSET_ID,
                 :ASSET_DESCRIPTION,
                 :ASSET_CUSTOMER,
@@ -560,7 +562,8 @@ module.exports = class Asset {
                 :WIN_SALES_PROCESS_TEAMS,
                 :WIN_LESSONS_LEARNED,
                 :WIN_CUSTOMER_BUSINESS_CHALLANGES,
-                :WIN_TCV_ARR)`,
+                :WIN_TCV_ARR,
+                :ASSET_APPROVAL_LVL)`,
                             bindvalue,
                             {
                                 outFormat: oracledb.Object
@@ -806,7 +809,7 @@ module.exports = class Asset {
                                 console.log("Calling file create " + uploadPath);
                                 file.mv(uploadPath, function (err) {
                                     if (err) {
-                                        console.log("Error on file movement: "+JSON.stringify(err));
+                                        console.log("Error on file movement: " + JSON.stringify(err));
                                         return res.status(201).send(err);
                                     }
                                 })
@@ -817,7 +820,7 @@ module.exports = class Asset {
                         console.log("Calling file create " + uploadPath);
                         file.mv(uploadPath, function (err) {
                             if (err) {
-                                console.log("Error on file movement: "+JSON.stringify(err));
+                                console.log("Error on file movement: " + JSON.stringify(err));
                                 return res.status(201).send(err);
                             }
                         })
@@ -1667,13 +1670,13 @@ module.exports = class Asset {
                         // asset.ASSET_THUMBNAIL = this.getimagepath(request) + asset.ASSET_THUMBNAIL;
                         asset.createdDate = asset.ASSET_CREATED_DATE;
 
-                        console.log(id+" Image Path: "+allAssetsObj.ASSET_THUMBNAIL);
+                        console.log(id + " Image Path: " + allAssetsObj.ASSET_THUMBNAIL);
 
-                        allAssetsObj.ASSET_THUMBNAIL = (allAssetsObj.ASSET_THUMBNAIL != null && allAssetsObj.ASSET_THUMBNAIL.trim().length > 0 )? this.getimagepath(request) + allAssetsObj.ASSET_THUMBNAIL : this.getimagepath(request) + '/no_image.png';
+                        allAssetsObj.ASSET_THUMBNAIL = (allAssetsObj.ASSET_THUMBNAIL != null && allAssetsObj.ASSET_THUMBNAIL.trim().length > 0) ? this.getimagepath(request) + allAssetsObj.ASSET_THUMBNAIL : this.getimagepath(request) + '/no_image.png';
 
                         var views = viewsArray.filter(v => v.ASSET_ID === id);
                         allAssetsObj.VIEWS = views.length == 0 ? { VIEW_COUNT: 0, ASSET_ID: id } : views[0];
-                        console.log(id+" Image Path: "+allAssetsObj.ASSET_THUMBNAIL);
+                        console.log(id + " Image Path: " + allAssetsObj.ASSET_THUMBNAIL);
 
                         if (!(sortBy == 'views' && allAssetsObj.VIEWS.VIEW_COUNT == 0)) {
                             allAssets.push(allAssetsObj);
