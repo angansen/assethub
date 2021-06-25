@@ -11,6 +11,9 @@ exports.saveUserDetails = (req, res) => {
     console.log("validating user. . .");
     user.saveUser(req.body, res);
 }
+exports.resetsession = (req, res) => {
+    res.status(200).send({timestamp:new Date().getTime()});
+}
 
 exports.findUserByEmail = (req, res) => {
     console.log("finding user. . . " + req.headers.oidc_claim_sub);

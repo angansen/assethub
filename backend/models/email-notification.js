@@ -74,7 +74,7 @@ exports.initiateAssetStatusEmail = (notification) => {
     console.log(JSON.stringify(notification));
 
     console.log("Initiating email notification despatch . . .");
-    axios.put('https://apex.oracle.com/pls/apex/assethub/email/despatch', {
+    axios.put('https://itfcuqba1dqacqh-db202104091443.adb.us-ashburn-1.oraclecloudapps.com/ords/assethub/api/despatch', {
         "from": 'angan.sen@oracle.com',
         "to": notification.to,
         "emailbody": notification.body,
@@ -82,7 +82,8 @@ exports.initiateAssetStatusEmail = (notification) => {
     }).then(res => {
         console.log('Email despatched successfully!');
     }).catch(err => {
-        console.log('Email despatched Failed > "' + JSON.stringify(err));
+        let msg=JSON.stringify(err).includes('555')?" Maximum email per email despatch is reached per workspace":JSON.stringify(err);
+        console.log('Email despatched Failed  "' + msg);
     })
 
 }

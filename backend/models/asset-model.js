@@ -110,16 +110,22 @@ const dynamicSort = (tAssets, sortBy, order) => {
 }
 const getAssetsById = (assetId) => {
     const connection = getDb();
-    return connection.query(`select a.ASSET_ID,a.ASSET_DESCRIPTION,a.ASSET_CUSTOMER,a.asset_review_note,a.ASSET_CREATEDBY,
-    a.ASSET_CREATED_DATE,a.ASSET_SERVICE_ID,a.ASSET_THUMBNAIL,a.ASSET_MODIFIED_DATE,a.ASSET_MODIFIED_BY,
-    a.ASSET_EXPIRY_DATE,a.ASSET_VIDEO_LINK,a.ASSET_OWNER,a.ASSET_STATUS,
-    a.ASSET_REVIEW_NOTE,a.ASSET_APPROVAL_LVL,c.checklist_items,d.filter_name as ASSET_TYPE,d.filter_id as ASSET_TYPE_ID
+    return connection.query(`select a.*,c.checklist_items,d.filter_name as ASSET_TYPE,d.filter_id as ASSET_TYPE_ID
      from asset_details a, asset_filter_asset_map b,asset_governance_checkpoint_by_type c,asset_tags d 
-    where a.asset_id=b.asset_id and b.filter_id=d.filter_id and c.asset_type_id=d.filter_id and a.ASSET_ID=:ASSET_ID`, [assetId],
-        {
-            outFormat: oracledb.OBJECT
-        })
+    where a.asset_id=b.asset_id and b.filter_id=d.filter_id and c.asset_type_id=d.filter_id and a.ASSET_ID=:ASSET_ID`, [assetId])
 }
+
+const updateViewByAssetId = ((assetId, email) => {
+    const connection = getDb();
+
+    console.log(`Updating view for ${assetId} by ${email}`);
+    return connection.insert(`insert into ASSET_VIEWS (ASSET_ID,VIEWED_BY,CLIENT_PLATFORM) values(:0,:1,:2)`, [assetId, email, 'w'],
+        {
+            autocommit: true
+        })
+
+})
+
 
 const getRatingsById = (assetId) => {
     const connection = getDb();
@@ -1064,15 +1070,21 @@ module.exports = class Asset {
                         {
                             autoCommit: true,
                             outFormat: oracledb.Object
-                        })
-                        .then(res => {
-                            connection.execute(`DELETE from ASSET_LINKS WHERE ASSET_ID=:ASSET_ID`, [assetId],
+                        }).then(res => {
+                            connection.execute(`DELETE from ASSET_FILTER_ASSET_MAP WHERE ASSET_ID=:ASSET_ID`, [assetId],
                                 {
                                     autoCommit: true,
                                     outFormat: oracledb.Object
                                 })
                                 .then(res => {
-                                    resolve("Asset deleted successfully")
+                                    connection.execute(`DELETE from ASSET_LINKS WHERE ASSET_ID=:ASSET_ID`, [assetId],
+                                        {
+                                            autoCommit: true,
+                                            outFormat: oracledb.Object
+                                        })
+                                        .then(res => {
+                                            resolve("Asset deleted successfully");
+                                        })
                                 })
                         })
                 })
@@ -1655,7 +1667,7 @@ module.exports = class Asset {
 
             const connection = getDb();
 
-            connection.execute(`SELECT count(*) view_count,asset_id from ASSET_VIEWS group by asset_id`, [],
+            connection.execute(`SELECT count(*)/2 view_count,asset_id from ASSET_VIEWS group by asset_id`, [],
                 {
                     outFormat: oracledb.OBJECT
                 })
@@ -1904,107 +1916,119 @@ module.exports = class Asset {
         let promote;
         let Industry = []
         return new Promise((resolve, reject) => {
-            getAssetsById(assetId)
+            updateViewByAssetId(assetId, user_email)
                 .then(res => {
-                    // //console.log(res)
-                    assetObj = res[0];
-                    if (!res.length > 0) {
-                        resolve("No such asset")
-                    }
-                    else {
-                        //resolve(res[0])
-                        getLinksById(assetId)
-                            .then(res => {
-                                //console.log(res)
-                                let linkType = [];
-                                linkType = res.map(a => a.LINK_REPOS_TYPE)
-                                linkType = [...new Set(linkType)]
-                                ////console.log(linkType)
-                                linkType.forEach(type => {
+                    console.log(assetId+" << view >> " + JSON.stringify(res));
+                    getAssetsById(assetId)
+                        .then(res => {
+                            // //console.log(res)
+                            assetObj = res[0];
 
-                                    let link2 = []
-                                    res.filter(link => {
-                                        link.LINK_URL = this.getimagepath(request) + link.LINK_URL;
-                                        link.LINK_REPOS_TYPE === type
-                                        link2.push(link);
-                                    })
-                                    lobj.TYPE = type;
-                                    lobj.arr = [...link2];
-                                    lobj2 = lobj
-                                    linkObjArr.push(lobj2);
-                                    lobj = {}
-                                })
-                                assetObj.LINKS = linkObjArr;
-                                // assetObj.ASSET_THUMBNAIL = request.protocol +'://'+ request.headers.host + this.getimagepath(request.protocol)+ '/' + assetObj.ASSET_THUMBNAIL;
-                                assetObj.ASSET_THUMBNAIL = assetObj.ASSET_THUMBNAIL != null && assetObj.ASSET_THUMBNAIL.trim().length > 0 ? this.getimagepath(request) + assetObj.ASSET_THUMBNAIL : this.getimagepath(request) + 'no_image.png';
-                                console.log("Image path >> " + assetObj.ASSET_THUMBNAIL);
-                                getImagesById(assetId)
+                            if (!res.length > 0) {
+                                resolve("No such asset")
+                            }
+                            else {
+                                //resolve(res[0])
+                                // console.log(JSON.stringify(assetObj));
+                                try {
+                                    assetObj.WIN_TCV_ARR = assetObj.WIN_TCV_ARR != null && WIN_TCV_ARR.trim().length > 0 ? parseInt(WIN_TCV_ARR.trim()) : parseInt('0');
+
+                                } catch (error) {
+                                    console.log(error);
+                                }
+                                getLinksById(assetId)
                                     .then(res => {
-                                        //  //console.log(res)
-                                        assetObj.IMAGES = res;
-                                        assetObj.IMAGES.forEach(image => {
-                                            image.IMAGEURL = this.getimagepath(request) + image.IMAGEURL;
-                                        });
+                                        console.log("Links >> " + JSON.stringify(res));
+                                        let linkType = [];
+                                        linkType = res.map(a => a.LINK_REPOS_TYPE)
+                                        linkType = [...new Set(linkType)]
+                                        ////console.log(linkType)
+                                        linkType.forEach(type => {
 
-                                        getCommentsById(assetId, request)
+                                            let link2 = []
+                                            res.filter(link => {
+                                                link.LINK_URL = this.getimagepath(request) + link.LINK_URL;
+                                                link.LINK_REPOS_TYPE === type
+                                                link2.push(link);
+                                            })
+                                            lobj.TYPE = type;
+                                            lobj.arr = [...link2];
+                                            lobj2 = lobj
+                                            linkObjArr.push(lobj2);
+                                            lobj = {}
+                                        })
+                                        assetObj.LINKS = linkObjArr;
+                                        // assetObj.ASSET_THUMBNAIL = request.protocol +'://'+ request.headers.host + this.getimagepath(request.protocol)+ '/' + assetObj.ASSET_THUMBNAIL;
+                                        assetObj.ASSET_THUMBNAIL = assetObj.ASSET_THUMBNAIL != null && assetObj.ASSET_THUMBNAIL.trim().length > 0 ? this.getimagepath(request) + assetObj.ASSET_THUMBNAIL : this.getimagepath(request) + 'no_image.png';
+                                        console.log("Image path >> " + assetObj.ASSET_THUMBNAIL);
+                                        getImagesById(assetId)
                                             .then(res => {
-                                                assetObj.COMMENTS = res;
-                                                getRatingsById(assetId)
-                                                    .then(res => {
-                                                        ratingAvg = res;
-                                                        getSolutionAreasByAssetId(assetId)
-                                                            .then(res => {
-                                                                solutionAreas = res
-                                                                getAssetTypesByAssetId(assetId)
-                                                                    .then(res => {
-                                                                        assetTypes = res
-                                                                        getIndustryByAssetId(assetId)
-                                                                            .then(res => {
-                                                                                assetObj.INDUSTRY = res;
-                                                                                getPromoteById(assetId, user_email)
-                                                                                    .then(res => {
-                                                                                        // console.log(res);
-                                                                                        assetObj.PROMOTE = res.length == 0 ? false : true;
-                                                                                        getGroupTypeByAssetId(assetId).then(res => {
-                                                                                            // console.log(res);
-                                                                                            assetObj.GROUP_TYPE = res;
-                                                                                            getSalesPlayByAssetId(assetId)
-                                                                                                .then(res => {
-                                                                                                    salesPlays = res.rows
-                                                                                                    assetObj.SOLUTION_AREAS = solutionAreas
-                                                                                                    assetObj.ASSET_TYPE = assetTypes
-                                                                                                    assetObj.SALES_PLAY = salesPlays
-                                                                                                    var avgArr = ratingAvg.map(r => r.RATE);
-                                                                                                    assetObj.AVG_RATING = avgArr.reduce((a, b) => a + b, 0) / avgArr.length;
-                                                                                                    getAssetFilterMapByIdandType(assetId).then(res => {
-                                                                                                        filterArr = [...res]
-                                                                                                        filterType = filterArr.map(a => a.FILTER_TYPE)
-                                                                                                        filterType = [...new Set(filterType)]
-                                                                                                        //console.log(filterType)
-                                                                                                        filterType.forEach(type => {
-                                                                                                            filterTypeArr = filterArr.filter(f => f.FILTER_TYPE === type)
-                                                                                                            filterObj.TYPE = type;
-                                                                                                            filterObj.arr = filterTypeArr;
-                                                                                                            filterArrFinal.push(filterObj)
-                                                                                                            filterObj = {};
-                                                                                                        })
-                                                                                                        //console.log(filterObj)
-                                                                                                        assetObj.FILTERMAP = filterArrFinal[0].arr;
-                                                                                                        resolve(assetObj)
+                                                //  //console.log(res)
+                                                assetObj.IMAGES = res;
+                                                assetObj.IMAGES.forEach(image => {
+                                                    image.IMAGEURL = this.getimagepath(request) + image.IMAGEURL;
+                                                });
 
-                                                                                                    })
+                                                getCommentsById(assetId, request)
+                                                    .then(res => {
+                                                        assetObj.COMMENTS = res;
+                                                        getRatingsById(assetId)
+                                                            .then(res => {
+                                                                ratingAvg = res;
+                                                                getSolutionAreasByAssetId(assetId)
+                                                                    .then(res => {
+                                                                        solutionAreas = res
+                                                                        getAssetTypesByAssetId(assetId)
+                                                                            .then(res => {
+                                                                                assetTypes = res
+                                                                                getIndustryByAssetId(assetId)
+                                                                                    .then(res => {
+                                                                                        assetObj.INDUSTRY = res;
+                                                                                        getPromoteById(assetId, user_email)
+                                                                                            .then(res => {
+                                                                                                // console.log(res);
+                                                                                                assetObj.PROMOTE = res.length == 0 ? false : true;
+                                                                                                getGroupTypeByAssetId(assetId).then(res => {
+                                                                                                    // console.log(res);
+                                                                                                    assetObj.GROUP_TYPE = res;
+                                                                                                    getSalesPlayByAssetId(assetId)
+                                                                                                        .then(res => {
+                                                                                                            salesPlays = res.rows
+                                                                                                            assetObj.SOLUTION_AREAS = solutionAreas
+                                                                                                            assetObj.ASSET_TYPE = assetTypes
+                                                                                                            assetObj.SALES_PLAY = salesPlays
+                                                                                                            var avgArr = ratingAvg.map(r => r.RATE);
+                                                                                                            assetObj.AVG_RATING = avgArr.reduce((a, b) => a + b, 0) / avgArr.length;
+                                                                                                            getAssetFilterMapByIdandType(assetId).then(res => {
+                                                                                                                filterArr = [...res]
+                                                                                                                filterType = filterArr.map(a => a.FILTER_TYPE)
+                                                                                                                filterType = [...new Set(filterType)]
+                                                                                                                //console.log(filterType)
+                                                                                                                filterType.forEach(type => {
+                                                                                                                    filterTypeArr = filterArr.filter(f => f.FILTER_TYPE === type)
+                                                                                                                    filterObj.TYPE = type;
+                                                                                                                    filterObj.arr = filterTypeArr;
+                                                                                                                    filterArrFinal.push(filterObj)
+                                                                                                                    filterObj = {};
+                                                                                                                })
+                                                                                                                //console.log(filterObj)
+                                                                                                                assetObj.FILTERMAP = filterArrFinal[0].arr;
+                                                                                                                resolve(assetObj)
+
+                                                                                                            })
+                                                                                                        })
                                                                                                 })
-                                                                                        })
+                                                                                            })
                                                                                     })
                                                                             })
                                                                     })
                                                             })
-                                                    })
 
+                                                    })
                                             })
                                     })
-                            })
-                    }
+                            }
+                        })
                 })
         })
 

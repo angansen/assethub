@@ -66,12 +66,12 @@ exports.addAssetReviewNote = (req, res) => {
                 }
                 else if (asset_status === 'Pending Rectification') {
                     getAssetDetailsAndOwnerDetails(asset);
-                    res.json({ "status": "The asset has been sent for rectification with your valuable inputs." })
+                    res.json({ "status": "The asset has been marked as Requires rectification and your suggestions have been shared with the submitter." })
                     // sendEmailForAssetStatusChange(assetId, 'rectification');
                 }
                 else if (asset_status === 'Reject') {
                     getAssetDetailsAndOwnerDetails(asset);
-                    res.json({ "status": "The asset has been rejected." })
+                    res.json({ "status": "The asset has been marked as rejected." })
                     // sendEmailForAssetStatusChange(assetId, 'rejected');
 
                 } else if (asset_status === 'Pending Review') {
@@ -99,9 +99,11 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
      * When approvalLevel 0/2 send notification to the asset owner,their manager and reviewer
      */
 
-    sql = `select a.asset_id,b.user_role,b.user_email,b.user_manager_email 
-    from asset_details a,asset_user b 
-    where a.asset_owner=b.user_email and a.asset_id=:0`;
+    sql = `select a.asset_customer,b.user_role,b.user_email,b.user_manager_email, listagg(d.filter_name,' -> ') as filter 
+    from asset_details a,asset_user b,asset_filter_asset_map c,asset_tags d  
+    where a.asset_owner=b.user_email and a.asset_id=c.asset_id and c.filter_id=d.filter_id 
+    and c.filter_id in(select filter_id from asset_tags where filter_parent_id in('zi9ga30v3c','goek85ttc43'))
+    and a.asset_id=:0  group by a.asset_customer,b.user_role,b.user_email,b.user_manager_email`;
 
     connection.query(sql, [asset.id], {
         outFormat: oracledb.OBJECT
@@ -111,6 +113,8 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
 
         let assetowner = data.USER_EMAIL;
         let manager = data.USER_MANAGER_EMAIL;
+        let customer=data.ASSET_CUSTOMER;
+        let mappedfilter=data.FILTER;
 
         //create email OBJECT
         let notification = {
@@ -164,9 +168,9 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     // Compile email body and subject for the submitter
                     notification.subject = `Your asset has been requested for rectification after governance review`;
                     notification.body = `Dear Submitter, 
-                        <br> An asset ${asset.id} you submitted, has been requested for rectification.
-                        <br><br> You can directly edit the asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>  with the relavant review comments.
-                        <br><br> For more information on AssetHub and Governance process, please visit <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">click here</a>`;
+                    <br><br>An asset you have submitted has been marked as "Requires Rectification" during governance review.
+                    <br><br>You can directly view comments and edit the asset by clicking - <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">here</a>                   
+                    <br><br>For more information on AssetHub and the Governance process, please visit the Confluence page - <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">here</a>`;
 
                     notification.to = assetowner;
                     try {
@@ -197,11 +201,11 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     // despatch notification for the Asset owner
 
                     // Compile email body and subject for the submitter
-                    notification.subject = `Your asset has been reject after governance review`;
-                    notification.body = `Dear Submitter,<br> 
-                         An asset ${asset.id} you submitted, has been rejected after careful governance review.<br><br>                        
-                         You can find the link to your asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>.<br><br>                        
-                         For more information on AssetHub and Governance process, please visit https://confluence.oraclecorp.com/confluence/display<br>ACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode`;
+                    notification.subject = `Update on an Asset you submitted to Asset Hub`;
+                    notification.body = `Dear Submitter,
+                         <br><br>An asset you submitted has been rejected during governance review.                        
+                         <br><br>To view the asset or feedback, please click - <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">here</a>.                    
+                         <br><br>For more information on AssetHub and the Governance process, please visit the Confluence page - <a href="https://confluence.oraclecorp.com/confluence/display<br>ACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">here</a>`;
 
                     notification.to = assetowner;
                     try {
@@ -216,9 +220,14 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     // despatch notifications for the reviewers
 
                     // compile email subject and body
-                    notification.subject = `Asset has been queued for governance review`;
-                    notification.body = `Hi Governance Team, 
-                    <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been queued for governance review.`;
+                    notification.subject = `An Asset has been flagged for governance review`;
+                    notification.body = `Hi Governance Team,
+                    <br><br>An Asset has been marked for your review. 
+                    <br><br>Asset Details: 
+                    <br> Asset Type : ${mappedfilter}
+                    <br> Customer Name : ${customer}
+                    <br>You can find a link to the asset - <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">here</a>.
+                    <br><br>For more information on AssetHub and the Governance process, please visit the Confluence page - <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">here</a>`;
 
                     notification.to = reviewers;
                     try {
@@ -231,14 +240,16 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     // despatch notifications for the Manager
 
                     // compile email subject and body
-                    notification.subject = `Asset has been queued for governance review`;
-                    notification.body = `Hello, 
-                    <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been queued for governance review after your initial approval.`;
+                    notification.subject = `Your asset has been queued for governance review`;
+                    notification.body = `Dear Submitter, 
+                    <br><br> An asset you submitted has been queued for Governance review after initial manager review.
+                    <br><br> You can find the link to your asset - <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">here</a>.
+                    <br><br> For more information on AssetHub and Governance process, please visit - <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">here</a>`;
 
                     notification.to = manager;
                     try {
 
-                        email.initiateAssetStatusEmail(notification);
+                        // email.initiateAssetStatusEmail(notification);
                     } catch (err) {
                         console.log(JSON.stringify(err));
                     }
@@ -250,9 +261,9 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     // Compile email body and subject for the submitter
                     notification.subject = `Your asset has been queued for governance review`;
                     notification.body = `Dear Submitter, 
-                    <br> An asset ${asset.id} you submitted has been queued for Governance review after initial manager review.
-                    <br><br> You can find the link to your asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>.
-                    <br><br> For more information on AssetHub and Governance process, please visit <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">click here</a>`;
+                    <br><br> An asset you submitted has been queued for Governance review after initial manager review.
+                    <br><br> You can find the link to your asset - <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">here</a>.
+                    <br><br> For more information on AssetHub and Governance process, please visit - <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">here</a>`;
 
                     notification.to = assetowner;
                     try {
@@ -292,11 +303,10 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
 
                     // Compile email body and subject for the submitter
                     notification.subject = `Your asset has been requested for rectification during manager review`;
-                    notification.body = `Dear Submitter,<br> 
-                    An asset ${asset.id} you submitted, has been requested for rectification after manager review.<br><br>
-                    You can directly edit the asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>   with the relavant review comments.<br><br>                    
-                    For more information on AssetHub and Governance process, 
-                    please visit <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">click here</a>`;
+                    notification.body = `Dear Submitter, 
+                    <br><br>An asset you have submitted has been marked as "Requires Rectification" during Manager review.
+                    <br><br>You can directly view comments and edit the asset by clicking - <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">here</a>                   
+                    <br><br>For more information on AssetHub and the Governance process, please visit the Confluence page - <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">here</a>`;
 
                     notification.to = assetowner;
                     try {
@@ -318,7 +328,7 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     notification.to = data.USER_MANAGER_EMAIL;
                     try {
 
-                        email.initiateAssetStatusEmail(notification);
+                        // email.initiateAssetStatusEmail(notification);
                     } catch (err) {
                         console.log(JSON.stringify(err));
                     }
@@ -327,11 +337,11 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     // despatch notification for the Asset owner
 
                     // Compile email body and subject for the submitter
-                    notification.subject = `Your asset has been reject after manager review`;
+                    notification.subject = `Update on an Asset you submitted to Asset Hub.`;
                     notification.body = `Dear Submitter, 
-                    <br> An asset ${asset.id} you submitted, has been rejected after careful manager review.
-                    <br><br> You can find the link to your asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>.
-                    <br><br> For more information on AssetHub and Governance process, please visit <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">click here</a>`;
+                    <br><br>An asset you submitted has been rejected during manager review.
+                    <br><br>To view the asset or feedback, please click - <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">here</a>.
+                    <br><br>For more information on AssetHub and the Governance process, please visit the Confluence page - <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">here</a>`;
 
                     notification.to = assetowner;
                     try {
@@ -346,9 +356,14 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     // despatch notifications for the reviewers
 
                     // compile email subject and body
-                    notification.subject = `Asset has been queued for governance review`;
-                    notification.body = `Hi Governance Team, 
-                    <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been published on Asset Hub after careful governance review.`;
+                    notification.subject = `An Asset has been flagged for governance review`;
+                    notification.body = `Hi Governance Team,
+                    <br><br>An Asset has been marked for your review. 
+                    <br><br>Asset Details: 
+                    <br> Asset Type : ${mappedfilter}
+                    <br> Customer Name : ${customer}
+                    <br>You can find a link to the asset - <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">here</a>.
+                    <br><br>For more information on AssetHub and the Governance process, please visit the Confluence page - <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">here</a>`;
 
                     notification.to = reviewers;
                     try {
@@ -364,9 +379,9 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     // Compile email body and subject for the submitter
                     notification.subject = `Your asset has been queued for governance review`;
                     notification.body = `Dear Submitter, 
-                    <br> An asset ${asset.id} you submitted has been queued for Governance review after initial manager review.
-                    <br><br> You can find the link to your asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>.
-                    <br><br> For more information on AssetHub and Governance process, please visit <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">click here</a>`;
+                    <br><br> An asset you submitted has been queued for Governance review after initial manager review.
+                    <br><br> You can find the link to your asset - <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">here</a>.
+                    <br><br> For more information on AssetHub and Governance process, please visit - <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">here</a>`;
 
                     notification.to = assetowner;
                     try {
@@ -386,10 +401,10 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                 notification.body = `Hi Governance Team, 
                         <br> Asset <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">click here</a> has been published on Asset Hub after careful governance review.`;
 
-                notification.to = reviewers + ',' + data.USER_MANAGER_EMAIL;
+                notification.to =data.USER_MANAGER_EMAIL;
                 try {
 
-                    email.initiateAssetStatusEmail(notification);
+                    // email.initiateAssetStatusEmail(notification);
                 } catch (err) {
                     console.log(JSON.stringify(err));
                 }
@@ -398,11 +413,11 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                 // despatch notification for the Asset owner
 
                 // Compile email body and subject for the submitter
-                notification.subject = `Your asset has been published on Asset Hub after Governance review`;
+                notification.subject = `An Asset you submitted is now Live on Asset Hub!`;
                 notification.body = `Dear Submitter, 
-                        <br> An asset ${asset.id} you submitted has been published on Assethub after careful governance review.
-                        <br><br> You can find the link to your asset <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">click here</a>.
-                        <br><br> For more information on AssetHub and Governance process, please visit <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">click here</a>`;
+                        <br><br> An asset you submitted has been published on Assethub after  governance review.
+                        <br><br> You can find the link to your asset - <a href="https://${asset.host}/create?${notification.id}&MyASSET=Y">here</a>.
+                        <br><br> For more information on Asset Hub and the Governance process, please visit - <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">here</a>`;
 
                 notification.to = assetowner;
                 try {
