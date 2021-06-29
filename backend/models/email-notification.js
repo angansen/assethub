@@ -74,7 +74,9 @@ exports.initiateAssetStatusEmail = (notification) => {
     console.log(JSON.stringify(notification));
 
     console.log("Initiating email notification despatch . . .");
-    axios.put('https://itfcuqba1dqacqh-db202104091443.adb.us-ashburn-1.oraclecloudapps.com/ords/assethub/api/despatch', {
+    // https://apex.oracle.com/pls/apex/assethub/email/despatch
+    // https://itfcuqba1dqacqh-db202104091443.adb.us-ashburn-1.oraclecloudapps.com/ords/assethub/api/despatch
+    axios.put('https://apex.oracle.com/pls/apex/assethub/email/despatch', {
         "from": 'angan.sen@oracle.com',
         "to": notification.to,
         "emailbody": notification.body,

@@ -85,7 +85,7 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                 // console.log(reviewers);
                 notification.to = reviewers;
                 try {
-                    // despatch notifications for the reviewers
+                    // despatch notifications for the Manager
 
                     // compile email subject and body
                     notification.subject = `New Asset has been submitted for Governance review`;
@@ -95,7 +95,7 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     notification.to = data.USER_MANAGER_EMAIL;
                     try {
 
-                        email.initiateAssetStatusEmail(notification);
+                        // email.initiateAssetStatusEmail(notification);
                     } catch (err) {
                         console.log(JSON.stringify(err));
                     }

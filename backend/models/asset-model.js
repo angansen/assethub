@@ -121,7 +121,7 @@ const updateViewByAssetId = ((assetId, email) => {
     console.log(`Updating view for ${assetId} by ${email}`);
     return connection.insert(`insert into ASSET_VIEWS (ASSET_ID,VIEWED_BY,CLIENT_PLATFORM) values(:0,:1,:2)`, [assetId, email, 'w'],
         {
-            autocommit: true
+            autoCommit: true
         })
 
 })
@@ -423,7 +423,7 @@ module.exports = class Asset {
                             console.log(JSON.stringify(filterArr));
                             return connection.execute(`delete from ASSET_FILTER_ASSET_MAP WHERE ASSET_ID=:ASSET_ID`, [self.assetId],
                                 {
-                                    autocommit: true
+                                    autoCommit: true
                                 }
                             ).then(res => {
                                 connection.batchInsert(`INSERT into ASSET_FILTER_ASSET_MAP values(
@@ -1667,7 +1667,7 @@ module.exports = class Asset {
 
             const connection = getDb();
 
-            connection.execute(`SELECT count(*)/2 view_count,asset_id from ASSET_VIEWS group by asset_id`, [],
+            connection.execute(`SELECT ROUND(count(*)/2)view_count,asset_id from ASSET_VIEWS group by asset_id`, [],
                 {
                     outFormat: oracledb.OBJECT
                 })
@@ -1687,6 +1687,7 @@ module.exports = class Asset {
                         allAssetsObj.ASSET_THUMBNAIL = (allAssetsObj.ASSET_THUMBNAIL != null && allAssetsObj.ASSET_THUMBNAIL.trim().length > 0) ? this.getimagepath(request) + allAssetsObj.ASSET_THUMBNAIL : this.getimagepath(request) + '/no_image.png';
 
                         var views = viewsArray.filter(v => v.ASSET_ID === id);
+
                         allAssetsObj.VIEWS = views.length == 0 ? { VIEW_COUNT: 0, ASSET_ID: id } : views[0];
                         console.log(id + " Image Path: " + allAssetsObj.ASSET_THUMBNAIL);
 
@@ -1918,7 +1919,7 @@ module.exports = class Asset {
         return new Promise((resolve, reject) => {
             updateViewByAssetId(assetId, user_email)
                 .then(res => {
-                    console.log(assetId+" << view >> " + JSON.stringify(res));
+                    console.log(assetId + " << view >> " + JSON.stringify(res));
                     getAssetsById(assetId)
                         .then(res => {
                             // //console.log(res)
@@ -1939,25 +1940,45 @@ module.exports = class Asset {
                                 getLinksById(assetId)
                                     .then(res => {
                                         console.log("Links >> " + JSON.stringify(res));
-                                        let linkType = [];
-                                        linkType = res.map(a => a.LINK_REPOS_TYPE)
-                                        linkType = [...new Set(linkType)]
-                                        ////console.log(linkType)
-                                        linkType.forEach(type => {
 
-                                            let link2 = []
-                                            res.filter(link => {
-                                                link.LINK_URL = this.getimagepath(request) + link.LINK_URL;
-                                                link.LINK_REPOS_TYPE === type
-                                                link2.push(link);
-                                            })
-                                            lobj.TYPE = type;
-                                            lobj.arr = [...link2];
-                                            lobj2 = lobj
-                                            linkObjArr.push(lobj2);
-                                            lobj = {}
+                                        let linkMap = {}
+                                        let finalinkList = []
+                                        res.filter(link => {
+                                            let linklist = linkMap[link.LINK_REPOS_TYPE] || [];
+                                            link.LINK_URL = link.LINK_URL_TYPE == 'DOCUMENT' ? this.getimagepath(request) + link.LINK_URL : link.LINK_URL;
+                                            linklist.push(link);
+                                            linkMap[link.LINK_REPOS_TYPE] = linklist;
                                         })
-                                        assetObj.LINKS = linkObjArr;
+                                        Object.keys(linkMap).filter(type => {
+                                            finalinkList.push({
+                                                TYPE: type,
+                                                arr: linkMap[type]
+                                            })
+                                        })
+
+                                        // let linkType = [];
+                                        // linkType = res.map(a => a.LINK_REPOS_TYPE)
+                                        // linkType = [...new Set(linkType)]
+                                        // ////console.log(linkType)
+                                        // linkType.forEach(type => {
+
+                                        //     let link2 = []
+                                        //     res.filter(link => {
+                                        //         link.LINK_URL = this.getimagepath(request) + link.LINK_URL;
+                                        //         link.LINK_REPOS_TYPE === type
+                                        //         link2.push(link);
+                                        //     })
+                                        //     lobj.TYPE = type;
+                                        //     lobj.arr = [...link2];
+                                        //     lobj2 = lobj
+                                        //     linkObjArr.push(lobj2);
+                                        //     lobj = {}
+                                        // })
+
+                                        // console.log(JSON.stringify(linkObjArr));
+                                        console.log(JSON.stringify(finalinkList));
+
+                                        assetObj.LINKS = finalinkList;
                                         // assetObj.ASSET_THUMBNAIL = request.protocol +'://'+ request.headers.host + this.getimagepath(request.protocol)+ '/' + assetObj.ASSET_THUMBNAIL;
                                         assetObj.ASSET_THUMBNAIL = assetObj.ASSET_THUMBNAIL != null && assetObj.ASSET_THUMBNAIL.trim().length > 0 ? this.getimagepath(request) + assetObj.ASSET_THUMBNAIL : this.getimagepath(request) + 'no_image.png';
                                         console.log("Image path >> " + assetObj.ASSET_THUMBNAIL);
