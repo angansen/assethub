@@ -360,8 +360,8 @@ const getAssetDetailsAndOwnerDetails = (asset) => {
                     notification.body = `Hi Governance Team,
                     <br><br>An Asset has been marked for your review. 
                     <br><br>Asset Details: 
+                    <br> Customer/Asset Title : ${customer}
                     <br> Asset Type : ${mappedfilter}
-                    <br> Customer Name : ${customer}
                     <br>You can find a link to the asset - <a href="https://${asset.host}/details/?${notification.id}&Governance=Y">here</a>.
                     <br><br>For more information on AssetHub and the Governance process, please visit the Confluence page - <a href="https://confluence.oraclecorp.com/confluence/display/NACCTO/Asset+Hub+Guidance?src=contextnavpagetreemode">here</a>`;
 
