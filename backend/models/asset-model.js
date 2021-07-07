@@ -143,9 +143,10 @@ const getLinksById = (assetId) => {
             outFormat: oracledb.OBJECT
         })
 }
-const getPromoteById = (assetId, email) => {
+const getPartnerById = (assetId, email) => {
     const connection = getDb();
-    return connection.query(`SELECT * from ASSET_LOB_LEADER_PROMOTED_ASSETS  where ASSET_ID=:ASSET_ID and status=1 and LOB_LEADER_LOB=(select user_lob from asset_user where user_email=:email)`, [assetId, email],
+    return connection.query(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_tags f on (m.filter_id=f.filter_id) 
+    where ASSET_ID=:ASSET_ID and filter_parent_id='w78svn48y0'`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })
@@ -202,31 +203,33 @@ const getAssetFilterMapByIdandType = (assetId) => {
         })
 }
 
-const getSolutionAreasByAssetId = (assetId) => {
+const getNACTLOBByAssetId = (assetId) => {
     const connection = getDb();
-    return connection.query(`select m.filter_id,filter_type,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where  ASSET_ID=:ASSET_ID and filter_type='Solution Area'`, [assetId],
+    return connection.query(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_tags f on (m.filter_id=f.filter_id) 
+    where ASSET_ID=:ASSET_ID and filter_parent_id='mhc9sit8xq'`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })
 }
 
-const getAssetTypesByAssetId = (assetId) => {
+const getWorkloadCatByAssetId = (assetId) => {
     const connection = getDb();
-    return connection.query(`select m.filter_id,filter_type,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where  ASSET_ID=:ASSET_ID and filter_type='Asset Type'`, [assetId],
+    return connection.query(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_tags f on (m.filter_id=f.filter_id) 
+    where ASSET_ID=:ASSET_ID and filter_parent_id in('kuw55eptpi','djd1dimyl7')`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })
 }
-const getSalesPlayByAssetId = (assetId) => {
+const getCompetetionByAssetId = (assetId) => {
     const connection = getDb();
-    return connection.execute(`select m.filter_id,filter_type,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where  ASSET_ID=:ASSET_ID and filter_type='Sales Initiatives'`, [assetId],
+    return connection.query(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_tags f on (m.filter_id=f.filter_id) where  ASSET_ID=:ASSET_ID and filter_parent_id ='bdjk9d4f9gd'`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })
 }
-const getGroupTypeByAssetId = (assetId) => {
+const getAssetTypeByAssetId = (assetId) => {
     const connection = getDb();
-    return connection.query(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where ASSET_ID=:ASSET_ID and filter_group like 'type_%'`, [assetId],
+    return connection.query(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_tags f on (m.filter_id=f.filter_id) where  ASSET_ID=:ASSET_ID and filter_parent_id ='goek85ttc43'`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })
@@ -234,7 +237,8 @@ const getGroupTypeByAssetId = (assetId) => {
 
 const getIndustryByAssetId = (assetId) => {
     const connection = getDb();
-    return connection.query(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_filter f on (m.filter_id=f.filter_id) where ASSET_ID=:ASSET_ID and filter_type='Industry'`, [assetId],
+    return connection.query(`select m.filter_id,f.filter_name,m.asset_id from asset_filter_asset_map m join asset_tags f 
+    on (m.filter_id=f.filter_id) where ASSET_ID=:ASSET_ID and filter_parent_id='2kos227ib0'`, [assetId],
         {
             outFormat: oracledb.OBJECT
         })
@@ -1996,28 +2000,26 @@ module.exports = class Asset {
                                                         getRatingsById(assetId)
                                                             .then(res => {
                                                                 ratingAvg = res;
-                                                                getSolutionAreasByAssetId(assetId)
+                                                                getNACTLOBByAssetId(assetId)
                                                                     .then(res => {
-                                                                        solutionAreas = res
-                                                                        getAssetTypesByAssetId(assetId)
+                                                                        assetObj.NACTLOB = res;
+                                                                        getWorkloadCatByAssetId(assetId)
                                                                             .then(res => {
-                                                                                assetTypes = res
+                                                                                assetObj.WORKLOADCATEGORY = res;
                                                                                 getIndustryByAssetId(assetId)
                                                                                     .then(res => {
                                                                                         assetObj.INDUSTRY = res;
-                                                                                        getPromoteById(assetId, user_email)
+                                                                                        getPartnerById(assetId, user_email)
                                                                                             .then(res => {
                                                                                                 // console.log(res);
-                                                                                                assetObj.PROMOTE = res.length == 0 ? false : true;
-                                                                                                getGroupTypeByAssetId(assetId).then(res => {
+                                                                                                assetObj.PARTNER = res;
+                                                                                                getAssetTypeByAssetId(assetId).then(res => {
                                                                                                     // console.log(res);
-                                                                                                    assetObj.GROUP_TYPE = res;
-                                                                                                    getSalesPlayByAssetId(assetId)
+                                                                                                    assetObj.ASSETTYPE = res;
+                                                                                                    getCompetetionByAssetId(assetId)
                                                                                                         .then(res => {
-                                                                                                            salesPlays = res.rows
-                                                                                                            assetObj.SOLUTION_AREAS = solutionAreas
-                                                                                                            assetObj.ASSET_TYPE = assetTypes
-                                                                                                            assetObj.SALES_PLAY = salesPlays
+                                                                                                            assetObj.COMPETETION = res;
+
                                                                                                             var avgArr = ratingAvg.map(r => r.RATE);
                                                                                                             assetObj.AVG_RATING = avgArr.reduce((a, b) => a + b, 0) / avgArr.length;
                                                                                                             getAssetFilterMapByIdandType(assetId).then(res => {

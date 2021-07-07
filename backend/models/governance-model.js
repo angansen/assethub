@@ -30,7 +30,7 @@ exports.fetchAssets = (user_email, user_role, request) => {
                 a.ASSET_EXPIRY_DATE,a.ASSET_VIDEO_LINK,a.ASSET_OWNER,a.ASSET_STATUS,
                 a.ASSET_APPROVAL_LVL,d.filter_name as ASSET_TYPE,d.filter_id as ASSET_TYPE_ID
                  from asset_details a, asset_filter_asset_map b,asset_governance_checkpoint_by_type c,asset_tags d
-                where asset_status in ('Live','Pending Review','Reject','Pending Rectification')
+                where asset_status in ('Pending Review','Reject','Pending Rectification')
                 and a.asset_id=b.asset_id and b.filter_id=c.asset_type_id and
                 b.filter_id=d.filter_id and d.filter_id in (select filter_id from asset_tags 
                 where filter_parent_id in (select filter_id
@@ -46,7 +46,7 @@ exports.fetchAssets = (user_email, user_role, request) => {
                     a.ASSET_EXPIRY_DATE,a.ASSET_VIDEO_LINK,a.ASSET_OWNER,a.ASSET_STATUS,
                     a.ASSET_APPROVAL_LVL,d.filter_name as ASSET_TYPE,d.filter_id as ASSET_TYPE_ID
                     from asset_details a, asset_filter_asset_map b,asset_governance_checkpoint_by_type c,asset_tags d
-                    where asset_status in ('Live','Pending Review','Reject','Pending Rectification')
+                    where asset_status in ('Pending Review','Reject','Pending Rectification')
                     and a.asset_id=b.asset_id and b.filter_id=c.asset_type_id and
                     b.filter_id=d.filter_id and d.filter_id in (select filter_id from asset_tags 
                     where filter_parent_id in (select filter_id
