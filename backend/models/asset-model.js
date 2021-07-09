@@ -1985,6 +1985,8 @@ module.exports = class Asset {
                                         assetObj.LINKS = finalinkList;
                                         // assetObj.ASSET_THUMBNAIL = request.protocol +'://'+ request.headers.host + this.getimagepath(request.protocol)+ '/' + assetObj.ASSET_THUMBNAIL;
                                         assetObj.ASSET_THUMBNAIL = assetObj.ASSET_THUMBNAIL != null && assetObj.ASSET_THUMBNAIL.trim().length > 0 ? this.getimagepath(request) + assetObj.ASSET_THUMBNAIL : this.getimagepath(request) + 'no_image.png';
+                                        assetObj.WIN_LOGO = assetObj.WIN_LOGO != null && assetObj.WIN_LOGO.trim().length > 0 ? this.getimagepath(request) + assetObj.WIN_LOGO :assetObj.WIN_LOGO;
+
                                         console.log("Image path >> " + assetObj.ASSET_THUMBNAIL);
                                         getImagesById(assetId)
                                             .then(res => {
