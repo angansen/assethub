@@ -306,7 +306,7 @@ exports.postAsset = (req, res) => {
     const owner = req.headers.oidc_claim_sub;
     // const location = req.body.location;
     let filters = req.body.filters;
-    console.log("Filter length: " + filters.length);
+    console.log("Filter length: " + JSON.stringify(req.body));
     if (filters.length > 1) {
         const expiryDate = req.body.expiryDate != undefined ? req.body.expiryDate : "12";
         // const asset_architecture_description = req.body.asset_architecture_description
@@ -328,7 +328,7 @@ exports.postAsset = (req, res) => {
         windata.WIN_SALES_PROCESS_TEAMS = req.body.WIN_SALES_PROCESS_TEAMS != undefined ? req.body.WIN_SALES_PROCESS_TEAMS : "";
         windata.WIN_LESSONS_LEARNED = req.body.WIN_LESSONS_LEARNED != undefined ? req.body.WIN_LESSONS_LEARNED : "";
         windata.WIN_CUSTOMER_BUSINESS_CHALLANGES = req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES != undefined ? req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES : "";
-        windata.WIN_TCV_ARR = req.body.WIN_TCV_ARR != undefined ? req.body.WIN_TCV_ARR : "";
+        windata.WIN_TCV_ARR = req.body.WIN_TCV_ARR != undefined ? req.body.WIN_TCV_ARR+"" : "0";
         windata.ASSET_APPROVAL_LVL = req.body.ASSET_APPROVAL_LVL != undefined ? req.body.ASSET_APPROVAL_LVL : 1;
 
         let assetCreatedEmailSql = `select  user_email,user_name,ASSET_DESCRIPTION from asset_user ,asset_details where user_role='reviewer' and asset_id=:0  and user_location in(
@@ -408,12 +408,12 @@ exports.postEditAsset = (req, res) => {
     } else {
         type = 'Saved';
     }
-    console.log(req.body.owner + "Owner -- STATE ASSET :::: " + type);
+    console.log("BODY:   "+JSON.stringify(req.body));
     const assetId = req.body.assetId;
 
     const description = req.body.description;
     const customer = req.body.customer;
-    const createdBy = req.headers.oidc_claim_sub;
+    const createdBy = req.body.owner;
     const createdDate = req.body.createdDate;
     const serviceid = req.body.serviceid;
     const thumbnail = req.body.thumbnail;
@@ -422,7 +422,7 @@ exports.postEditAsset = (req, res) => {
     let filters = req.body.filters;
     const expiryDate = req.body.expiryDate;
     const video_link = req.body.video_link;
-    const owner = req.headers.oidc_claim_sub;
+    const owner = req.body.owner;
     const approval_level = req.body.ASSET_APPROVAL_LVL;
     let windata = {};
     windata.WIN_ECA = req.body.WIN_ECA != undefined ? req.body.WIN_ECA : "";
@@ -440,7 +440,7 @@ exports.postEditAsset = (req, res) => {
     windata.WIN_SALES_PROCESS_TEAMS = req.body.WIN_SALES_PROCESS_TEAMS != undefined ? req.body.WIN_SALES_PROCESS_TEAMS : "";
     windata.WIN_LESSONS_LEARNED = req.body.WIN_LESSONS_LEARNED != undefined ? req.body.WIN_LESSONS_LEARNED : "";
     windata.WIN_CUSTOMER_BUSINESS_CHALLANGES = req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES != undefined ? req.body.WIN_CUSTOMER_BUSINESS_CHALLANGES : "";
-    windata.WIN_TCV_ARR = req.body.WIN_TCV_ARR != undefined ? req.body.WIN_TCV_ARR : "";
+    windata.WIN_TCV_ARR = req.body.WIN_TCV_ARR != undefined ? req.body.WIN_TCV_ARR+"" : "0";
     windata.ASSET_APPROVAL_LVL = approval_level;
 
 
